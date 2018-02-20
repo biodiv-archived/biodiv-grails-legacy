@@ -519,8 +519,9 @@ environments {
         grails.serverURL = "http://hybrid.indiabiodiversity.org"
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
-            search.serverURL = "http://localhost:8090/solr"
+            search.serverURL = "http://10.0.0.11/solr"
             search.nakshaURL = "http://localhost:8090/biodiv-api"
+             search.nakshaURL = "http://localhost:8090/biodiv-api"
             //names.parser.serverURL = "10.0.0.10"
         }
         google.analytics.enabled = false
@@ -564,7 +565,7 @@ environments {
             error stdout:"StackTrace"
             error   'net.sf.ehcache.hibernate'
             error    'org.codehaus.groovy.grails.web.pages' //  GSP
-            debug    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
+            error    'org.codehaus.groovy.grails.web.mapping.filter' // URL mapping
             error    'org.codehaus.groovy.grails.web.mapping.DefaultUrlMappingsHolder' // URL mapping
             error   'org.codehaus.groovy.grails.commons', // core / classloading
             'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
@@ -578,7 +579,7 @@ environments {
             error 'grails.app.resourceMappers.org.grails.plugin.resource'
             warn "org.grails.plugin.resource"
 
-            debug    'org.springframework.security',
+            warn    'org.springframework.security',
             'org.codehaus.groovy.grails.web.servlet',  //  controllers
             'grails.app'
             warn   'org.springframework.security'
@@ -586,10 +587,10 @@ environments {
             warn   'org.springframework.security.authentication'
             debug   'speciespage',
             'species'
-            debug   'com.the6hours',
+            info   'com.the6hours',
             'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
+            info   'species.auth'
+            info   'com.odobo',
             'grails.app.controllers.com.odobo',
             'grails.app.services.com.odobo',
             'org.pac4j'
@@ -608,7 +609,7 @@ environments {
             debug   'species.sourcehandler.XMLConverter'
 
             debug   'grails.plugin.springsecurity.openid'
-            debug    'grails.app.filters.species'
+            info    'grails.app.filters.species'
             info    'jdbc.sqltiming'
             info    'jdbc.connection'
             info   'jdbc.sqlonly'
@@ -627,23 +628,23 @@ environments {
             debug 'org.hibernate.transaction'
             debug 'org.springframework.transaction'
             info    'org.hibernate.jdbc.ConnectionManager'
-            */ 
-            trace   'com.grailsrocks.emailconfirmation'
-            debug   'com.odobo.grails.plugin.springsecurity.rest'
-            debug   'com.odobo.grails.plugin.springsecurity.openid'
-            debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
-            debug   'uk.co.desirableobjects.oauth.scribe'
+            */
+            info   'com.grailsrocks.emailconfirmation'
+            info   'com.odobo.grails.plugin.springsecurity.rest'
+            info   'com.odobo.grails.plugin.springsecurity.openid'
+            info   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
+            info   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
 			debug   'grails.app.services.speciespage.SpeciesUploadService'
             debug   'org.hibernate.cache.EhCache'
             debug   'org.hibernate.cache.internal.StandardQueryCache'
             info   'org.hibernate.cache'
-            debug 'org.springframework.security.web.authentication.rememberme',
+            info 'org.springframework.security.web.authentication.rememberme',
                   'org.springframework.security.web.authentication',
                   'org.springframework.security.web.authentication.*'
                   'org.springframework.security.web.authentication.dao'
             info  'org.springframework.security.web'
-            debug  'org.springframework.security'
+            info  'org.springframework.security'
             info  'org.springframework.security.access'
 
             debug 'species'
@@ -696,7 +697,7 @@ environments {
             }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
-                serverURL = "https://${servername}/${appName}/usersRes"   
+                serverURL = "https://${servername}/${appName}/usersRes"
             }
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
@@ -776,8 +777,8 @@ environments {
             'species'
             debug   'com.the6hours',
             'grails.app.taglib.com.the6hours'
-            debug   'species.auth'
-            debug   'com.odobo',
+            info   'species.auth'
+            info   'com.odobo',
             'grails.app.controllers.com.odobo',
             'grails.app.services.com.odobo',
             'org.pac4j'
@@ -1477,7 +1478,7 @@ grails.exceptionresolver.logRequestParameters=true
 
 
 grails.plugin.springsecurity.logout.postOnly = false
-//'rememberMeServices', 
+//'rememberMeServices',
 grails.plugin.springsecurity.logout.handlerNames = ['securityContextLogoutHandler', 'facebookAuthCookieLogout'];
 
 grails.doc.title="${speciesPortal.app.siteName}"
@@ -1601,7 +1602,7 @@ grails.plugins.dynamicController.mixins = [
     'com.burtbeckwith.appinfo_test.AdminManageController'
 ]
 //'securityContextPersistenceFilter',
-//'rememberMeAuthenticationFilter', 
+//'rememberMeAuthenticationFilter',
 grails.plugin.springsecurity.filterChain.filterNames = [
     'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',

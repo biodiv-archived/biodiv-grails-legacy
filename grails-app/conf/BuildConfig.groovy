@@ -121,7 +121,7 @@ grails.project.dependency.resolution = {
             excludes 'hibernate-core', 'javassist'
         }
 
-        runtime 'postgresql:postgresql:9.0-801.jdbc4'
+        //runtime 'postgresql:postgresql:42.2.1'
         //runtime 'postgresql:postgresql:8.4-702.jdbc4'
         /*        runtime ('org.postgis:postgis-jdbc:1.3.3') {
                   exclude 'postgresql'
@@ -151,8 +151,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins { 
-         build   ":tomcat:7.0.55"
-        //build ":tomcat8:8.0.5"
+         //build   ":tomcat:7.0.55"
+        build ":tomcat8:8.0.5"
         //build ':jetty:2.0.3'
 
         compile ":scaffolding:2.1.2"
@@ -245,6 +245,6 @@ grails.project.dependency.resolution = {
     grails.tomcat.jvmArgs = ["-server", "-noverify", "-XX:PermSize=256m", "-XX:MaxPermSize=256m", "-Xmx3G", "-Xms1024M", "-XX:+UseParallelGC", "-Djava.net.preferIPv4Stack=true", "-Dsun.reflect.inflationThreshold=100000", "-Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"]
 }
 
-development {
-    grails.server.port.http = 8080
+development{
+    grails.server.port.http=8085
 }

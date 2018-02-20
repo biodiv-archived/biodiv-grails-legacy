@@ -29,13 +29,13 @@ import java.text.SimpleDateFormat;
 import au.com.bytecode.opencsv.CSVReader;
 import species.formatReader.SpreadsheetReader;
 
-             
+
 import org.apache.commons.logging.LogFactory;
 import grails.plugin.cache.Cacheable;
 import org.apache.log4j.Level;
 
 class AbstractObjectService {
-    
+
 	def grailsApplication;
 	def dataSource;
 	def springSecurityService;
@@ -44,7 +44,7 @@ class AbstractObjectService {
     def messageSource;
 
 	protected static final log = LogFactory.getLog(this);
-    
+
     /**
     */
     protected static List createUrlList2(observations) {
@@ -70,31 +70,31 @@ class AbstractObjectService {
                 item.lat = obv.remove('latitude');
                 item.lng = obv.remove('longitude');
             }
-            
+
 			item.url = "/" + controller + "/show/" + obv.id
 			item.title = param['title']
-            item.type = controller                  
+            item.type = controller
     		if(param.inGroup) {
 				item.inGroup = param.inGroup;
-			} 
-            
+			}
+
             if(param['featuredNotes']) {
                 item.featuredNotes = param['featuredNotes']
                  item.language= param['featuredNotes'].language
             }
-           
+
             if(param['featuredOn']) {
                 item.featuredOn = param['featuredOn'].getTime();
             }
 
-	        
+
 			urlList << item;
 		}
 		return urlList
 	}
 
     protected static asJSON(def obv, String iconBasePath) {
-            def item = [:] 
+            def item = [:]
             item.id = obv.id
 			def config = grails.util.Holders.config
             def sGroup = obv.fetchSpeciesGroup()
@@ -102,7 +102,7 @@ class AbstractObjectService {
 			    item.sGroup = sGroup.name
             if(obv.hasProperty('habitat') && obv.habitat)
 			    item.habitat = obv.habitat?.name
-			
+
             Resource image = obv.mainImage()
 			if(image){
 				if(image.type == ResourceType.IMAGE) {
@@ -112,14 +112,14 @@ class AbstractObjectService {
 					item.imageLink = image.thumbnailUrl()
 				} else if(image.type == ResourceType.AUDIO) {
                     item.imageLink = config.grails.serverURL+"/images/audioicon.png"
-                }                
+                }
 			}else{
 				item.imageLink =  config.speciesPortal.resources.serverURL + "/" + "no-image.jpg"
-			} 			
-		
+			}
+
             item.notes = obv.notes()
-  			item.summary = obv.summary();				
-            
+  			item.summary = obv.summary();
+
             def obj = obv;
             if(obj.hasProperty('latitude') && obj.latitude) item.lat = obj.latitude
             if(obj.hasProperty('longitude') && obj.longitude) item.lng = obj.longitude
@@ -136,14 +136,14 @@ class AbstractObjectService {
 			}
             return item;
     }
-	
+
     /**
     */
     protected String getIconBasePath(String controller) {
 		def config = grails.util.Holders.config
         String iconBasePath = '';
         switch(controller) {
-            case "observation": 
+            case "observation":
 		        iconBasePath = config.speciesPortal.observations.serverURL
                 break;
             case "species":
@@ -181,7 +181,7 @@ class AbstractObjectService {
         }
         else if (controller == "discussion") {
             type = "species.participation.Discussion";
-        }else {    
+        }else {
         }
 
         def featured = []
@@ -244,7 +244,7 @@ class AbstractObjectService {
 
 
      /**
-     * 
+     *
      */
     protected def createResourcesXML(params) {
         NodeBuilder builder = NodeBuilder.newInstance();
@@ -253,7 +253,7 @@ class AbstractObjectService {
         Node images = new Node(resources, "images");
         Node videos = new Node(resources, "videos");
         Node audios = new Node(resources, "audios");
-        
+
 
         String uploadDir = ""
         if( params.resourceListType == "ofSpecies" || params.resourceListType == "fromSingleSpeciesField" ){
@@ -277,9 +277,9 @@ class AbstractObjectService {
         List annotations = [];
         //List resContext = [];
 
-        
+
         params.each { key, val ->
-         
+
             int index = -1;
             if(key.startsWith('file_') || key.startsWith('url_')) {
 
@@ -289,11 +289,11 @@ class AbstractObjectService {
                 } else {
                     if(val != ""){
                         indexes.set(index);
-                    }    
+                    }
                 }
 
             }
-           
+
             if(index != -1) {
                 if(val != "") {
                     files.add(val);
@@ -314,7 +314,7 @@ class AbstractObjectService {
         }
         files.eachWithIndex { file, key ->
             Node image;
-          
+
             if(file) {
                 if(type.getAt(key).equalsIgnoreCase(ResourceType.IMAGE.value())) {
                     image = new Node(images, "image");
@@ -330,12 +330,12 @@ class AbstractObjectService {
                     new Node(image, "fileName", file);
                     new Node(image, "source", url.getAt(key));
                 } else if(type.getAt(key).equalsIgnoreCase(ResourceType.AUDIO.value())) {
-                    image = new Node(audios, "audio");                    
+                    image = new Node(audios, "audio");
                     File f = new File(uploadDir, file);
                     new Node(image, "fileName", f.absolutePath);
-                }	
+                }
 
-              			
+
                 new Node(image, "caption", titles.getAt(key));
                 new Node(image, "license", licenses.getAt(key));
                 new Node(image, "rating", ratings.getAt(key));
@@ -347,7 +347,7 @@ class AbstractObjectService {
                     if(!params.author || !contributor.getAt(key)){
                         params.author = springSecurityService.currentUser;
                     }
-                    new Node(image, "contributor", contributor.getAt(key)?:params.author.username); 
+                    new Node(image, "contributor", contributor.getAt(key)?:params.author.username);
                 }
                 else{
                     new Node(image, "contributor", contributor.getAt(key));
@@ -357,7 +357,7 @@ class AbstractObjectService {
                 }
             } else {
                 log.warn("No reference key for image : "+key);
-            } 
+            }
         }
 
         return resources;
@@ -370,7 +370,7 @@ class AbstractObjectService {
             case [Observation.class.name, Checklists.class.name]:
             rootDir = grailsApplication.config.speciesPortal.observations.rootDir
             break;
-            
+
             case [Species.class.name, SpeciesField.class.name]:
             rootDir = grailsApplication.config.speciesPortal.resources.rootDir
             break;
@@ -393,7 +393,7 @@ class AbstractObjectService {
             if(relImagesContext !="")
             break;
         }
-       
+
         if(relImagesContext == ""){
             relImagesContext = resourcesXML.audios.audio?.getAt(0)?.fileName?.getAt(0)?.text()?.replace(rootDir.toString(), "")?:""
         }
@@ -403,7 +403,7 @@ class AbstractObjectService {
 
 
     /**
-     * 
+     *
      * @param groupId
      * @return
      */
@@ -414,12 +414,12 @@ class AbstractObjectService {
     String getExportableValue(String key, String value) {
         if(!value) return;
         switch(key.toLowerCase()) {
-            case 'rank' : return TaxonomyRank.getTRFromInt(Integer.parseInt(value)); 
+            case 'rank' : return TaxonomyRank.getTRFromInt(Integer.parseInt(value));
             case ['group_id', 'species group'] : return SpeciesGroup.read(Long.parseLong(value))?.name;
             default : return value;
         }
     }
-	
+
 	def upload(params) {
         println "creating upload request"
         log.debug "^^^^^^^^^^^^^^^^^^^^^^^^^^^creating upload request"
@@ -431,13 +431,13 @@ class AbstractObjectService {
                 r['msg']= messageSource.getMessage('observation.import.requsted',null,'Processing... You will be notified by email when it is completed. Login and check your user profile for import link.', LCH.getLocale())
             } else {
                 r['success'] = false;
-                r['msg'] = 'Error in creating upload log.' 
+                r['msg'] = 'Error in creating upload log.'
                 def errors = [];
                 dl.errors.allErrors.each {
                     def formattedMessage = messageSource.getMessage(it, LCH.getLocale());
                     errors << ['field': it.field, 'message': formattedMessage]
                 }
-                r['errors'] = errors 
+                r['errors'] = errors
                 println dl.errors.allErrors
             }
         }
@@ -464,7 +464,7 @@ class AbstractObjectService {
 
         if(andTraitLT == null) {
             traitQuery = " and t.traits is null";
-        } 
+        }
         if(notTraitLT) {
             notTraitLT.each {
                 traitQuery += " and (not t.traits[1##999][1] @> cast(ARRAY[["+it+"]] as bigint[]) or t.traits is null)";
@@ -481,7 +481,7 @@ class AbstractObjectService {
                     }
                 } else if (t.dataTypes == DataTypes.COLOR) {
                     traitJsonQuery += " and cast(traits_json#>>'{${t.id},r}' as integer) is not null ";
-                } else { 
+                } else {
                     traitQuery += " and t.traits[1##999][1] @> cast(ARRAY[["+t.id+"]] as bigint[])";
                 }
             }
@@ -489,7 +489,7 @@ class AbstractObjectService {
         if(andTraitLT) {
             traitQuery = " and t.traits @> cast(ARRAY[ "
             andTraitLT.each { traitId, traitValueId ->
-                //for cases as trait.8= .. ie., with no value 
+                //for cases as trait.8= .. ie., with no value
                 if(!traitValueId) return;
 
                 Trait t = Trait.read(Long.parseLong(traitId));
@@ -502,7 +502,7 @@ class AbstractObjectService {
                 values.each { tvId ->
                     if(t.traitTypes == TraitTypes.RANGE) {
                         if(t.dataTypes == DataTypes.DATE) {
-                            def range = tvId.split(':'); 
+                            def range = tvId.split(':');
                             if(range.size() == 2) {
                                 if(t.units == Units.MONTH) {
                                     int getFromMonth = utilsService.getMonthIndex(range[0]);
@@ -514,23 +514,23 @@ class AbstractObjectService {
                                 }
                             }
                         } else {
-                            def range = tvId.split(':'); 
+                            def range = tvId.split(':');
                             if(range.size() == 2) {
                             //TODO: range value datatype is set to be float... can be date as well
                             traitJsonQuery += " and (traits_json#>>'{${traitId},value}') is not null and numrange(cast(traits_json#>>'{${traitId},value}' as numeric), cast(traits_json#>>'{${traitId},to_value}' as numeric)) && numrange(${range[0]}, ${range[1]})";
                             }
                         }
                     } else if (t.dataTypes == DataTypes.COLOR) {
-                            def range = tvId.replaceAll('rgb\\(|\\)','').split(','); 
-                            //COLOR is specified as sarray of RGB values. 
-                            //Computing Euclidean distance 
+                            def range = tvId.replaceAll('rgb\\(|\\)','').split(',');
+                            //COLOR is specified as sarray of RGB values.
+                            //Computing Euclidean distance
                             traitJsonQuery += " and cast(traits_json#>>'{${traitId},r}' as integer) is not null "
                             orderQuery += " (sqrt(power(${range[0]} - cast(traits_json#>>'{${traitId},r}' as integer), 2) + power(${range[1]} - cast(traits_json#>>'{${traitId},g}' as integer), 2) + power(${range[2]} - cast(traits_json#>>'{${traitId},b}' as integer), 2))), ";
                     } else {
                         if(traitId && tvId) {
                             traitQuery += "[${traitId}, ${tvId}],";
                         }
-                    } 
+                    }
                 }
             }
             traitQuery = traitQuery[0..-2] + "] as bigint[])";
@@ -571,7 +571,7 @@ class AbstractObjectService {
                 }
             }
         }
-        
+
         List missingHeaders = reqdHeaders - headerNames.keySet();
         if(missingHeaders.size() != 0) {
             errors << "Columns missing : ${missingHeaders}";

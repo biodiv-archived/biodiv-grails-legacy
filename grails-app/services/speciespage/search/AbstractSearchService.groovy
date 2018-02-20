@@ -1,6 +1,6 @@
 package speciespage.search
 
-import static groovyx.net.http.ContentType.JSON
+// import static groovyx.net.http.ContentType.JSON
 
 import java.text.SimpleDateFormat
 import java.util.Date;
@@ -14,7 +14,7 @@ import org.apache.solr.client.solrj.SolrServer
 import org.apache.solr.client.solrj.SolrServerException
 import org.apache.solr.common.SolrException
 import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
+  import org.apache.solr.common.params.SolrParams
 import org.apache.solr.common.params.TermsParams
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import org.springframework.context.ApplicationContext;
@@ -22,21 +22,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
+import groovyx.net.http.HTTPBuilder
 
-
+import groovyx.net.http.ContentType
+import static groovyx.net.http.Method.POST
+import static groovyx.net.http.Method.GET
 abstract class AbstractSearchService {
 
     static transactional = false
 
     def grailsApplication;
     def utilsServiceBean;
-    
+
     @Autowired
-    private ApplicationContext applicationContext
-    
-    protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    
-    SolrServer solrServer;
+    ApplicationContext applicationContext
+
+    SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+    SolrServer solrServer = null;
 	SessionFactory sessionFactory;
     int BATCH_SIZE = 10;
     int INDEX_DOCS = -1;
@@ -62,7 +65,7 @@ abstract class AbstractSearchService {
     }
 
     /**
-     * 
+     *
      */
     def abstract publishSearchIndex();
 
@@ -71,7 +74,7 @@ abstract class AbstractSearchService {
     }
 
     /**
-     * 
+     *
      * @param species
      * @return
      */
@@ -80,6 +83,24 @@ abstract class AbstractSearchService {
     /**
     *
     */
+    void postToElastic(List doc,String index){
+      if(!doc) return;
+        //def searchConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
+        def http = new HTTPBuilder('http://localhost:8081')
+        http.request(POST,ContentType.JSON) {
+            uri.path = "/naksha/services/bulk-upload/${index}/${index}";
+            body = doc
+            response.success = { resp, reader ->
+                log.debug "Successfully posted observation  to elastic"
+            }
+            response.'404' = {
+              println 'Not found';
+              log.debug "Error in posting observation to elastic : Not found";
+            }
+        }
+    }
+
+
     public boolean commitDocs(List<SolrInputDocument> docs, boolean commit = true) {
         if(docs) {
             try {
@@ -103,20 +124,39 @@ abstract class AbstractSearchService {
     }
 
     /**
-     * 
+     *
      * @param query
      * @return
      */
-    def search(query) {
-        def params = SolrParams.toSolrParams(query);
+    def search(params) {
+        //def params = SolrParams.toSolrParams(query);
+
         log.info "######Running ${this.getClass().getName()} search query : "+params
         def result = [];
-        try {
-            result = solrServer.query( params );
-        } catch(SolrException e) {
-            log.error "Error: ${e.getMessage()}"
-        }
-        return result;
+        def queryResponse;
+        def http = new HTTPBuilder()
+
+              http.request( 'http://localhost:8081', GET, ContentType.JSON ) { req ->
+                uri.path = '/biodiv-api/search/all'
+                uri.query = [ query:params.query,object_type:params.object_type,name:params.aq?params.aq.name:null,text:params.aq?params.aq.text:null,
+                location:params.aq?.location,contributor:params.aq?.contributor,license:params.aq?.license,member:params.aq?.member,
+                attribution:params.aq?.attribution,from:params?.offset]
+                headers.Accept = 'application/json'
+
+                response.success = { resp, json ->
+                  assert resp.statusLine.statusCode == 200
+                  println "Got response: ${resp.statusLine}"
+                  println resp
+                  println json;
+                  queryResponse = json;
+                }
+
+                response.'404' = {
+                  println 'Not found'
+                }
+              }
+        return queryResponse
+
     }
 
 
@@ -180,7 +220,7 @@ abstract class AbstractSearchService {
     /**
      *
      */
-    protected void cleanUpGorm() {
+     void cleanUpGorm() {
 
         def hibSession = sessionFactory?.getCurrentSession();
 

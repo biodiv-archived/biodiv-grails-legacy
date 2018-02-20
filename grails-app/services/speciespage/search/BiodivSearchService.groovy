@@ -30,7 +30,7 @@ import org.apache.solr.common.SolrDocument
 import org.springframework.beans.factory.annotation.Autowired;
 
 class BiodivSearchService extends AbstractSearchService {
-    
+
     static transactional = false
 
     @Autowired
@@ -44,66 +44,76 @@ class BiodivSearchService extends AbstractSearchService {
     //def newsletterSearchService
     @Autowired
     def userGroupSearchService
+
     @Autowired
     def resourceSearchService
+
+    @Autowired
+    def newsletterSearchService
+
+
+    @Autowired
+    def projectSearchService
+
+
 
     //ApplicationContext applicationContext
 /*
     def getObservationsSearchServiceBean() {
         println "=======HELLO==========="
-        if(!observationsSearchServiceBean) { 
+        if(!observationsSearchServiceBean) {
             println "=================="
             observationsSearchServiceBean = applicationContext.getBean("observationsSearchService");
         }
         return observationsSearchServiceBean;
     }
-    
+
     def getSpeciesSearchServiceBean() {
-        if(!speciesSearchServiceBean) { 
+        if(!speciesSearchServiceBean) {
             speciesSearchServiceBean = applicationContext.getBean("speciesSearchService");
         }
         return speciesSearchServiceBean;
-    
+
     }
-    
+
     def getDocumetSearchServiceBean() {
-        if(!documentSearchServiceBean) { 
+        if(!documentSearchServiceBean) {
             documentSearchServiceBean = applicationContext.getBean("documentSearchService");
         }
         return documentSearchServiceBean;
-    
+
     }
-    
+
     def getSUserSearchServiceBean() {
-        if(!SUserSearchServiceBean) { 
+        if(!SUserSearchServiceBean) {
             SUserSearchServiceBean = applicationContext.getBean("SUserSearchService");
         }
         return SuserSearchServiceBean;
-    
+
     }
-    
+
     def getNewsletterSearchServiceBean() {
-        if(!newsletterSearchServiceBean) { 
+        if(!newsletterSearchServiceBean) {
             newsletterSearchServiceBean = applicationContext.getBean("newsletterSearchService");
         }
         return newsletterSearchServiceBean;
     }
-    
+
     def getUserGroupSearchServiceBean() {
-        if(!userGroupSearchServiceBean) { 
+        if(!userGroupSearchServiceBean) {
             userGroupSearchServiceBean = applicationContext.getBean("userGroupSearchService");
         }
         return userGroupSearchServiceBean;
     }
-*/  
+*/
     /**
-     * 
+     *
      */
     def publishSearchIndex() {
         log.info "Initializing publishing to biodiv search index"
 
         //TODO: change limit
-        int limit = BATCH_SIZE//Observation.count()+1, 
+        int limit = BATCH_SIZE//Observation.count()+1,
         int offset = 0;
 
         def startTime = System.currentTimeMillis()
@@ -143,6 +153,22 @@ class BiodivSearchService extends AbstractSearchService {
         //log.info "===NEWSLETTER========"
         //def f5 = newsletterSearchService.publishSearchIndex(newsletters, commit)
         log.info "=====INDEXING USER GROUP==== "
+        userGroupSearchService.INDEX_DOCS = INDEX_DOCS
+        userGroupSearchService.publishSearchIndex()
+
+        log.info "=====INDEXING NEWSLETTER==== "
+        newsletterSearchService.INDEX_DOCS = INDEX_DOCS
+        newsletterSearchService.publishSearchIndex()
+
+        log.info "=====INDEXING RESOURCE==== "
+        resourceSearchService.INDEX_DOCS = INDEX_DOCS
+        resourceSearchService.publishSearchIndex()
+
+        log.info "=====INDEXING PROJECT==== "
+        projectSearchService.INDEX_DOCS = INDEX_DOCS
+        projectSearchService.publishSearchIndex()
+
+        log.info "=====INDEXING UserGroup==== "
         userGroupSearchService.INDEX_DOCS = INDEX_DOCS
         userGroupSearchService.publishSearchIndex()
 
@@ -196,6 +222,14 @@ class BiodivSearchService extends AbstractSearchService {
         def queryParams = queryParts.queryParams
         def activeFilters = queryParts.activeFilters
 
+
+println "PAAAARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRAAAAAAAAAAAAAAAAAAAAAAAAMMMMMMMMMMMMMAAAAAAAAAAAAAAAAAAA"
+println paramsList
+println "PAAAARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRAAAAAAAAAAAAAAAAAAAAAAAAMMMMMMMMMMMMMAAAAAAAAAAAAAAAAAAA"
+println "PAAAARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRAAAAAAAAAAAAAAAAAAAAAAAAMMMMMMMMMMMMMAAAAAAAAAAAAAAAAAAA"
+println params
+println "PAAAARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRAAAAAAAAAAAAAAAAAAAAAAAAMMMMMMMMMMMMMAAAAAAAAAAAAAAAAAAA"
+
         if(isMapView) {
             //query = mapViewQuery + filterQuery + orderByClause
         } else {
@@ -211,106 +245,20 @@ class BiodivSearchService extends AbstractSearchService {
         List objectTypes = [], uGroups = [], sGroups = [], tags= [], contributors = [];
 
         if(paramsList) {
-            //Facets
-            paramsList.add('facet', "true");
-            paramsList.add('facet.mincount', "1");
-            paramsList.add('facet.field', searchFieldsConfig.OBJECT_TYPE);
-            paramsList.add('facet.field', searchFieldsConfig.USER_GROUP);
-            paramsList.add('f.'+searchFieldsConfig.USER_GROUP+'.facet.limit', max);
-            paramsList.add('f.'+searchFieldsConfig.USER_GROUP+'.facet.offset', 0);
-
-
-//            paramsList.add('facet.field', searchFieldsConfig.SGROUP);
-//            paramsList.add('facet.field', searchFieldsConfig.TAG);
-//            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.limit', max);
-//            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.offset', 0);
-
-//            paramsList.add('facet.field', searchFieldsConfig.CONTRIBUTOR+"_exact");
-//            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.limit', max);
-//            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.offset', 0);
-
-
-            def queryResponse = search(paramsList);
-
-            if(queryResponse) {
-                if(!params.loadMore?.toBoolean()){
-                    List objectTypeFacets = queryResponse.getFacetField(searchFieldsConfig.OBJECT_TYPE)?.getValues()?:[]
-                    objectTypeFacets.each {
-                        //TODO: sort on name
-                        objectTypes << [name:it.getName(), count:it.getCount()]
-                    }
-
-                    List uGroupFacets = queryResponse.getFacetField(searchFieldsConfig.USER_GROUP)?.getValues()?:[]
-                    uGroupFacets.each {
-                        //TODO: sort on name
-                        uGroups << [name:it.getName(), count:it.getCount()]
-                    }
-
-
-    /*                List sGroupFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
-                    sGroupFacets.each {
-                        //TODO: sort on name
-                        sGroups << [name:it.getName(), count:it.getCount()]
-                    }
-
-                    List tagFacets = queryResponse.getFacetField(searchFieldsConfig.TAG).getValues()
-                    tagFacets.each {
-                        //TODO: sort on name
-                        tags << [name:it.getName(), count:it.getCount()]
-                    }
-
-                    List contributorFacets = queryResponse.getFacetField(searchFieldsConfig.CONTRIBUTOR+"_exact").getValues()
-                    contributorFacets.each {
-                        //TODO: sort on name
-                        contributors << [name:it.getName(), count:it.getCount()]
-                    }
-    */ 
-                }
-
-                responseHeader = queryResponse.responseHeader;
-                org.apache.solr.common.SolrDocumentList results = queryResponse.getResults();
+                def queryResponse = search(params);
                 def instance;
-                results.each { doc ->
-                    Long instanceId = Long.parseLong(doc.getFieldValue(searchFieldsConfig.ID).split('_')[1])
-                    String className = doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)
-                    Class clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
+                queryResponse.eData.each { doc ->
+                    Long instanceId = Long.parseLong(doc.id);
+                    String className = doc.type
+                    Class clazz = grailsApplication.domainClasses.find { it.clazz.simpleName.equalsIgnoreCase(className) }?.clazz
                     if(clazz) {
                         instance = clazz.read(instanceId);
                     }
 
-                    def containers = doc.getFieldValue(searchFieldsConfig.CONTAINER)
+                    def containers = doc.container;
                     List containerInstances = [];
-                    containers.each { container ->
-                        container = container.split('_')
-                        if(container) {
-                            Long containerId = Long.parseLong(container[1])
-                            className = container[0]
-                            clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
-                            if(clazz) {
-                                containerInstances << clazz.read(containerId);
-                            }
-                        }
-                    }
-    /*                    switch(doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)) {
-                        case Species.simpleName:
-                            instance = Species.read(instanceId);
-                            break;
-                        case Observation.simpleName:
-                            instance = Observation.read(instanceId);
-                            break;
-                        case Document.simpleName:
-                            instance = Species.read(instanceId);
-                            break;
-                        case SUser.simpleName:
-                            break;
-                        case Newsletter.simpleName:
-                            break;
-                        case UserGroup.simpleName:
-                            break;
-                        default:
-                            log.debug "Not a valid object ${doc}"
-                    }
-    */
+
+
                     if(instance) {
                         if(params.format?.equalsIgnoreCase("json")) {
                             instanceList.add([id:instanceId, object_type:className, title:instance.title(), summary:instance.summary(params.userLanguage), containers:containerInstances]);
@@ -321,8 +269,67 @@ class BiodivSearchService extends AbstractSearchService {
                         log.error "${doc} has invalid id in search index. May be out of sync from db"
                     }
                 }
-                noOfResults = queryResponse.getResults().getNumFound();
-            }
+                noOfResults = queryResponse.count;
+
+                queryResponse.docCount.each {
+                    println it;
+                    it.each {key,value ->
+                     objectTypes << [name:key, count:value]
+                   }
+                }
+
+            // if(queryResponse) {
+            //     if(!params.loadMore?.toBoolean()){
+            //         List objectTypeFacets = queryResponse.getFacetField(searchFieldsConfig.OBJECT_TYPE)?.getValues()?:[]
+            //         objectTypeFacets.each {
+            //             //TODO: sort on name
+            //             objectTypes << [name:it.getName(), count:it.getCount()]
+            //         }
+            //
+            //         List uGroupFacets = queryResponse.getFacetField(searchFieldsConfig.USER_GROUP)?.getValues()?:[]
+            //         uGroupFacets.each {
+            //             //TODO: sort on name
+            //             uGroups << [name:it.getName(), count:it.getCount()]
+            //         }
+            //     }
+            //
+            //     responseHeader = queryResponse.responseHeader;
+            //     org.apache.solr.common.SolrDocumentList results = queryResponse.getResults();
+            //     def instance;
+            //     results.each { doc ->
+            //         Long instanceId = Long.parseLong(doc.getFieldValue(searchFieldsConfig.ID).split('_')[1])
+            //         String className = doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)
+            //         Class clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
+            //         if(clazz) {
+            //             instance = clazz.read(instanceId);
+            //         }
+            //
+            //         def containers = doc.getFieldValue(searchFieldsConfig.CONTAINER)
+            //         List containerInstances = [];
+            //         containers.each { container ->
+            //             container = container.split('_')
+            //             if(container) {
+            //                 Long containerId = Long.parseLong(container[1])
+            //                 className = container[0]
+            //                 clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
+            //                 if(clazz) {
+            //                     containerInstances << clazz.read(containerId);
+            //                 }
+            //             }
+            //         }
+            //
+            //         if(instance) {
+            //             if(params.format?.equalsIgnoreCase("json")) {
+            //                 instanceList.add([id:instanceId, object_type:className, title:instance.title(), summary:instance.summary(params.userLanguage), containers:containerInstances]);
+            //             } else {
+            //                 instanceList.add([id:instanceId, object_type:className, instance:instance, containers:containerInstances]);
+            //             }
+            //         } else {
+            //             log.error "${doc} has invalid id in search index. May be out of sync from db"
+            //         }
+            //     }
+            //     noOfResults = queryResponse.getResults().getNumFound();
+            // }
         }
 
         return [responseHeader:responseHeader, queryParams:queryParams, activeFilters:activeFilters, instanceTotal:noOfResults, instanceList:instanceList, objectTypes:objectTypes, uGroups:uGroups]
@@ -369,7 +376,7 @@ class BiodivSearchService extends AbstractSearchService {
                 }
             }
         }
-        
+
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String lastRevisedStartDate = '';
         String lastRevisedEndDate = '';
@@ -493,9 +500,9 @@ class BiodivSearchService extends AbstractSearchService {
         if(offset>= 0)
             paramsList.add('start', offset);
         if(max >= 0)
-            paramsList.add('rows', max);    
+            paramsList.add('rows', max);
         params['sort'] = params['sort']?:"score"
-        String sort = params['sort'].toLowerCase(); 
+        String sort = params['sort'].toLowerCase();
         if(isValidSortParam(sort)) {
             if(sort.indexOf(' desc') == -1) {
                 sort += " desc";
@@ -504,7 +511,7 @@ class BiodivSearchService extends AbstractSearchService {
         }
 
         paramsList.add('fl', params['fl']?:searchFieldsConfig.ID+","+searchFieldsConfig.OBJECT_TYPE+","+searchFieldsConfig.CONTAINER);
-        
+
         //Filters
         if(params.sGroup) {
             params.sGroup = params.sGroup.toLong()
@@ -578,7 +585,7 @@ class BiodivSearchService extends AbstractSearchService {
             queryParams["object_type"] = params.object_type
             activeFilters["object_type"] = params.object_type
         }
-        
+
         if(params.contributor){
             paramsList.add('fq', searchFieldsConfig.CONTRIBUTOR+":"+params.contributor);
             queryParams["contributor"] = params.contributor
@@ -586,7 +593,7 @@ class BiodivSearchService extends AbstractSearchService {
         }
 
         log.debug "Along with faceting params : "+paramsList;
-        return [paramsList:paramsList, queryParams:queryParams, activeFilters:activeFilters];	
+        return [paramsList:paramsList, queryParams:queryParams, activeFilters:activeFilters];
     }
 
     private boolean isValidSortParam(String sortParam) {

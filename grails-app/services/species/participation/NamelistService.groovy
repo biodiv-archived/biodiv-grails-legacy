@@ -44,21 +44,21 @@ import species.SpeciesPermission;
 import species.ScientificName.RelationShip
 
 class NamelistService extends AbstractObjectService {
-  
+
     static transactional = false;
     private static final String COL_SITE = 'http://www.catalogueoflife.org'
 	private static final String COL_URI = '/annual-checklist/2015/webservice'
-    
+
     private static final String GBIF_SITE = 'http://api.gbif.org'
 	private static final String GBIF_URI = '/v1/species'
-    
+
     private static final String TNRS_SITE = 'http://tnrs.iplantc.org'
     private static final String TNRS_URI = '/tnrsm-svc/matchNames'
-	
+
     private static final String EOL_SITE = 'http://eol.org'
     private static final String EOL_URI = '/api/search/1.0.json'
     private static final String EOL_URI_ID = '/api/hierarchy_entries/1.0/'
-    
+
     private static final String WORMS_SITE = 'http://www.marinespecies.org/'
     private static final String WORMS_URI = 'aphia.php'
 
@@ -73,10 +73,10 @@ class NamelistService extends AbstractObjectService {
 	private static final String MIS_APP_NAME = "misapplied name"
 
 	private final static int EXPORT_BATCH_SIZE = 10000;
-	
+
  	//XXX: this map is used to store new name created by session for bulk and name upload. This is needed because
 	//if a user want to create new name by saying 'new' in spreadsheet then same name may be created multiple times
-	//it that name appears multiple time in hir sheet 
+	//it that name appears multiple time in hir sheet
 	//this map will be cleared by every bulk upload thread to avoid any conflict
 	private static Map NEW_NAME_IN_SESSION = [:]
 
@@ -91,9 +91,9 @@ class NamelistService extends AbstractObjectService {
     def activityFeedService;
 	//def speciesUploadService;
     def speciesPermissionService;
-    
+
     //Searches IBP accepted and synonym only in WORKING AND RAW LIST and NULL list
-    public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {  
+    public static List<ScientificName> searchIBP(String canonicalForm, String authorYear, NameStatus status, int rank = -1, boolean searchInNull = false, String normalizedForm = null, boolean useAuthorYear = false) {
         //println "=SEARCH IBP== canForm " + canonicalForm +"--- authorYear "+authorYear +"---status "+ status + "---rank "+ rank + " userauthoryear " + useAuthorYear + " searchInNull " + searchInNull ;
         List res = [];
 
@@ -101,7 +101,7 @@ class NamelistService extends AbstractObjectService {
         if(status == NameStatus.ACCEPTED || !status) {
             clazz = TaxonomyDefinition.class;
         } else {
-            clazz = SynonymsMerged.class; 
+            clazz = SynonymsMerged.class;
         }
 		if(normalizedForm || authorYear){
 			String authorYearSuffix = authorYear ? (' ' +  authorYear) :''
@@ -119,7 +119,7 @@ class NamelistService extends AbstractObjectService {
 				}
 			}
 		}
-		
+
 		if(res){
 			//println "== FINAL SEARCH RESULT " + res
 			return res
@@ -135,8 +135,8 @@ class NamelistService extends AbstractObjectService {
 				if(!searchInNull){
 					isNotNull('position')
 				}
-				//XXX in curation while taking col hir. we want author year column to be used forcefully 
-				// in other cases we will not use untill gets multiple matches 
+				//XXX in curation while taking col hir. we want author year column to be used forcefully
+				// in other cases we will not use untill gets multiple matches
 				if(useAuthorYear && authorYear){
 					eq('authorYear', authorYear)
 				}
@@ -146,12 +146,12 @@ class NamelistService extends AbstractObjectService {
         //println "== FINAL SEARCH RESULT " + res
         return res;
     }
- 
-   
+
+
     List searchIBPResults(String canonicalForm, String authorYear, NameStatus status, rank) {
         def res = searchIBP(canonicalForm, authorYear, status, rank) //TaxonomyDefinition.findAllByCanonicalForm(canonicalForm);
         def finalResult = []
-        res.each { 
+        res.each {
             def temp = [:]
             temp['taxonId'] = it.id
             temp['externalId'] = it.id
@@ -162,10 +162,10 @@ class NamelistService extends AbstractObjectService {
             temp['sourceDatabase'] = it.viaDatasource?it.viaDatasource:''
             finalResult.add(temp);
         }
-        return finalResult 
+        return finalResult
     }
 
-	
+
 	/**
 	 * Searches given name with rank in ibp and col and return all the matched result
 	 * @param name
@@ -173,22 +173,22 @@ class NamelistService extends AbstractObjectService {
 	 * @return
 	 */
 	public Map nameMapper(List<NameInfo> names) {
-		
+
 		Map finalResult = [:]
 		NamesParser namesParser = new NamesParser();
 		List<TaxonomyDefinition> parsedNames = namesParser.parse(names.collect {it.name});
-		
+
 		int i = -1
         List nameSubLists = parsedNames.collate(5)
         nameSubLists.each { nl ->
 	        TaxonomyDefinition.withNewTransaction {
 		        nl.each { TaxonomyDefinition name ->
 					i++
-					
+
 					if(i%100 == 0){
 						log.debug "---------------------------------------- current count " + i
 					}
-					
+
 					List tmpRes = []
 					if(!name || !name.canonicalForm) {
 						log.debug "Name is not parsed by Names Parser " + name
@@ -197,13 +197,13 @@ class NamelistService extends AbstractObjectService {
 						// return works here as continue
 						return
 					}
-					
+
 					List ibpResult = searchIBP(name.canonicalForm, name.authorYear, null, names[i].rank, false, name.normalizedForm, true)
 					ibpResult.each { TaxonomyDefinition t ->
 		                t = TaxonomyDefinition.get(t.id)
 						tmpRes << ['match':'IBP', 'name':t.name, 'rank':ScientificName.TaxonomyRank.getTRFromInt(t.rank).value(), 'status': t.status.value(), 'group' : t.group?.name, 'position':t.position.value(),'id':t.id]
 					}
-					
+
 					if(!ibpResult){
 						List colResult = searchCOL(name.canonicalForm, 'name');
 						colResult.each { t ->
@@ -225,7 +225,7 @@ class NamelistService extends AbstractObjectService {
 								tmpRes << ['match':'COL', 'name':t.name, 'rank':t.rank, 'status': t.colNameStatus, 'group' : t.group, 'position':'WORKING','id':t.externalId]
 							}
 						}
-						
+
 						//No ibp result then searching only by canonical name and rank and excluding author year info
 						//to give all match option for curation
 						if(name.authorYear){
@@ -236,8 +236,8 @@ class NamelistService extends AbstractObjectService {
 							}
 						}
 					}
-					
-					
+
+
 					finalResult[names[i]] = tmpRes
 		        }
 	        }
@@ -248,16 +248,16 @@ class NamelistService extends AbstractObjectService {
 	public ScientificName createNameFromColId(String colId, boolean runPostProcess = true){
 		if(!colId)
 			return
-		
+
 		def td = TaxonomyDefinition.findByMatchId(colId)
 		if(td){
 			return td
 		}
-		
+
 		def colRes = searchCOL(colId, 'id')
 		if(!colRes)
 			return
-		
+
 		colRes = colRes[0]
 		String status = colRes.nameStatus
 		if(status.equalsIgnoreCase('accepted')){
@@ -268,21 +268,21 @@ class NamelistService extends AbstractObjectService {
 		addNewNameInSession(td)
 		return td
 	}
-	
+
 	private ScientificName createAcceptedNameFromColId(String colId, boolean runPostProcess){
 		TaxonomyDefinition td = TaxonomyDefinition.findByMatchId(colId)
 		if(td){
 			return td
 		}
-		
+
 		td = processDataForMigration(new TaxonomyDefinition(), searchCOL(colId, 'id')[0], 1, true)
-		
+
 		if(runPostProcess){
 			td.postProcess()
 		}
 		return td
 	}
-	
+
 	private ScientificName createSynonymFromColId(String colId, runPostProcess){
 		def colRes = searchCOL(colId, 'id')[0]
 		String accepteNameColId = colRes.acceptedNamesList[0].id
@@ -297,15 +297,15 @@ class NamelistService extends AbstractObjectService {
 		println "---------------created synonym " + syn
 		return syn
 	}
-	
+
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// COL Migration related /////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////
-	
+
     def populateInfoFromCol(File sourceDir, totalCount){
         if(!sourceDir.exists()){
-            log.debug "Source dir does not exist. ${sourceDir} Aborting now..." 
+            log.debug "Source dir does not exist. ${sourceDir} Aborting now..."
             return
         }
 
@@ -325,10 +325,10 @@ class NamelistService extends AbstractObjectService {
             List tds = domainClass.createCriteria().list(max:BATCH_SIZE, offset:offset) {
 				and {
 					le("id", totalCount)
-					order("rank", "asc")	
-					order("id", "asc")	
+					order("rank", "asc")
+					order("id", "asc")
 				}
-				
+
             }
             tds.each {
                 log.debug  it.rank +  "    " + it.id + "   " +  it.canonicalForm
@@ -367,14 +367,14 @@ class NamelistService extends AbstractObjectService {
 		if(acceptedMatch)
 			processDataForMigration(sciName, acceptedMatch, colData.size());
 	}
-    
+
 	def validateColMatch(ScientificName sciName, List colData) {
         //println "================LIST OF COL DATA=========================== " + colData
         log.debug "=========== Curating name ${sciName} "
         def acceptedMatch;
         String dirtyListReason;
         if(!colData) return;
-		
+
 		int colDataSize = colData.size();
 		//check if this is a single direct match
         if(colData.size() == 1 ) {
@@ -464,14 +464,14 @@ class NamelistService extends AbstractObjectService {
                         acceptedMatch = parentTaxonMatch(sciName, multiMatches);
                         if(!acceptedMatch) {
                             dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
-                        } 
+                        }
                     }
                 } else {
                     //log.debug "[CANONICAL+RANK : SINGLE MATCH] Canonical ${sciName.canonicalForm} and rank ${sciName.rank} matches single entry in col matches. Accepting ${acceptedMatch}"
                 }
             }
             else if(colNames[sciName.normalizedForm].size() == 1) {
-                //generate and compare verbatim. If verbatim matches with a single match accept. 
+                //generate and compare verbatim. If verbatim matches with a single match accept.
                 acceptedMatch = colNames[sciName.normalizedForm][0]
                 //log.debug "[VERBATIM : SINGLE MATCH] Verbatim ${sciName.name} matches single entry in col matches. Accepting ${acceptedMatch}"
             } else {
@@ -495,9 +495,9 @@ class NamelistService extends AbstractObjectService {
                 } else if(noOfMatches == 0) {
                     //log.debug "[VERBATIM+RANK : NO MATCH] No match on verbatim + rank"
                     acceptedMatch = null;
-                    //If verbatim shows no match, and the original has no author year, compare Canonical+ rank.  If matched with single match exists accept match. 
+                    //If verbatim shows no match, and the original has no author year, compare Canonical+ rank.  If matched with single match exists accept match.
                     if(sciName.authorYear) {
-                    
+
                         //If original has author year and no match exists, leave for curation (if author info exists and only canonical+rank match is considered, errors may occur eg: Aq matched with Ax, Ay and Az)(comparing hierarchies to further match will not help as a single name on IBP can have multiple hierarchies).
                         log.debug "As there is author year info .. leaving name for manual curation"
                         dirtyListReason = "[VERBATIM+RANK : NO MATCH] - As there is author year info .. leaving name for manual curation"
@@ -526,7 +526,7 @@ class NamelistService extends AbstractObjectService {
                                 acceptedMatch = parentTaxonMatch(sciName, multiMatches);
                                 if(!acceptedMatch) {
                                     dirtyListReason = "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
-                                } 
+                                }
                             }
                         }
                     }
@@ -545,7 +545,7 @@ class NamelistService extends AbstractObjectService {
                 }
             }
         }
-       
+
         if(acceptedMatch) {
             //println "================ACCEPTED MATCH=========================== " + acceptedMatch
             if(acceptedMatch.parsedRank != sciName.rank) {
@@ -560,7 +560,7 @@ class NamelistService extends AbstractObjectService {
                 return;
             }
             //log.debug "There is an acceptedMatch ${acceptedMatch} for ${sciName}. Updating status, rank and hieirarchy"
-			return acceptedMatch                  
+			return acceptedMatch
         } else {
             //log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
             sciName.noOfCOLMatches = colDataSize;
@@ -576,18 +576,18 @@ class NamelistService extends AbstractObjectService {
 
     public processDataForMigration(ScientificName sciName, Map acceptedMatch, colDataSize, boolean createOnlyNameFromCol = false, boolean addHir= true) {
         updateAttributes(sciName, acceptedMatch, createOnlyNameFromCol);
-		
+
 		//inside this we are adding hirarchy
 		if(addHir)
         	sciName = updateStatus(sciName, acceptedMatch).sciName;
-			
+
         //println "========THE SCI NAME======== " + sciName
         //println "=======AFTER STATUS======== " + sciName.status +"==== "+  acceptedMatch.parsedRank
         if(!acceptedMatch['parsedRank']) {
             acceptedMatch['parsedRank'] = XMLConverter.getTaxonRank(acceptedMatch.rank);
         }
-        updateRank(sciName, acceptedMatch.parsedRank);            
-        
+        updateRank(sciName, acceptedMatch.parsedRank);
+
         //already updated in update attributes
         sciName.dirtyListReason = null;
         sciName.noOfCOLMatches = colDataSize;
@@ -610,7 +610,7 @@ class NamelistService extends AbstractObjectService {
         } else {
             sciName.errors.allErrors.each { log.error it }
         }
-		
+
 		//WHY required here??
 		//XXX: comment this once bulk migration is over
 		addColHir(acceptedMatch);
@@ -618,7 +618,7 @@ class NamelistService extends AbstractObjectService {
 		sciName.addSynonymFromCol(acceptedMatch.synList)
 		return sciName
     }
-   
+
     public def processDataFromUI(ScientificName sciName, Map acceptedMatch) {
         println "+++++++++++++++++++++++++++++++++++"
         println sciName
@@ -640,28 +640,28 @@ class NamelistService extends AbstractObjectService {
 
             //if(!justMoveToAnotherList) {
             /*def upAt = updateAttributes(sciName, acceptedMatch);
-            println  "====UP AT == " + upAt 
+            println  "====UP AT == " + upAt
             if(upAt.isDeleted) {
             log.debug "MARKED AS DELETED ${sciName}"
             return;
             }*/
-           
+
 
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 println "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
             tempResult = updateAttributes(sciName, acceptedMatch);
-           println sciName.name 
+           println sciName.name
             result.errors << tempResult.errors;
-            
+
             println "======= RESULT FROM UpdateAttributes ${tempResult}";
 
             //adds IBP Hierarchy as well
             tempResult = updateStatus(sciName, acceptedMatch);
-           println sciName.name 
+           println sciName.name
             sciName = TaxonomyDefinition.get(sciName.id);
-           println sciName.name 
+           println sciName.name
             result.errors << tempResult.errors;
             println "======= RESULT FROM UpdateStatus ${tempResult}";
             /*if(r)
@@ -676,7 +676,7 @@ class NamelistService extends AbstractObjectService {
             tempResult = updateRank(sciName, acceptedMatch.parsedRank);
             println "======= RESULT FROM UpdateRank ${tempResult}";
             result.errors << tempResult.errors;
-            
+
 
             //WHY required here??
             //addColHir(sciName, acceptedMatch);
@@ -687,8 +687,8 @@ class NamelistService extends AbstractObjectService {
             if(moveToWKG) position = NamesMetadata.NamePosition.WORKING;
             if(moveToRaw) position = NamesMetadata.NamePosition.RAW;
 
-            tempResult = updatePosition(sciName, position); 
-           println sciName.name 
+            tempResult = updatePosition(sciName, position);
+           println sciName.name
             println "======= RESULT FROM UpdatePosition ${tempResult}";
             result.errors << tempResult.errors;
             //taxonService.moveToWKG([taxonReg]);
@@ -696,10 +696,10 @@ class NamelistService extends AbstractObjectService {
 
             println "=====SCI NAME ==== " + sciName
             println "=====SCI NAME CLASS ==== " + sciName.class
-           println sciName.name 
-            log.debug "Saving sciname ${sciName}"        
+           println sciName.name
+            log.debug "Saving sciname ${sciName}"
             if(!sciName.hasErrors() && sciName.save(flush:true)) {
-                log.debug "Saved sciname ${sciName}" 
+                log.debug "Saved sciname ${sciName}"
                 sciName.updateNameSignature()
 				//utilsService.cleanUpGorm(true);
                 result.success = true;
@@ -707,8 +707,8 @@ class NamelistService extends AbstractObjectService {
                 result.success = false;
                 result.msg = "Error while saving sciName";
                 result.errors << sciName.errors.allErrors;
-                sciName.errors.allErrors.each { 
-                    log.error it 
+                sciName.errors.allErrors.each {
+                    log.error it
                     println it;
                 }
             }
@@ -739,14 +739,14 @@ class NamelistService extends AbstractObjectService {
             log.debug "[CANONICAL+RANK : MULTIPLE MATCH TRYING PARENT TAXON MATCH] No single match on parent taxon match... leaving name for manual curation"
             acceptedMatch = null;
             return acceptedMatch;
-        } 
+        }
     }
 
     //Handles name moving from accepted to synonym & vice versa
     //also updates IBP Hierarchy if no status change and its accepted name
     private def updateStatus(ScientificName sciName, Map colMatch) {
         //println "=======\nUPDATING STATUS of ${sciName} to ${colMatch.nameStatus} from ${colMatch}"
-        
+
         boolean success = false;
         def errors = [];
 
@@ -776,7 +776,7 @@ class NamelistService extends AbstractObjectService {
                 result = changeSynonymToAccepted(sciName, colMatch);
                 sciName = result.lastTaxonInIBPHierarchy;        //changeSynonymToAccepted(sciName, colMatch);
                 //result.sciName = result.lastTaxonInIBPHierarchy
-                /*    
+                /*
                 def result = speciesService.deleteSynonym(sciName.id);
                 if(!result.success) {
                 log.debug "Error in deleting synonym ${sciName}. Not updating status."
@@ -784,7 +784,7 @@ class NamelistService extends AbstractObjectService {
                 sciName = saveAcceptedName(colMatch);
                  */
                 break;
-                case NameStatus.SYNONYM :                     
+                case NameStatus.SYNONYM :
                 sciName = changeAcceptedToSynonym(sciName, colMatch);
                 //changeAcceptedToSynonym(sciName, colMatch);
                 result.sciName = sciName
@@ -794,7 +794,7 @@ class NamelistService extends AbstractObjectService {
                 //if the changed status is Synonym and its accepted name doesn't exist create it
                 colMatch.acceptedNamesList.each { colAcceptedNameData ->
                 ScientificName acceptedName = saveAcceptedName(colAcceptedNameData);
-                    //update acceptedName property for this synonym  
+                    //update acceptedName property for this synonym
                     synonym = saveSynonym(sciName, acceptedName);
                     }*/
                 break;
@@ -807,7 +807,7 @@ class NamelistService extends AbstractObjectService {
                 colMatch.curatingTaxonId = sciName.id;
                 //sciName = updateAttributes(sciName, colMatch)
                 result = addColHir(colMatch);
-                //sciName = result.lastTaxonInIBPHierarchy; 
+                //sciName = result.lastTaxonInIBPHierarchy;
                 //println "======STATUS MEIN SCINAME==== " + sciName
                 result.sciName = sciName //result.lastTaxonInIBPHierarchy;
 
@@ -854,7 +854,7 @@ class NamelistService extends AbstractObjectService {
 		}
         return null;
     }
-    
+
     public COLNameStatus getCOLNameStatus(String colNameStatus) {
         if(!colNameStatus) return null;
 		for(COLNameStatus s : COLNameStatus){
@@ -863,7 +863,7 @@ class NamelistService extends AbstractObjectService {
 		}
         return null;
     }
-    
+
     private List<ScientificName> checkIfSciNameExists(Map colAcceptedNameData) {
         NameStatus status = getNewNameStatus(colAcceptedNameData.nameStatus);
         def rank = XMLConverter.getTaxonRank(colAcceptedNameData.rank);
@@ -872,9 +872,9 @@ class NamelistService extends AbstractObjectService {
         println "========RESULTS of SEARCH IBP ===== " + res
         return res;
     }
-    
+
     ScientificName saveAcceptedName(Map colAcceptedNameData) {
-        
+
         if(colAcceptedNameData.taxonConcept) return colAcceptedNameData.taxonConcept;
 
         //List<ScientificName> acceptedNameList = checkIfSciNameExists(colAcceptedNameData);
@@ -897,7 +897,7 @@ class NamelistService extends AbstractObjectService {
         }
 
         if(!synonyms) {
-            def result = speciesService.updateSynonym(null, null, ScientificName.RelationShip.SYNONYM, sciName.name, ['taxonId':acceptedName.id]);  
+            def result = speciesService.updateSynonym(null, null, ScientificName.RelationShip.SYNONYM, sciName.name, ['taxonId':acceptedName.id]);
             return result.dataInstance;
         } else {
             log.debug "Already a synonym exists with same name for this acceptedName"
@@ -919,16 +919,16 @@ class NamelistService extends AbstractObjectService {
                 sciName.errors.allErrors.each { log.error it }
             } else {
                 success = true;
-            }            
+            }
         } else {
             success = false;
         }
         //println "======= UPDATING RANK DONE to ${sciName.rank}============+"
         return [success:success, errors:errors];
     }
-        
+
     //A scientific name was also passed to this function but not used - so removed
-	
+
     private def  addColHir(Map colAcceptedNameData) {
         //log.debug "------------------------------------------------------------------"
         //log.debug "------------------------------------------------------------------"
@@ -971,7 +971,7 @@ class NamelistService extends AbstractObjectService {
             boolean fromCOL = false;
             println metadata1
             if('COL'.equalsIgnoreCase(metadata1['source']) || 'CatalogueOfLife'.equalsIgnoreCase(metadata1['source']) ||  'Catalogue Of Life'.equalsIgnoreCase(metadata1['source'])) {
-                fromCOL = true; 
+                fromCOL = true;
             }
             println "===============++"
             //println colAcceptedNameData
@@ -1011,10 +1011,10 @@ class NamelistService extends AbstractObjectService {
         }
 		return _processColData(new XmlParser().parse(f), sn)
     }
-	
+
 	List processColData(String colId) {
 		String text = Utils.getColDataAsText(colId)
-		if(!text) return 
+		if(!text) return
 		def res = _processColData(new XmlParser().parseText(text))
 		if(res){
 			String taxCan = res[0].canonicalForm.replaceAll(' ', '_');
@@ -1027,16 +1027,16 @@ class NamelistService extends AbstractObjectService {
 		}
 		return res
 	}
-		
+
 	private _processColData(results, ScientificName sn = null){
         try{
             String errMsg = results.'@error_message'
-            int resCount = Integer.parseInt((results.'@total_number_of_results').toString()) 
+            int resCount = Integer.parseInt((results.'@total_number_of_results').toString())
             if(errMsg != ""){
                 log.debug "11Error in col response " + errMsg
                 if(sn){
                 	sn.dirtyListReason = "COL : " + errMsg
-                	log.debug "settting error " +  sn.dirtyListReason 
+                	log.debug "settting error " +  sn.dirtyListReason
                 	if(!sn.save(flush:true)){
                 		sn.errors.allErrors.each { log.error it }
                 	}
@@ -1082,7 +1082,7 @@ class NamelistService extends AbstractObjectService {
         if(m['rank'] == 'species'){
             result['taxonRegistry.9'] = res['9'] = m['species']     //TODO:check author year coming or not + " " + m['authorString']
         } else {
-            result['taxonRegistry.9'] = res['9'] = m['species'];    
+            result['taxonRegistry.9'] = res['9'] = m['species'];
         }
         if(m['rank'] == 'infraspecies'){
             if(m['species']) {
@@ -1091,11 +1091,11 @@ class NamelistService extends AbstractObjectService {
 					authStr = searchCOL(m.id_details[m['species'] + "#" + "9"], "id")[0].authorString;
 					m.id_details[m['genus'] + " " +m['species']+ "#" + "9"] = m.id_details[m['species']+ "#" + "9"]
                 }
-                result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr?:"";    
+                result['taxonRegistry.9'] = res['9'] = m['genus'] + " " +m['species'] + " " + authStr?:"";
             }
             result['taxonRegistry.10'] = res['10'] = m['infraspecies']      //TODO:check author year coming or not + " " + m['authorString'];
         } else {
-            result['taxonRegistry.10'] = res['10'] = m['infraspecies'];     
+            result['taxonRegistry.10'] = res['10'] = m['infraspecies'];
         }
         result['taxonRegistry'] = res;
         result['reg'] = m["taxonRegId"]          //$('#taxaHierarchy option:selected').val();
@@ -1119,7 +1119,7 @@ class NamelistService extends AbstractObjectService {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
-	
+
     def getSynonymsOfTaxon(TaxonomyDefinition taxonConcept) {
         def res = taxonConcept.fetchSynonyms(); //Synonyms.findAllByTaxonConcept(taxonConcept);
         def result = []
@@ -1135,12 +1135,12 @@ class NamelistService extends AbstractObjectService {
             if(contri != '') {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
-            temp['contributors'] = contri; 
+            temp['contributors'] = contri;
             result.add(temp);
         }
         return result
     }
-    
+
     def getAcceptedNamesOfSynonym(SynonymsMerged syn) {
         //def r = Synonyms.findAllByName(synName);
         def res = syn.fetchAcceptedNames();  //[]
@@ -1157,7 +1157,7 @@ class NamelistService extends AbstractObjectService {
             if(contri != '') {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
-            temp['contributors'] = contri; 
+            temp['contributors'] = contri;
             result.add(temp);
         }
         return result
@@ -1182,7 +1182,7 @@ class NamelistService extends AbstractObjectService {
             if(contri != '') {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
-            temp['contributors'] = contri; 
+            temp['contributors'] = contri;
             result.add(temp);
         }
         return result
@@ -1204,7 +1204,7 @@ class NamelistService extends AbstractObjectService {
             if(contri != '') {
                 contri = contri.substring(0,contri.lastIndexOf(','));
             }
-            temp['contributors'] = contri; 
+            temp['contributors'] = contri;
             result.add(temp);
         }
         return result
@@ -1230,24 +1230,24 @@ class NamelistService extends AbstractObjectService {
     def getSpeciesCountOfTaxon(TaxonomyDefinition taxonConcept) {
         def taxonId = taxonConcept.id.toString();
         def sql = new Sql(dataSource)
-        String sqlStr = """select * 
+        String sqlStr = """select *
         from taxonomy_registry
-        where 
+        where
         path like '%!_"""+taxonId+"' escape '!'";
-        
+
         def res1 = sql.rows(sqlStr)
-        sqlStr = """select * 
+        sqlStr = """select *
         from taxonomy_registry
-        where 
+        where
         path like '%!_"""+taxonId+"!_%"+"' escape '!'";
-        
+
         def res2 = sql.rows(sqlStr);
 
-        sqlStr = """select * 
+        sqlStr = """select *
         from taxonomy_registry
-        where 
+        where
         path like '"""+taxonId+"!_%"+"' escape '!'";
-        
+
         def res3 = sql.rows(sqlStr);
 
         def taxonConcepts = res1.collect {TaxonomyDefinition.read(it.taxon_definition_id.toLong())};
@@ -1289,7 +1289,7 @@ class NamelistService extends AbstractObjectService {
         def finalResult = []
         allResults.each { result ->
             Map temp = new HashMap()
-            temp['externalId'] = "" 
+            temp['externalId'] = ""
             temp['name'] = result['nameScientific'];
             if(searchBy == 'name') {
                 temp['name'] = temp['name'] + " " + result['acceptedAuthor'];
@@ -1299,15 +1299,15 @@ class NamelistService extends AbstractObjectService {
             temp['sourceDatabase'] = result['url']? result['url'] : "";
             temp['group'] = result['kingdom']? result['kingdom']:"";
             //if(searchBy == 'id') {
-            temp['kingdom'] = result['kingdom']; 
-            temp['phylum'] = result['phylum']; 
-            temp['order'] = result['order']; 
-            temp['family'] = result['family']; 
-            temp['class'] = result['class']; 
-            temp['genus'] = result['genus']; 
-            temp['species'] = result['species']; 
+            temp['kingdom'] = result['kingdom'];
+            temp['phylum'] = result['phylum'];
+            temp['order'] = result['order'];
+            temp['family'] = result['family'];
+            temp['class'] = result['class'];
+            temp['genus'] = result['genus'];
+            temp['species'] = result['species'];
             temp['authorString'] = result['acceptedAuthor'];
-            //} 
+            //}
             finalResult.add(temp);
         }
         println "===========PARSED RESULT ======== " + finalResult
@@ -1316,7 +1316,7 @@ class NamelistService extends AbstractObjectService {
 
     List searchEOL(String input, String searchBy) {
         //http://eol.org/api/search/1.0.json?q=Mangifera+indica&page=1&exact=true
-        
+
         def http = new HTTPBuilder()
         println "========EOL SITE===== " + EOL_SITE
         println "========INPUT===== " + EOL_URI_ID + input+'.json'
@@ -1338,8 +1338,8 @@ class NamelistService extends AbstractObjectService {
                 println "========TNRS RESULT====== " + xmlText
                 return responseFromEOLAsMap(xmlText, searchBy);
             }
-            response.'404' = { 
-            println '404 - Not found' 
+            response.'404' = {
+            println '404 - Not found'
             return null
             }
         }
@@ -1351,22 +1351,22 @@ class NamelistService extends AbstractObjectService {
         def finalResult = []
         allResults.each { result ->
             Map temp = new HashMap()
-            temp['externalId'] = result['id'] 
+            temp['externalId'] = result['id']
             temp['name'] = result['title'];
             temp['rank'] = result['rank']?result['rank'].toLowerCase() : "";
             temp['nameStatus'] = "";
             temp['sourceDatabase'] = result['link']? result['link'] : "";
             temp['group'] = result['kingdom']? result['kingdom']:"";
             //if(searchBy == 'id') {
-            temp['kingdom'] = result['kingdom']; 
-            temp['phylum'] = result['phylum']; 
-            temp['order'] = result['order']; 
-            temp['family'] = result['family']; 
-            temp['class'] = result['class']; 
-            temp['genus'] = result['genus']; 
-            temp['species'] = result['species']; 
+            temp['kingdom'] = result['kingdom'];
+            temp['phylum'] = result['phylum'];
+            temp['order'] = result['order'];
+            temp['family'] = result['family'];
+            temp['class'] = result['class'];
+            temp['genus'] = result['genus'];
+            temp['species'] = result['species'];
             temp['authorString'] = result['acceptedAuthor']?result['acceptedAuthor']:"" ;
-            //} 
+            //}
             finalResult.add(temp);
         }
         println "===========PARSED RESULT ======== " + finalResult
@@ -1404,7 +1404,7 @@ class NamelistService extends AbstractObjectService {
         //sciName = result.lastTaxonInIBPHierarchy;
         return result;
     }
-    
+
     private ScientificName changeAcceptedToSynonym(ScientificName sciName,  Map colMatch) {
         if(colMatch.acceptedNamesList && colMatch.acceptedNamesList.size() == 0) {
             log.error "No acceptedMatch for the synonym. Ignoring status change"
@@ -1414,10 +1414,10 @@ class NamelistService extends AbstractObjectService {
         //Attach its synonyms to the new accepted suggested by COL
         def oldSynonyms = sciName.fetchSynonyms();
         println "======OLD SYNONYMS OF THAT ==== " + oldSynonyms
-        //Remove as accepted name from all synonyms 
+        //Remove as accepted name from all synonyms
         sciName.removeAsAcceptedName();
         println "======REMOVED AS ACCEPTED NAME ==== "
-        
+
         //sciName = updateAttributes(sciName, colMatch)
         //Change status and class for this row entry in database
         updateStatusAndClass(sciName, NameStatus.SYNONYM)
@@ -1452,7 +1452,7 @@ class NamelistService extends AbstractObjectService {
             println "=======MAKING IT ACCEPTED=========="
             sciName.relationship = null;
             /*TaxonomyDefinition.executeUpdate(
-                    "update TaxonomyDefinition t set t.class = :klass where t.id = :id ", 
+                    "update TaxonomyDefinition t set t.class = :klass where t.id = :id ",
                         [klass:'species.TaxonomyDefinition', id:sciName.id]);
             */
             //def sql =  Sql.newInstance(dataSource);
@@ -1462,7 +1462,7 @@ class NamelistService extends AbstractObjectService {
             sql.setProperties([id:sciName.id, class:'species.TaxonomyDefinition', status:status.toString()]).executeUpdate();
             println " ========executed query =="
             //utilsService.cleanUpGorm(true);
-            
+
             //sciName.class = 'species.TaxonomyDefinition';
             //TODO: CHK: sciName = TaxonomyDefinition.get(sciName.id.toLong())
             //println "CASTING SYNONYM TO TAXONDEFINITION"
@@ -1470,7 +1470,7 @@ class NamelistService extends AbstractObjectService {
             //println sciName.class
         } else {
             println "=======MAKING IT SYNONYM=========="
-            
+
 		    //def sql = new Sql(dataSource)
             query = "update taxonomy_definition set (class, status, relationship) = (:class, :status, :relationship) where id = :id";
             def session = sessionFactory.getCurrentSession()
@@ -1478,9 +1478,9 @@ class NamelistService extends AbstractObjectService {
             sql.setProperties([id:sciName.id, class:'species.SynonymsMerged', relationship:ScientificName.RelationShip.SYNONYM.toString(), status:status.toString()]).executeUpdate();
             println " ========executed query =="
             //utilsService.cleanUpGorm(true);
-            
+
             /*TaxonomyDefinition.executeUpdate(
-                    "update TaxonomyDefinition t set t.class = :klass where t.id = :id ", 
+                    "update TaxonomyDefinition t set t.class = :klass where t.id = :id ",
                         [klass:'species.SynonymsMerged', id:sciName.id]);
             */
             //sciName.class = 'species.SynonymsMerged';
@@ -1567,7 +1567,7 @@ class NamelistService extends AbstractObjectService {
             } else {
                 success = true;
             }
-            
+
             //println "=========DONE UPDATING ATTRIBUTES ========\n" + sciName
 
         } catch (Exception e) {
@@ -1576,13 +1576,13 @@ class NamelistService extends AbstractObjectService {
             e.printStackTrace();
             println "=========ERROR WHILE UPDATING ATTRIBUTES ========\n"
         }
-        return [success:success, errors:errors, sciName:sciName]; 
+        return [success:success, errors:errors, sciName:sciName];
         //:sciName,isDeleted:false];
     }
 
 ///////////////////OBV RECO NAMES/////////////////////////
 
-    public def curateRecoName(Recommendation reco , List colData) {      
+    public def curateRecoName(Recommendation reco , List colData) {
         log.debug "Curating reco name ${reco.name} id ${reco.id} with col data ${colData}"
         def acceptedMatch = null;
 
@@ -1656,10 +1656,10 @@ class NamelistService extends AbstractObjectService {
                 }
                 println "########### Flagging reco ============== "
                 reco.flaggingReason = reco.flaggingReason + " ### " + flaggingReason;
-            } 
-            //processDataForMigration(sciName, acceptedMatch);            
+            }
+            //processDataForMigration(sciName, acceptedMatch);
             syncReco(reco, sciName);
-            
+
         } else {
             log.debug "[NO MATCH] No accepted match in colData. So leaving name in dirty list for manual curation"
         }
@@ -1724,7 +1724,7 @@ class NamelistService extends AbstractObjectService {
             }
             println "########### Flagging reco ============== "
             reco.flaggingReason = reco.flaggingReason + " ### " + flaggingReason;
-        } 
+        }
         syncReco(reco, sciName);
     }
 
@@ -1739,14 +1739,14 @@ class NamelistService extends AbstractObjectService {
         return desc;
     }
 
- 
+
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	public List searchCOL(String input, String searchBy) {
 		//http://www.catalogueoflife.org/col/webservice?name=Tara+spinosa
-		
+
 		File sourceDir = new File(Holders.config.speciesPortal.namelist.rootDir)
 		if(searchBy == 'name'){
 			File xmlFile = new File(sourceDir,  "" + input.replaceAll(' ', '_') + ".xml")
@@ -1755,7 +1755,7 @@ class NamelistService extends AbstractObjectService {
 				return responseAsMap(xmlFile.text, searchBy)
 			}
 		}
-		
+
 		def http = new HTTPBuilder()
 		http.request( COL_SITE, GET, TEXT ) { req ->
 			uri.path = COL_URI
@@ -1972,7 +1972,7 @@ class NamelistService extends AbstractObjectService {
 				}
 				*/
 			}
-			
+
 			temp['id_details'] = id_details
 			temp['colIdPath'] = colIdPath.join("_").trim()
 			temp['colNamePath'] = colNamePath.join("->").trim()
@@ -2014,14 +2014,14 @@ class NamelistService extends AbstractObjectService {
 		return finalResult;
 	}
 
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	
+
+
     public def getNamesFromTaxon(params){
-    	println "===================== params " + params 
+    	println "===================== params " + params
         def sql = new Sql(dataSource)
         def sqlStr, rs
         def classSystem = params.classificationId?params.classificationId.toLong():Classification.fetchIBPClassification().id;
@@ -2040,7 +2040,7 @@ class NamelistService extends AbstractObjectService {
             exportFields = "";
             TaxonomyDefinition.fetchExportableFields(grailsApplication).each {
                 if(reqExportFields.contains(it.field)) {
-                    if(it.dbField) 
+                    if(it.dbField)
                         exportFields += "t."+it.dbField +' as "'+it.name+'", ';
                 }
             }
@@ -2197,7 +2197,7 @@ class NamelistService extends AbstractObjectService {
 
     private List getRanksToFetch(def parentRank, def rF) {
         List ranksToFetch = [parentRank];
-        
+
         rF.each {
             int rank = Integer.parseInt(it);
             if(rank > parentRank) ranksToFetch << rank;
@@ -2271,59 +2271,59 @@ class NamelistService extends AbstractObjectService {
         }
 	}
 
-	
+
 	public static void clearSessionNewNames(){
 		NEW_NAME_IN_SESSION.clear()
 	}
-	
+
 	public static void addNewNameInSession(TaxonomyDefinition td){
 		if(!td || !td.id)
 			return
-			
+
 		NEW_NAME_IN_SESSION.put(td.canonicalForm + "##" + td.rank , td.id)
 	}
-	
+
 	public static TaxonomyDefinition getNewNameInSession(String canonicalForm, int rank){
 		if(!canonicalForm)
 			return
-			
+
 		def tdId = NEW_NAME_IN_SESSION.get(canonicalForm + "##" + rank)
 		return TaxonomyDefinition.get(tdId)
 	}
-	
-	
-	
+
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////  Name list API ///////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	public boolean changeAccToSyn(long oldId, long newId){
 		ScientificName oldName = TaxonomyDefinition.get(oldId)
 		ScientificName newName = TaxonomyDefinition.get(newId)
-		
+
 		if(oldName && (oldName.status == NamesMetadata.NameStatus.SYNONYM)){
 			log.debug "Name is already synonym... nothing to do... RETURNING " + oldId
 			return true
 		}
-		
+
 		if(!oldName || !newName){
 			log.debug "Null id is given for the names  old id " + oldId + " new name " + newName
 			return false
 		}
-		
+
 		if(newName.status != NamesMetadata.NameStatus.ACCEPTED){
 			log.debug "Status of new name  is not acceepted aborting... new name id " + newId
 			return false
 		}
-		
+
 		_mergeAccepted(oldName, newName, false)
 		//cache is cleared so reading name again
 		oldName.refresh()// = TaxonomyDefinition.get(oldId)
-		
+
 		updateStatusAndClass(oldName,  NamesMetadata.NameStatus.SYNONYM)
 		utilsService.clearCache("defaultCache")
 		utilsService.cleanUpGorm()
-		
+
 		newName = TaxonomyDefinition.get(newId)
 		oldName = SynonymsMerged.get(oldId)
 
@@ -2331,33 +2331,33 @@ class NamelistService extends AbstractObjectService {
 		newName.addSynonym(oldName)
 		return true
 	}
-	
+
 	public boolean changeSynToAcc(long oldId, Map hirMap=null){
 		ScientificName oldName = TaxonomyDefinition.get(oldId)
-		
+
 		if(!oldName){
 			log.debug "Null id is given for the names  old id " + oldId
 			return false
 		}
-		
+
 		if(oldName && (oldName.status == NamesMetadata.NameStatus.ACCEPTED)){
 			log.debug "Name is already accepted... nothing to do... RETURNING " + oldId
 			return true
 		}
-		
+
 		//removing this name as synonym from all other accepted name
 		oldName.removeAsSynonym()
 		updateStatusAndClass(oldName,  NamesMetadata.NameStatus.ACCEPTED)
-		
+
 		//TODO have to add ibp hir fir this changed name
 		return true
 	}
-	
-	
+
+
 	public boolean updateNamePosition(long oldId, String position, Map hirMap=null){
 		TaxonomyDefinition oldName = TaxonomyDefinition.get(oldId)
 		NamesMetadata.NamePosition newPosition = NamesMetadata.NamePosition.getEnum(position)
-		
+
 		if(!oldName || !newPosition){
 			log.debug "Null id is given for the names  old id " + oldId + " Or position is wrong " + position
 			return false
@@ -2366,18 +2366,18 @@ class NamelistService extends AbstractObjectService {
 		TaxonomyDefinition.executeUpdate( "update TaxonomyDefinition set position = :newPosition where id = :id",[newPosition:newPosition, id:oldName.id])
 		return true
 	}
-	
+
 	public boolean deleteName(long id){
 		ScientificName name = TaxonomyDefinition.get(id)
 		if(!name || name.isDeleted){
 			log.debug "Null id is given for the name or name is already deleted... ABORTING " + id
 			return false
 		}
-		
+
 		if(name.status == NamesMetadata.NameStatus.SYNONYM){
 			return mergeSynonym(name, null)
 		}
-		
+
 		//its an accepted name
 		Classification ibpClassification = Classification.fetchIBPClassification()
 		int tCount = TaxonomyRegistry.countByParentTaxonDefinitionAndClassification(name, ibpClassification)
@@ -2385,37 +2385,37 @@ class NamelistService extends AbstractObjectService {
 			log.debug "Given name has children in ibp classification... Aborting delete ... child count  " +  tCount
 			return false
 		}
-		
+
 		//every thing passed now deleting the accepted name
 		return _mergeAccepted(name, null)
 	}
-	
-	
+
+
 	public boolean mergeNames(long oldId, long newId){
 		ScientificName oldName = TaxonomyDefinition.get(oldId)
 		ScientificName newName = TaxonomyDefinition.get(newId)
-		
+
 		if(!oldName || !newName){
 			log.debug "Null id is given for the names  old id " + oldId + " new name " + newName
 			return false
 		}
-		
-		
+
+
 		if(oldName.status != newName.status){
 			log.debug "Status is not same for  the name " + oldName.status + " new name " + newName.status
 			return false
 		}
-		
+
 		if(oldName.status == NamesMetadata.NameStatus.SYNONYM){
 			return mergeSynonym(oldName, newName)
 		}
-		
+
 		//status is accepted
 		return mergeAccepted(oldName, newName)
-		
+
 	}
-	
-	
+
+
 	private void updateStatusAndClass(ScientificName sciName, NameStatus status) {
 		//sciName.relationship = (status == NameStatus.SYNONYM)? ScientificName.RelationShip.SYNONYM.toString():null
 		sciName.status = status
@@ -2432,21 +2432,21 @@ class NamelistService extends AbstractObjectService {
 		def sql = sessionFactory.getCurrentSession().createSQLQuery(query)
 		sql.setProperties(m).executeUpdate()
 	}
-	
+
 	private boolean mergeAccepted(oldName, newName){
 		if(oldName.rank != newName.rank){
 			log.debug "Rank is not same... Aborting merge " + oldName.rank + "  new name " + newName.rank
 			return false
 		 }
-		
-		
+
+
 		if(oldName.fetchRootId() != newName.fetchRootId()){
 			log.debug "Kingdom is not same... Aborting merge " + oldName.fetchRootId() + "  new name " + newName.fetchRootId()
 			return false
 		 }
-		
+
 		log.debug "All validation passed Merging names..." + oldName + " new name " + newName
-		
+
 		return _mergeAccepted(oldName, newName)
 	}
 
@@ -2478,9 +2478,9 @@ class NamelistService extends AbstractObjectService {
 
 		return true
 	}
-	
-	
-	
+
+
+
 	private boolean mergeSynonym(SynonymsMerged oldName, SynonymsMerged newName){
 
 		//moving synonym
@@ -2497,7 +2497,7 @@ class NamelistService extends AbstractObjectService {
 
 		//XXX save is not updating so using hiberet call to set isdelete flag
 		SynonymsMerged.executeUpdate( "update SynonymsMerged set isDeleted = true where id = (:id) ", [id:oldName.id])
-		
+
 		utilsService.clearCache("defaultCache")
 		return true
 	}
@@ -2509,15 +2509,15 @@ class NamelistService extends AbstractObjectService {
 			log.debug "Species page is not there... nothing to move " + oldName
 			return
 		}
-		
+
 		//old species page is there but new name is not given which means want to delete species content
 		if(!newName){
 			oldSpecies.deleteSpecies(null)
 			return
 		}
-		
+
 		Species newSpecies = Species.get(newName.findSpeciesId())
-		
+
 		//updating species for names
 		if(!newSpecies && oldSpecies){
 			oldSpecies.taxonConcept = newName
@@ -2526,7 +2526,7 @@ class NamelistService extends AbstractObjectService {
 			}
 			log.debug "  new speices not available"
 		}
-		
+
 		if(newSpecies && oldSpecies){
 			//move sfield
 			SpeciesField.findAllBySpecies(oldSpecies).each {sf ->
@@ -2535,7 +2535,7 @@ class NamelistService extends AbstractObjectService {
 					sf.errors.allErrors.each { log.error it }
 				}
 			}
-			
+
 			//move resources
 			def ress = oldSpecies.resources.collect { it}
 			ress.each { res ->
@@ -2543,21 +2543,21 @@ class NamelistService extends AbstractObjectService {
 				newSpecies.addToResources(res)
 				oldSpecies.removeFromResources(res)
 			}
-			
+
 			//add hyper link for redirect
 			ResourceRedirect.addLink(oldSpecies, newSpecies)
-			
+
 			//saving new species
 			if(!newSpecies.save(flush:true)){
 				newSpecies.errors.allErrors.each { log.error it }
 			}
-			
+
 			//deleting speices
 			oldSpecies.deleteSpecies(null)
 		}
 	}
-	
-	
+
+
 	private moveRecoAndObv(oldName, newName){
         println "Moving ${oldName} to ${newName}";
 		def newReco = newName ? Recommendation.findByTaxonConcept(newName) : null;
@@ -2566,7 +2566,7 @@ class NamelistService extends AbstractObjectService {
 			RecommendationVote.findAllByRecommendationOrCommonNameReco(reco, reco).each { r ->
 				println " saving reco vote  " + r
 				if(r.recommendation == reco){
-                    println "Setting recommendation to ${newReco}" 
+                    println "Setting recommendation to ${newReco}"
 					r.recommendation = newReco
 				}
 				if(r.commonNameReco == reco){
@@ -2583,7 +2583,7 @@ class NamelistService extends AbstractObjectService {
 				if(!obv.save(flush:true)){
 					obv.errors.allErrors.each { log.error it }
 				}
-				
+
 			}
 			println "========= deleting reco " + reco
 			reco.delete(flush:true)
@@ -2597,16 +2597,16 @@ class NamelistService extends AbstractObjectService {
 			}
         }
 	}
-	
+
 	private moveOtherNamesReference(oldName, newName){
 		//moving synonym
 		oldName.fetchSynonyms().each {
 			log.debug "================ synonym move " + it
 			oldName.removeSynonym(it)
 			if(newName) newName.addSynonym(it)
-			
+
 		}
-		
+
 		//moving common names
 		List cns = CommonNames.findAllByTaxonConcept(oldName)
 		cns.each { CommonNames cn ->
@@ -2615,14 +2615,14 @@ class NamelistService extends AbstractObjectService {
 				cn.taxonConcept = newName
 			else
 				cn.isDeleted = true
-				
+
 			if(!cn.save(flush:true)){
 				cn.errors.allErrors.each { log.error it }
 			}else{
 				cn.delete(flush:true)
 			}
 		}
-		
+
 		//moving docsciname
 		List dcs = DocSciName.findAllByTaxonConcept(oldName)
 		dcs.each {DocSciName  cn ->
@@ -2631,7 +2631,7 @@ class NamelistService extends AbstractObjectService {
 				cn.taxonConcept = newName
 			else
 				cn.isDeleted = true
-				
+
 			if(!cn.save(flush:true)){
 				cn.errors.allErrors.each { log.error it }
 			}else{
@@ -2639,7 +2639,7 @@ class NamelistService extends AbstractObjectService {
 			}
 		}
 	}
-	
+
 	//moving children and deleting ibp hir
 	private moveTaxonReg(oldName, newName){
 		Classification ibpClassification = Classification.fetchIBPClassification()
@@ -2660,12 +2660,12 @@ class NamelistService extends AbstractObjectService {
 //			   }
 //			}
 		}
-		
+
 		//deleteing ibp hir of old name
 		if(!tr.delete(flush:true)){
 			tr.errors.allErrors.each { log.error it }
 		}
-		
+
 		//moving all children to new ibp path
 		if(newName){
 			List sqlStrings = newName.fetchUpdateTaxonRegSql(oldName.id)
@@ -2694,7 +2694,7 @@ class NamelistService extends AbstractObjectService {
             if(!downloadDir.exists()){
                 downloadDir.mkdirs()
             }
-        log.debug "export type " + dl.type 
+        log.debug "export type " + dl.type
         if(dl.type == DownloadLog.DownloadType.CSV) {
             return exportAsCSV(downloadDir, dl, params.webaddress)
         } /*else if(dl.type == DownloadLog.DownloadType.KML) {
@@ -2746,7 +2746,7 @@ class NamelistService extends AbstractObjectService {
                         }
                         index++;
                     }
-                    
+
                     writer.writeNext(array)
                 }
             }

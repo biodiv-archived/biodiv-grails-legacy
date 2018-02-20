@@ -54,7 +54,7 @@ class ProjectSearchService extends AbstractSearchService {
     }
 
 	/**
-	 * 
+	 *
 	 * @param projects
 	 * @param commit
 	 * @return
@@ -66,41 +66,52 @@ class ProjectSearchService extends AbstractSearchService {
 		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+		//Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+    List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
+
 		Map names = [:];
 		Map docsMap = [:]
 		projects.each { proj ->
 			log.debug "Reading Project : "+proj.id;
 
-				SolrInputDocument doc = new SolrInputDocument();
-				doc.addField(searchFieldsConfig.ID, proj.id.toString());
-				doc.addField(searchFieldsConfig.TITLE, proj.title);
-				doc.addField(searchFieldsConfig.GRANTEE_ORGANIZATION, proj.granteeOrganization);
+				//SolrInputDocument doc = new SolrInputDocument();
+        Map<String,Object> doc=new HashMap<String,Object>();
 
-                doc.addField(searchFieldsConfig.UPLOADED_ON, proj.dateCreated);
-                doc.addField(searchFieldsConfig.UPDATED_ON, proj.lastUpdated);
+				doc.put(searchFieldsConfig.ID, proj.id.toString());
+				doc.put(searchFieldsConfig.TITLE, proj.title);
+				doc.put(searchFieldsConfig.GRANTEE_ORGANIZATION, proj.granteeOrganization);
 
-				
+                doc.put(searchFieldsConfig.UPLOADED_ON, proj.dateCreated);
+                doc.put(searchFieldsConfig.UPDATED_ON, proj.lastUpdated);
+
+
 				proj.locations.each { location ->
-					doc.addField(searchFieldsConfig.SITENAME, location.siteName);				
-					doc.addField(searchFieldsConfig.CORRIDOR, location.corridor);
-				}				
+					doc.put(searchFieldsConfig.SITENAME, location.siteName);
+					doc.put(searchFieldsConfig.CORRIDOR, location.corridor);
+				}
 
-				
+
 				proj.tags.each { tag ->
-					doc.addField(searchFieldsConfig.TAG, tag);
+					doc.put(searchFieldsConfig.TAG, tag);
 				}
-					
-				
+
+
 				proj.userGroups.each { userGroup ->
-					doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
-					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+					doc.put(searchFieldsConfig.USER_GROUP, userGroup.id);
+					doc.put(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
 				}
-				docs.add(doc);
-			
+        String values = "";
+        doc.each { k,v ->
+          values += v.toString() +" ";
+        }
+
+        doc.put("all",values)
+				eDocs.add(doc);
+
 		}
 
-        return commitDocs(docs, commit);
+        postToElastic(eDocs,"project")
+        //return commitDocs(docs, commit);
 	}
 
     def delete(long id) {
