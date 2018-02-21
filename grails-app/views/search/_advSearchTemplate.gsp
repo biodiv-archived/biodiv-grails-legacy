@@ -2,8 +2,8 @@
 <%@page import="java.text.SimpleDateFormat" %>
 <%@page import="species.License.LicenseType"%>
 
-<g:set var="modules"  value="[All:[name:'All',displayName:g.message(code:'default.all.label') ], Species:[name:'Species', template:'species',displayName:g.message(code:'default.species.label')], Observation:[name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], Document:[name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], SUser:[name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], UserGroup:[name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], Resource:[name:'Resource', template:'resource',displayName:g.message(code:'resource.label')], Checklists:[name:'Checklists', template:'observation',displayName:g.message(code:'checklists.label')], Newsletter:[name:'Newsletter', template:'newsletter',displayName:g.message(code:'title.value.newsletter')], Pages:[name:'Pages', template:'pages',displayName:g.message(code:'default.pages.label')]]"/>
 
+            <g:set var="modules"  value="[All:[name:'All',displayName:g.message(code:'default.all.label') ], Species:[name:'Species', template:'species',displayName:g.message(code:'default.species.label')], Observation:[name:'Observation', template:'observation',displayName:g.message(code:'observation.label')], Document:[name:'Document', template:'document',displayName:g.message(code:'feature.part.document')], SUser:[name:'SUser', template:'SUser',displayName:g.message(code:'search.suser')], UserGroup:[name:'UserGroup', template:'userGroup',displayName:g.message(code:'userGroup.label')], Resource:[name:'Resource', template:'resource',displayName:g.message(code:'resource.label')], Checklists:[name:'Checklists', template:'observation',displayName:g.message(code:'checklists.label')], Newsletter:[name:'Newsletter', template:'newsletter',displayName:g.message(code:'title.value.newsletter')], Pages:[name:'Pages', template:'pages',displayName:g.message(code:'default.pages.label')]]"/>
 <div  class="block-tagadelic">
 
     <form id="advSearchForm" method="get"  title="${g.message(code:'button.advanced.search')}"
@@ -22,7 +22,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="name">${g.message(code:"default.species.label")}</label> 
+            <label class="control-label" for="name">${g.message(code:"default.species.label")}</label>
             <div class="controls nameContainer" style="position:relative;">
                 <input id="aq.name"
                 data-provide="typeahead" type="text" class="input-block-level"
@@ -34,7 +34,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="location">${g.message(code:"default.location.label")}</label> 
+            <label class="control-label" for="location">${g.message(code:"default.location.label")}</label>
             <div class="controls">
                 <input id="aq.location"
                 data-provide="typeahead" type="text" class="input-block-level"
@@ -44,22 +44,22 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="text">${g.message(code:"default.content.label")}</label> 
+            <label class="control-label" for="text">${g.message(code:"default.content.label")}</label>
             <div class="controls">
                 <input id="aq.text"
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.text" value="${queryParams?queryParams['aq.text']?.encodeAsHTML():''}"
-                placeholder="${g.message(code:'placeholder.search.all.content')}" /> 
+                placeholder="${g.message(code:'placeholder.search.all.content')}" />
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="text">${g.message(code:'default.tags.label')}</label> 
+            <label class="control-label" for="text">${g.message(code:'default.tags.label')}</label>
             <div class="controls">
                 <input
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.tag" value="${queryParams?queryParams['aq.tag']?.encodeAsHTML():''}"
-                placeholder="${g.message(code:'placeholder.search.all.tags')}" /> 
+                placeholder="${g.message(code:'placeholder.search.all.tags')}" />
             </div>
         </div>
 
@@ -67,7 +67,7 @@
 
 
         <div class="control-group">
-            <label class="control-label" for="contributor">${g.message(code:"placeholder.contributor")}</label> 
+            <label class="control-label" for="contributor">${g.message(code:"placeholder.contributor")}</label>
             <div class="controls">
                 <input id="aq.contributor"
                 data-provide="typeahead" type="text" class="input-block-level"
@@ -77,7 +77,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="attribution">${g.message(code:"default.attribution.label")}</label> 
+            <label class="control-label" for="attribution">${g.message(code:"default.attribution.label")}</label>
             <div class="controls">
                 <input id="aq.attribution"
                 data-provide="typeahead" type="text" class="input-block-level"
@@ -88,17 +88,17 @@
 
 
         <div class="control-group">
-            <label class="control-label" for="members">${g.message(code:'default.members.label')}</label> 
+            <label class="control-label" for="members">${g.message(code:'default.members.label')}</label>
             <div class="controls">
                 <input
                 data-provide="typeahead" type="text" class="input-block-level"
                 name="aq.members" value="${queryParams?queryParams['aq.members']?.encodeAsHTML():''}"
-                placeholder="${g.message(code:'placeholder.search.members')}" /> 
+                placeholder="${g.message(code:'placeholder.search.members')}" />
             </div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="license">${g.message(code:"default.licenses.label")}</label> 
+            <label class="control-label" for="license">${g.message(code:"default.licenses.label")}</label>
             <div class="controls">
                 <select name="aq.license" multiple="multiple" class="multiselect licenseFilter input-block-level">
                     <g:each in="${LicenseType.toList()}" var="license">
@@ -123,13 +123,13 @@
 
         <div class="control-group">
             <div style="${params.webaddress?:'display:none;'}">
-                <label class="radio inline"> 
-                    <input type="radio" id="uGroup_ALL" name="uGroup" 
+                <label class="radio inline">
+                    <input type="radio" id="uGroup_ALL" name="uGroup"
                     value="ALL"> ${g.message(code:'default.search.in.all.groups')} </label> <label
-                    class="radio inline"> 
-                   
+                    class="radio inline">
 
-                    <input type="radio" id="uGroup_THIS_GROUP" name="uGroup" 
+
+                    <input type="radio" id="uGroup_THIS_GROUP" name="uGroup"
                     value="${userGroupInstance?.id}"> ${g.message(code:'default.search.within.this.group')} </label>
 
             </div>
@@ -148,7 +148,7 @@
         </div>
         </g:if>
         </g:each>
-    
+
         <g:render template="/search/advSearchCommonFooterOptionsTemplate"/>
 
     <div class="form-action">
@@ -187,7 +187,7 @@ $(document).ready(function(){
             endDate: endDate,
             maxDate: moment(),
             parentEl:$("#uploadedOnDatePicker")
-        }, 
+        },
         function(start, end, label) {
             $('#uploadedOn span.date').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
         }
@@ -226,7 +226,7 @@ $(document).ready(function(){
             $( "#advSearchForm" ).attr('action', "${Utils.getIBPServerDomain()}"+$( "#advSearchForm" ).attr('action'));
             updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
             return false;
-        } 
+        }
         resetSearchFilters();
         updateGallery($( "#advSearchForm" ).attr('action'), undefined, undefined, undefined, false);
         return false;
@@ -275,7 +275,7 @@ $(document).ready(function(){
     });
 
     $('.daterangepicker').parent().width('230%');
-    $('button.multiselect').css('text-align','left'); 
+    $('button.multiselect').css('text-align','left');
 
     $('#advSearchDropdownA').on('click', function (event) {
         $(this).parent().toggleClass("open");

@@ -64,9 +64,9 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
         HttpServletRequest request = servletRequest
         HttpServletResponse response = servletResponse
         String url = request.requestURI.substring(request.contextPath.length())
-        println "+++++++++++++++++++++++++++++++++++++++++++++++++++"+url;
-        println chain
-        println SecurityContextHolder.context
+        // println "+++++++++++++++++++++++++++++++++++++++++++++++++++"+url;
+        // println chain
+        // println SecurityContextHolder.context
         logger.debug("Processing url: $url with params : ${request.getParameterMap()} with method : ${request.getMethod()}")
         //logger.debug("SecurityContext authentication : ${SecurityContextHolder.context.authentication }");
         if (url != logoutUrl && SecurityContextHolder.context.authentication == null) {
@@ -75,11 +75,11 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
             Cookie cookie = facebookAuthUtils.getAuthCookie(request)
             Cookie fbLoginCookie = facebookAuthUtils.getFBLoginCookie(request);
             Cookie jwtTokenCookie = facebookAuthUtils.getJwtTokenCookie(request);
-            logger.debug ("Got jwtToken : ${jwtTokenCookie}"); 
+            logger.debug ("Got jwtToken : ${jwtTokenCookie}");
             def token;
             if(jwtTokenCookie != null) {
                 token = facebookAuthUtils.buildJwtToken(jwtTokenCookie.value);
-                logger.debug ("Got jwtToken : ${token}"); 
+                logger.debug ("Got jwtToken : ${token}");
             }
 
             if (cookie != null && fbLoginCookie != null) {
@@ -96,14 +96,14 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                         //logger.debug("Got fbAuthToken user ${token?.user}");
                         Authentication authentication = null
                         authentication = authenticationManager.authenticate(token);
-                        println authentication
-                        println "+++++++++++++++++++++++++++++++++++++++"
+                        // println authentication
+                        // println "+++++++++++++++++++++++++++++++++++++++"
                         if (authentication && authentication.authenticated) {
 
 
                             // Store to SecurityContextHolder
                             SecurityContextHolder.context.authentication = authentication;
-        println SecurityContextHolder.context
+        // println SecurityContextHolder.context
 
                             // Fire event only if its the authSuccess url
                             if (this.eventPublisher != null && (url == '/login/authSuccess' || url == '/oauth/google/success')) {
@@ -125,7 +125,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                 } catch(UsernameNotFoundException e) {
                     e.printStackTrace();
                     logger.info("UsernameNotFoundException: $e.message")
-                    println url;
+                    // println url;
                     def referer = request.getHeader("referer");
                     if(url == '/login/authSuccess' || url == '/oauth/google/success') {
                         log.debug "Handling Usernamenotfound for token ${token}"
@@ -164,7 +164,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
         }
 
         //when not authenticated, don't have auth cookie or bad credentials
-        println "Continuing filter chain==========================="
+        // println "Continuing filter chain==========================="
         chain.doFilter(request, response)
     }
 

@@ -90,7 +90,7 @@ beans = {
 
     def configRoot = CH.config
     def config = CH.config.speciesPortal.search
-
+/*
     if (Environment.current == Environment.DEVELOPMENT) {
         // In development we use messageLocalService as implementation
         // of MessageService.
@@ -100,17 +100,10 @@ beans = {
         container.load() 
             
         
-//        speciesSolrServer(EmbeddedSolrServer, container, "biodiv" )
-//        observationsSolrServer(EmbeddedSolrServer, container, "biodiv" );
-//        newsletterSolrServer(EmbeddedSolrServer, container, "biodiv" );
-            projectSolrServer(EmbeddedSolrServer, container, "projects" );
-        //checklistSolrServer(EmbeddedSolrServer, container, "checklists" );
-//        documentSolrServer(EmbeddedSolrServer, container, "biodiv" );
-//        usersSolrServer(EmbeddedSolrServer, container, "biodiv" );
-//        userGroupSolrServer(EmbeddedSolrServer, container, "biodiv" );
+        projectSolrServer(EmbeddedSolrServer, container, "projects" );
         biodivSolrServer(EmbeddedSolrServer, container, "biodiv" );
 
-    } else {
+    } else {*/
 /*        speciesSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
@@ -194,7 +187,7 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             println "Initialized search server to "+config.serverURL+"/biodiv"
          }
-    }//end of initializing solr Server
+//    }//end of initializing solr Server
     
     resourceSearchService(speciespage.search.ResourceSearchService) {
         solrServer = ref('biodivSolrServer');

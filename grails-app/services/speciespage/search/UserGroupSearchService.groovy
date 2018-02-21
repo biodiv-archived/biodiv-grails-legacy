@@ -26,15 +26,15 @@ class UserGroupSearchService extends AbstractSearchService {
     static transactional = false
 
 	/**
-	 * 
+	 *
 	 */
 	def publishSearchIndex() {
 		log.info "Initializing publishing to usergroup search index"
-		
+
 		//TODO: change limit
-		int limit = BATCH_SIZE//UserGroup.count()+1, 
+		int limit = BATCH_SIZE//UserGroup.count()+1,
         int offset = 0, noIndexed = 0;
-		
+
 		def userGroups;
         def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:UserGroup.count()+1;
@@ -56,7 +56,7 @@ class UserGroupSearchService extends AbstractSearchService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param species
 	 * @return
 	 */
@@ -67,38 +67,48 @@ class UserGroupSearchService extends AbstractSearchService {
 		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+		// Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+
+    List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
+
 		Map names = [:];
 		Map docsMap = [:]
 		ugs.each { ug ->
 			log.debug "Reading usergroup : "+ug.id;
 
-				SolrInputDocument doc = new SolrInputDocument();
-                doc.setDocumentBoost(3);
-				doc.addField(searchFieldsConfig.ID, ug.class.simpleName +"_"+ ug.id.toString());
-			    doc.addField(searchFieldsConfig.OBJECT_TYPE, ug.class.simpleName);
-				doc.addField(searchFieldsConfig.TITLE, ug.name);
+				// SolrInputDocument doc = new SolrInputDocument();
+        Map<String,Object> doc=new HashMap<String,Object>();
+
+              //  doc.setDocumentBoost(3);
+				doc.put(searchFieldsConfig.ID, ug.id.toString());
+			    doc.put(searchFieldsConfig.OBJECT_TYPE, ug.class.simpleName);
+				doc.put(searchFieldsConfig.TITLE, ug.name);
 				//Location
-                doc.addField(searchFieldsConfig.UPLOADED_ON, ug.foundedOn);
+                doc.put(searchFieldsConfig.UPLOADED_ON, ug.foundedOn);
 				//Pages
                 def allPages = ""
                 ug.newsletters.each {
                     allPages += it.title + " "
                 }
-                doc.addField(searchFieldsConfig.PAGES, allPages);
-                
+                doc.put(searchFieldsConfig.PAGES, allPages);
+
                 String memberInfo = ""
                 List allMembers = utilsServiceBean.getParticipants(ug)
                 allMembers.each { mem ->
                     memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
-                    doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+                    doc.put(searchFieldsConfig.MEMBERS, memberInfo);
+                }
+                String values = "";
+                doc.each { k,v ->
+                  values += v.toString() +" ";
                 }
 
-                docs.add(doc);
-			
-		}
+                doc.put("all",values)
+                eDocs.add(doc);
 
-        return commitDocs(docs, commit);
+		}
+    postToElastic(eDocs,"usergroup")
+        //return commitDocs(docs, commit);
 	}
 
     def delete(long id) {
