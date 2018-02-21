@@ -283,6 +283,30 @@ log.debug fbProfile
 		}
 	}
 
+	def createSocialAccountFromProfile () {
+        log.info "Redirecting to register"
+        println params
+        CustomRegisterCommand command = new CustomRegisterCommand();
+        Map profile = params;
+        command['username'] = profile.username
+        command['name'] = profile.name
+        command['email'] = profile.email
+        if(profile.website)
+            command['website'] = profile.website
+            command['profilePic'] = "http://graph.facebook.com/$profile.id/picture?type=large";
+        if(profile.timezone)
+            command['timezone'] = profile.timezone;
+        if(profile.link)
+            command.openId = profile.link
+        if(profile.sexType) 
+            command.sexType = profile.sexType.toLowerCase().capitalize();
+        if(profile.facebookUser)
+            command.facebookUser = true;
+        log.debug "register command : $command"
+        flash.chainedParams = [command: command]
+        chain ( controller:"register");
+	}
+
 	/**
 	 * Authenticate the user for real now that the account exists/is linked and redirect
 	 * to the originally-requested uri if there's a SavedRequest.

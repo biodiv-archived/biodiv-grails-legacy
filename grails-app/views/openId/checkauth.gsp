@@ -23,7 +23,14 @@
             'loginUrl':"biodiv-api/login",
             'tokenUrl':"biodiv-api/login/token",
             logoutUrl : "${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
-            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
+            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}",
+            api: {
+                cookie : {
+                    domain : "${grailsApplication.config.speciesPortal.api.cookie.domain}",
+                    path : "${grailsApplication.config.speciesPortal.api.cookie.path}"
+                }
+            }
+ 
         }
     }
 </script>
