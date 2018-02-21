@@ -102,12 +102,7 @@ class NewsletterSearchService extends AbstractSearchService {
 //				obv.tags.each { tag ->
 //					doc.put(searchFieldsConfig.TAG, tag);
 //				}
-    String values = "";
-    doc.each { k,v ->
-      values += v.toString() +" ";
-    }
-
-    doc.put("all",values)
+  
 				eDocs.add(doc);
 
 		}

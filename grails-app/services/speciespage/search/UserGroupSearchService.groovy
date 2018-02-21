@@ -98,12 +98,7 @@ class UserGroupSearchService extends AbstractSearchService {
                     memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
                     doc.put(searchFieldsConfig.MEMBERS, memberInfo);
                 }
-                String values = "";
-                doc.each { k,v ->
-                  values += v.toString() +" ";
-                }
-
-                doc.put("all",values)
+              
                 eDocs.add(doc);
 
 		}

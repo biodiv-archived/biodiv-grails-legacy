@@ -86,12 +86,7 @@ class ResourceSearchService extends AbstractSearchService {
         resources.each { r ->
             log.debug "Reading Resource : "+r.id;
             Map<String,Object> doc = getSolrDocument(r);
-            String values = "";
-            doc.each { k,v ->
-              values += v.toString() +" ";
-            }
-
-            doc.put("all",values)
+          
             eDocs.add(doc);
         }
         postToElastic(eDocs,"resource")

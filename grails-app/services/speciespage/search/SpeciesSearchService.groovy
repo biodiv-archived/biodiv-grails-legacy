@@ -235,12 +235,7 @@ class SpeciesSearchService extends AbstractSearchService {
 
             //List resourceDocs = getResourcesDocs(s);
 
-            String values = "";
-            doc.each { k,v ->
-              values += v.toString() +" ";
-            }
-
-      doc.put("all",values)
+          
 			eDocs.add(doc);
 			//eDocs.addAll(resourceDocs);
 		}

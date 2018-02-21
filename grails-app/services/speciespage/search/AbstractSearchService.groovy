@@ -85,8 +85,9 @@ abstract class AbstractSearchService {
     */
     void postToElastic(List doc,String index){
       if(!doc) return;
-        //def searchConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
-        def http = new HTTPBuilder('http://localhost:8081')
+        def searchConfig = grailsApplication.config.speciesPortal
+        def URL=searchConfig.search.nakshaURL;
+        def http = new HTTPBuilder(URL)
         http.request(POST,ContentType.JSON) {
             uri.path = "/naksha/services/bulk-upload/${index}/${index}";
             body = doc
@@ -130,13 +131,14 @@ abstract class AbstractSearchService {
      */
     def search(params) {
         //def params = SolrParams.toSolrParams(query);
-
+          def searchConfig = grailsApplication.config.speciesPortal
+        def URL=searchConfig.search.biodivApiURL;
         log.info "######Running ${this.getClass().getName()} search query : "+params
         def result = [];
         def queryResponse;
         def http = new HTTPBuilder()
 
-              http.request( 'http://localhost:8081', GET, ContentType.JSON ) { req ->
+              http.request( URL, GET, ContentType.JSON ) { req ->
                 uri.path = '/biodiv-api/search/all'
                 uri.query = [ query:params.query,object_type:params.object_type,name:params.aq?params.aq.name:null,text:params.aq?params.aq.text:null,
                 location:params.aq?.location,contributor:params.aq?.contributor,license:params.aq?.license,member:params.aq?.member,
