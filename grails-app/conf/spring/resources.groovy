@@ -27,7 +27,7 @@ import org.apache.solr.core.CoreContainer;
 import grails.util.Environment
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
-import grails.util.Holders as CH 
+import grails.util.Holders as CH
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import species.auth.DefaultOauthUserDetailsService;
@@ -59,7 +59,7 @@ beans = {
         useReferer = true // false
         redirectStrategy = ref('redirectStrategy')
     }
-    
+
     // default 'authenticationEntryPoint'
     //overriding entry point defined in rest plugin to redirect to login page on accessdenied exception. Workd only when anonymous auth is present in the session
     authenticationEntryPoint(AjaxAwareAuthenticationEntryPoint, conf.auth.loginFormUrl) { // '/login/auth'
@@ -68,7 +68,7 @@ beans = {
         useForward = conf.auth.useForward // false
         portMapper = ref('portMapper')
         portResolver = ref('portResolver')
-        userGroupService = ref('userGroupService') 
+        userGroupService = ref('userGroupService')
     }
 
     /** securityContextRepository */
@@ -78,7 +78,7 @@ beans = {
         springSecurityContextKey = conf.scr.springSecurityContextKey // SPRING_SECURITY_CONTEXT
     }
 
-          
+
     requestCache(HttpSessionRequestCache) {
         portResolver = ref('portResolver')
         createSessionAllowed = false//conf.requestCache.createSession // true
@@ -97,9 +97,9 @@ beans = {
 	//File home = new File("${configRoot.speciesPortal.app.rootDir}/solr" );
         //File f = new File( home, "solr.xml" );
         CoreContainer container = new CoreContainer("${configRoot.speciesPortal.app.rootDir}/solr");
-        container.load() 
-            
-        
+        container.load()
+
+
         projectSolrServer(EmbeddedSolrServer, container, "projects" );
         biodivSolrServer(EmbeddedSolrServer, container, "biodiv" );
 
@@ -163,7 +163,7 @@ beans = {
             //setParser(new XMLResponseParser()); // binary parser is used by default
             println "Initialized search server to "+config.serverURL+"/documents"
          }
-        
+
         userGroupSolrServer(org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer,config.serverURL+"/biodiv", config.queueSize, config.threadCount ) {
             setSoTimeout(config.soTimeout);
             setConnectionTimeout(config.connectionTimeout);
@@ -188,21 +188,25 @@ beans = {
             println "Initialized search server to "+config.serverURL+"/biodiv"
          }
 //    }//end of initializing solr Server
-    
+
     resourceSearchService(speciespage.search.ResourceSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+      grailsApplication = ref('grailsApplication');
     }
 
     speciesSearchService(speciespage.search.SpeciesSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
         resourceSearchService = ref('resourceSearchService');
+          grailsApplication = ref('grailsApplication');
     }
     observationsSearchService(speciespage.search.ObservationsSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
         resourceSearchService = ref('resourceSearchService');
+
+     grailsApplication = ref('grailsApplication');
      }
     //checklistSearchService(speciespage.search.ChecklistSearchService) {
     //    solrServer = ref('checklistSolrServer');
@@ -210,22 +214,32 @@ beans = {
     newsletterSearchService(speciespage.search.NewsletterSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+      grailsApplication = ref('grailsApplication');
+
     }
     projectSearchService(speciespage.search.ProjectSearchService) {
         solrServer = ref('projectSolrServer');
 		sessionFactory = ref("sessionFactory");
+    grailsApplication = ref('grailsApplication');
+
     }
     documentSearchService(speciespage.search.DocumentSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+    grailsApplication = ref('grailsApplication');
+
     }
     SUserSearchService(speciespage.search.SUserSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+    grailsApplication = ref('grailsApplication');
+
     }
     userGroupSearchService(speciespage.search.UserGroupSearchService) {
         solrServer = ref('biodivSolrServer');
 		sessionFactory = ref("sessionFactory");
+    grailsApplication = ref('grailsApplication');
+
     }
 
     biodivSearchService(speciespage.search.BiodivSearchService) {
@@ -257,8 +271,8 @@ beans = {
 
     }
 
-    facebookAuthUtils(FacebookAuthUtils) { 
-        grailsApplication = ref('grailsApplication') 
+    facebookAuthUtils(FacebookAuthUtils) {
+        grailsApplication = ref('grailsApplication')
         apiKey = conf.facebook.apiKey
         secret = conf.facebook.secret
         applicationId = conf.facebook.appId
@@ -267,8 +281,8 @@ beans = {
         userDetailsService = ref('userDetailsService')
     }
 
-    facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) { 
-        facebookAuthUtils = ref('facebookAuthUtils') 
+    facebookAuthCookieLogout(FacebookAuthCookieLogoutHandler) {
+        facebookAuthUtils = ref('facebookAuthUtils')
         facebookAuthDao = ref('facebookAuthDao')
     }
     SpringSecurityUtils.registerLogoutHandler('facebookAuthCookieLogout')
@@ -356,7 +370,7 @@ beans = {
         unreturnedConnectionTimeout = 90 // seconds
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
-     } 
+     }
 
     /*if (Environment.current == Environment.DEVELOPMENT) {
     log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
@@ -377,7 +391,7 @@ beans = {
         userDetailsService = ref('userDetailsService')
         userService = ref('SUserService')
     }
-    
+
     restOauthService(MyOauthService) {
         tokenGenerator = ref('tokenGenerator')
         tokenStorageService = ref('tokenStorageService')
@@ -388,9 +402,9 @@ beans = {
     }
 
     customObjectMarshallers( CustomObjectMarshallers ) {
-        grailsApplication = ref('grailsApplication') 
-        userGroupService = ref('userGroupService') 
-        observationService = ref('observationService') 
+        grailsApplication = ref('grailsApplication')
+        userGroupService = ref('userGroupService')
+        observationService = ref('observationService')
 
         marshallers = [
             new ObservationMarshaller(),
@@ -403,7 +417,7 @@ beans = {
     }
 
     restAuthenticationTokenJsonRenderer(BiodivRestAuthenticationTokenJsonRenderer)
-    restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler) { 
+    restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler) {
         renderer = ref('restAuthenticationTokenJsonRenderer')
     }
     /* restAuthenticationFilter */
@@ -426,10 +440,10 @@ beans = {
     commentV1Renderer(CommentRenderer, Comment, v1_MIME_TYPE) {
     }
  */
-    
+
     restTokenValidationFilter(RestTokenValidationFilter) {
-        grailsApplication = ref('grailsApplication') 
-        webInvocationPrivilegeEvaluator = ref('webInvocationPrivilegeEvaluator') 
+        grailsApplication = ref('grailsApplication')
+        webInvocationPrivilegeEvaluator = ref('webInvocationPrivilegeEvaluator')
         headerName = conf.rest.token.validation.headerName
         validationEndpointUrl = conf.rest.token.validation.endpointUrl
         active = conf.rest.token.validation.active
@@ -446,5 +460,3 @@ beans = {
         coreUserDetailsService = ref('userDetailsService')
     }
 }
-
-
