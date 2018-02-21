@@ -246,5 +246,5 @@ grails.project.dependency.resolution = {
 }
 
 development{
-    grails.server.port.http=8085
+    grails.server.port.http=8080
 }
