@@ -190,8 +190,8 @@ console.log(data);
     var expires_in = new Date();
     expires_in.setTime(decoded.exp);
 
-    $.cookie("BAToken", data.access_token, {path : '/', expires : expires_in});
-    $.cookie("BRToken", data.refresh_token, {path : '/', expires : 60});//setting for 60 days
+    $.cookie("BAToken", data.access_token, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain, expires : expires_in});
+    $.cookie("BRToken", data.refresh_token, {path : window.params.login.api.cookie.path, domain:window.params.login.api.cookie.domain, expires : 60});//setting for 60 days
     if(typeof isAjax === 'undefined')
        isAjax = $("#ajaxLogin").is(':visible'); 
     if(isAjax == false) {

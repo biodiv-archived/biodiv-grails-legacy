@@ -88,6 +88,10 @@ $(document).ready(function() {
                 loginUrl : "${grailsApplication.config.speciesPortal.api.loginURL}", 
                 tokenUrl : "${grailsApplication.config.speciesPortal.api.tokenURL}", 
                 logoutUrl : "${grailsApplication.config.speciesPortal.api.logoutURL}", 
+                cookie : {
+                    domain : "${grailsApplication.config.speciesPortal.api.cookie.domain}",
+                    path : "${grailsApplication.config.speciesPortal.api.cookie.path}"
+                },
                 facebook : {
                     apiKey : "${grailsApplication.config.speciesPortal.api.facebook.apiKey}",
                     redirect_uri : "${grailsApplication.config.speciesPortal.api.facebook.redirect_uri}"
