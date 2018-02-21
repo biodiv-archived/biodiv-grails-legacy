@@ -120,12 +120,7 @@ class DocumentSearchService extends AbstractSearchService {
             }
 
             doc.put(searchFieldsConfig.DOC_TYPE, document.type);
-            String values = "";
-            doc.each { k,v ->
-              values += v.toString() +" ";
-            }
-
-            doc.put("all",values)
+          
             eDocs.add(doc);
 
         }

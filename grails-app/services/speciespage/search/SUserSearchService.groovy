@@ -90,7 +90,7 @@ class SUserSearchService extends AbstractSearchService {
             doc.put(searchFieldsConfig.EMAIL, suser.email);
             doc.put(searchFieldsConfig.ABOUT_ME, suser.aboutMe);
             doc.put(searchFieldsConfig.LAST_LOGIN, suser.lastLoginDate);
-            doc.put(searchFieldsConfig.LOCATION, suser.location);
+            doc.put("placename", suser.location);
 
             String userInfo = suser.name + " ### " + suser.email +" "+ suser.username +" "+suser.id.toString()
             doc.put(searchFieldsConfig.USER, userInfo);
@@ -103,12 +103,7 @@ class SUserSearchService extends AbstractSearchService {
                 doc.put(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
             }
 
-            String values = "";
-            doc.each { k,v ->
-              values += v.toString() +" "
-            }
 
-            doc.put("all",values)
 
             eDocs.add(doc);
 		}

@@ -466,8 +466,10 @@ class ObservationsSearchService extends AbstractSearchService {
     void postToElastic(Map doc) {
       if(!doc) return;
       println doc
-        def searchConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
-        def http = new HTTPBuilder('http://localhost:8081')
+        def searchConfig = grailsApplication.config.speciesPortal
+      def URL=searchConfig.search.nakshaURL;
+
+        def http = new HTTPBuilder(URL)
         http.request(ContentType.POST, groovyx.net.http.ContentType.JSON) {
             uri.path = "/biodiv-api/naksha/observation/observation/${doc.id}";
             body = doc

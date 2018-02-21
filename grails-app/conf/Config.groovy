@@ -520,8 +520,8 @@ environments {
         speciesPortal {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://10.0.0.11/solr"
-            search.nakshaURL = "http://localhost:8090/biodiv-api"
-             search.nakshaURL = "http://localhost:8090/biodiv-api"
+            search.biodivApiURL="http://localhost:8090"
+            search.nakshaURL = "http://localhost:8080"
             //names.parser.serverURL = "10.0.0.10"
         }
         google.analytics.enabled = false
@@ -663,7 +663,8 @@ environments {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
-
+            search.biodivApiURL="http://localhost:8081"
+            search.nakshaURL = "http://localhost:8081"
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
@@ -812,7 +813,8 @@ environments {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
-
+            search.biodivApiUrl="http://localhost:8081"
+            search.nakshaURL = "http://localhost:8081"
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "http://${servername}/${appName}/img"
