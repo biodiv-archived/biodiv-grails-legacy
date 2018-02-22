@@ -125,11 +125,18 @@ function clearAllCookies() {
     }
     document.cookie = clearCookies;
 */
-    document.cookie.split(";").forEach(function(c) { 
-        console.log(c);
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-    });
+//    document.cookie.split(";").forEach(function(c) { 
+//        console.log(c);
+//        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+//    });
 
+
+    $.cookie('BAToken',null, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain});
+    $.cookie('BRToken',null, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain});
+
+    localStorage.removeItem("id");
+    localStorage.removeItem("pic");
+    localStorage.removeItem("name");
 }
 
 function callAuthSuccessUrl(url, p) {
@@ -192,6 +199,10 @@ console.log(data);
 
     $.cookie("BAToken", data.access_token, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain, expires : expires_in});
     $.cookie("BRToken", data.refresh_token, {path : window.params.login.api.cookie.path, domain:window.params.login.api.cookie.domain, expires : 60});//setting for 60 days
+    localStorage.setItem("id", data.id);
+    localStorage.setItem("pic", data.pic);
+    localStorage.setItem("name", data.name);
+
     if(typeof isAjax === 'undefined')
        isAjax = $("#ajaxLogin").is(':visible'); 
     if(isAjax == false) {
