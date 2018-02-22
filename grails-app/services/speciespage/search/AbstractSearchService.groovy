@@ -131,7 +131,12 @@ abstract class AbstractSearchService {
      */
     def search(params) {
         //def params = SolrParams.toSolrParams(query);
-          def searchConfig = grailsApplication.config.speciesPortal
+
+
+    
+
+
+        def searchConfig = grailsApplication.config.speciesPortal
         def URL=searchConfig.search.biodivApiURL;
         log.info "######Running ${this.getClass().getName()} search query : "+params
         def result = [];
@@ -140,7 +145,7 @@ abstract class AbstractSearchService {
 
               http.request( URL, GET, ContentType.JSON ) { req ->
                 uri.path = '/biodiv-api/search/all'
-                uri.query = [ query:params.query,object_type:params.aq?.object_type,name:params.aq?params.aq.name:null,text:params.aq?params.aq.text:null,
+                uri.query = [ query:params.query,object_type:(params.aq?.object_type?:params.object_type),name:params.aq?params.aq.name:null,text:params.aq?params.aq.text:null,
                 location:params.aq?.location,contributor:params.aq?.contributor,license:params.aq?.license,member:params.aq?.member,user:params.aq?.user,
                 attribution:params.aq?.attribution,from:params?.offset]
                 headers.Accept = 'application/json'
