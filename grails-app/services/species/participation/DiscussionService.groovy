@@ -13,9 +13,7 @@ import species.Habitat
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
-import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
-import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
 import species.utils.Utils;
@@ -101,7 +99,6 @@ class DiscussionService extends AbstractObjectService {
 	Map getFilteredDiscussions(params, max, offset) {
 		def res = [canPullResource:userGroupService.getResourcePullPermission(params)]
 		if(Utils.isSearchAction(params)){
-			//returning docs from solr search
 			res.putAll(search(params))
 		}else{
 			res.putAll(getDiscussionFromDB(params, max, offset))

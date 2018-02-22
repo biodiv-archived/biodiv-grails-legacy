@@ -14,7 +14,6 @@ import java.util.List
 import java.util.Map
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.solr.common.util.NamedList;
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.dao.DataIntegrityViolationException

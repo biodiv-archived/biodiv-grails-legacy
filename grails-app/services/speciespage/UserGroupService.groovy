@@ -10,7 +10,6 @@ import grails.plugin.springsecurity.annotation.Secured;
 import groovy.sql.Sql;
 import groovy.util.Eval;
 
-import org.apache.solr.common.SolrException;
 import org.hibernate.FlushMode;
 
 import grails.plugin.springsecurity.SpringSecurityUtils;
@@ -836,7 +835,7 @@ class UserGroupService {
 
 		try {
 			model = getFilteredUserGroups(params, max, offset, false);
-		} catch(SolrException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 			//model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
 		}

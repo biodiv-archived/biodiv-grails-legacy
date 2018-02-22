@@ -48,14 +48,8 @@ import species.Metadata
 import species.SpeciesPermission;
 import content.eml.Contact;
 
-//import org.apache.lucene.document.DateField;
-import org.apache.lucene.document.DateTools;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
-
 import grails.converters.JSON;
 import java.net.URLDecoder;
-import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;

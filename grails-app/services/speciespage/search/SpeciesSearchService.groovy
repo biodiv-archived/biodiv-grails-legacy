@@ -6,13 +6,6 @@ import java.text.SimpleDateFormat
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,7 +15,6 @@ import species.Species
 import species.SpeciesField
 import species.Synonyms
 import species.TaxonomyDefinition
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import species.auth.SUser;
 
 class SpeciesSearchService extends AbstractSearchService {
@@ -77,23 +69,18 @@ class SpeciesSearchService extends AbstractSearchService {
 		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 		List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
 		Map names = [:];
 		Map docsMap = [:]
 
 		species.each { s ->
 			log.debug "Reading Species : "+s.id;
-			SolrInputDocument docsa = new SolrInputDocument();
 			Map<String,Object> doc=new HashMap<String,Object>();
           //  doc.setDocumentBoost(2);
 			doc.put(searchFieldsConfig.ID, s.id.toString());
 			doc.put(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
 			doc.put(searchFieldsConfig.GUID, s.guid);
-			docsa.addField(searchFieldsConfig.ID, s.class.simpleName +"_"+s.id.toString());
-			docsa.addField(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
-			docsa.addField(searchFieldsConfig.GUID, s.guid);
-			addNameToDoc(docsa, s.taxonConcept);
+			//addNameToDoc(docsa, s.taxonConcept);
 
 			def syns = s.taxonConcept.fetchSynonyms()
 			syns.each { syn ->
@@ -244,12 +231,7 @@ class SpeciesSearchService extends AbstractSearchService {
 		postToElastic(eDocs,"species")
         //return commitDocs(docs, commit);
 	}
-
-	/**
-	 *
-	 * @param doc
-	 * @param name
-	 */
+/*
 	private void addNameToDoc(SolrInputDocument doc, TaxonomyDefinition name) {
 		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
@@ -271,11 +253,6 @@ class SpeciesSearchService extends AbstractSearchService {
 		}
 	}
 
-	/**
-	 *
-	 * @param names
-	 * @return
-	 */
 	private Map fetchParsedNames(names) {
 		def nameParser = new NamesParser();
 		def parsedNamesMap = [:];
@@ -314,7 +291,7 @@ class SpeciesSearchService extends AbstractSearchService {
         }
         return resourcesDocs;
     }
-
+*/
     def delete(long id) {
         super.delete(Species.simpleName +"_"+id.toString());
     }

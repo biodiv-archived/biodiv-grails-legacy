@@ -16,8 +16,6 @@ import grails.converters.XML;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;

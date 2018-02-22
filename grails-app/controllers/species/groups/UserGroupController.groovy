@@ -103,7 +103,6 @@ def dataSource;
 
 	def filteredList = {
 		def result;
-		//TODO: Dirty hack to feed results through solr if the request is from search
 		if(params.action == 'search') {
 			result = userGroupService.getUserGroupFromSearch(params)
 		} else {

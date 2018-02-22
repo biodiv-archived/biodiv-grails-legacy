@@ -234,8 +234,8 @@ class ActivityFeedService {
 
 def updateDescriptionJSON(ActivityFeed feedInstance) {
 		def activityType = feedInstance.activityType
-		def activityDomainObj = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
-		def activityRootObj = 	getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
+		//def activityDomainObj = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
+		//def activityRootObj = 	getDomainObject(feedInstance.rootHolderType, feedInstance.rootHolderId)
 		def text = null
 		def activityTitle = null;
     def sql = Sql.newInstance(dataSource);

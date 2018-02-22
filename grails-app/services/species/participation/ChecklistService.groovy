@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.springframework.transaction.annotation.Transactional;
@@ -461,15 +459,16 @@ class ChecklistService {
 
 		def queryResponse = checklistSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+        /*    NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Checklists"]);
             }
+        */
         }
 		return result;
 	}
-
+/*
 	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -578,14 +577,14 @@ class ChecklistService {
 			//queryParams = queryResponse.responseHeader.params
 			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), checklistInstanceList:checklistInstanceList, snippets:queryResponse.getHighlighting()]
 			return result;
-		} catch(SolrException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
 		result = [queryParams:queryParams, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
-
+*/
 	private boolean isValidSortParam(String sortParam) {
 		if(sortParam.equalsIgnoreCase("score"))
 			return true

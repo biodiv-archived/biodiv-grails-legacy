@@ -14,9 +14,7 @@ import species.TaxonomyDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
-import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
-import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
 import species.participation.UploadLog;
@@ -213,6 +211,7 @@ class DocumentService extends AbstractMetadataService {
 	 * @param params
 	 * @return
 	 */
+/*
 	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -306,14 +305,14 @@ class DocumentService extends AbstractMetadataService {
             }
 			log.debug "result returned from search: "+ result
 			return result;
-		} catch(SolrException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
-
+*/
 	private boolean isValidSortParam(String sortParam) {
 		if(sortParam.equalsIgnoreCase('createdOn'))
 			return true;
@@ -323,12 +322,12 @@ class DocumentService extends AbstractMetadataService {
 	def nameTerms(params) {
 		List result = new ArrayList();
 
-		def queryResponse = documentSearchService.terms(params.term, params.field, params.max);
+		/*def queryResponse = documentSearchService.terms(params.term, params.field, params.max);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();
 			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Documents"]);
-		}
+		}*/
 		return result;
 	}
 

@@ -33,8 +33,6 @@ import species.Resource;
 import species.BlockedMails;
 import species.Resource.ResourceType;
 import species.auth.SUser;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.participation.ResourceRedirect
 

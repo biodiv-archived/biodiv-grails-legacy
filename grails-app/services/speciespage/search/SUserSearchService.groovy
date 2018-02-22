@@ -8,16 +8,7 @@ import java.util.List
 import java.util.Map
 import java.util.HashMap
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-
 import species.auth.SUser;
-//import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import groovyx.net.http.HTTPBuilder
 
 import groovyx.net.http.ContentType
@@ -72,14 +63,12 @@ class SUserSearchService extends AbstractSearchService {
 
 		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-		//Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
     List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
 		Map names = [:];
 		Map docsMap = [:]
 		susers.each { suser ->
             suser = SUser.read(suser.id);
             log.debug "Reading User : "+suser.id;
-            //SolrInputDocument doc = new SolrInputDocument();
             Map<String,Object> doc=new HashMap<String,Object>();
             //doc.setDocumentBoost(3);
             String className = org.hibernate.Hibernate.getClass(suser).getSimpleName()

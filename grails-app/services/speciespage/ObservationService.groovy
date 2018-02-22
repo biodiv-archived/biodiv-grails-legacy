@@ -64,11 +64,8 @@ import au.com.bytecode.opencsv.CSVWriter
 
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 
 import java.net.URLDecoder;
-import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
@@ -1923,7 +1920,7 @@ println "*******************************************"
 
         try {
             model = getFilteredObservationsFromSearch(params, max, offset, false);
-        } catch(SolrException e) {
+        } catch(Exception e) {
             e.printStackTrace();
             //model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
         }
@@ -1936,6 +1933,7 @@ println "*******************************************"
      * offset: offset results: if offset = -1 its not passed to the
      * executing query
      */
+/*
     Map getFilteredObservationsFromSearch(params, max, offset, isMapView){
         def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, isMapView);
@@ -2013,15 +2011,12 @@ println "*******************************************"
             responseHeader = queryResponse?.responseHeader;
 
         }
-        /*if(responseHeader?.params?.q == "*:*") {
-          responseHeader.params.remove('q');
-          }*/
 
         return [responseHeader:responseHeader, observationInstanceList:instanceList, resultType:'observation', instanceTotal:noOfResults, checklistCount:checklistCount, observationCount: noOfResults-checklistCount , queryParams:queryParams, activeFilters:activeFilters, totalObservationIdList:totalObservationIdList, distinctRecoList:distinctRecoList, speciesGroupCountList:speciesGroupCountList, canPullResource:userGroupService.getResourcePullPermission(params)]
 
     }
 
-    private Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView) {
+  private Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView) {
         def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
@@ -2267,7 +2262,7 @@ println "*******************************************"
         log.debug "Along with faceting params : "+paramsList;
         return [paramsList:paramsList, queryParams:queryParams, activeFilters:activeFilters];
     }
-
+*/
     private boolean isValidSortParam(String sortParam) {
         if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("visitCount")  || sortParam.equalsIgnoreCase("createdOn") || sortParam.equalsIgnoreCase("lastRevised") )
             return true;
@@ -2279,12 +2274,12 @@ println "*******************************************"
 
         def queryResponse = observationsSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+/*            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
             }
-        }
+*/        }
         return result;
     }
 
@@ -2378,31 +2373,7 @@ println "*******************************************"
 
         if(!params.term) return result;
 
-        NamedList paramsList = new NamedList();
-        /*        paramsList.add('fl', 'location_exact');
-        if(springSecurityService.currentUser){
-        paramsList.add('q', "author_id:"+springSecurityService.currentUser.id.toLong())
-        } else {
-        paramsList.add('q', "*:*");
-        }
-        paramsList.add('facet', "true");
-        paramsList.add('facet.field', "location_exact")
-        paramsList.add('facet.mincount', "1")
-        paramsList.add('facet.prefix', params.term?:'*');
-        paramsList.add('facet.limit', 5);
-
-        def facetResults = []
-        if(paramsList) {
-        def queryResponse = observationsSearchService.search(paramsList);
-        List facets = queryResponse.getFacetField('location_exact').getValues()
-
-        facets.each {
-        facetResults.add([value:it.getName(), label:it.getName()+'('+it.getCount()+')',  "category":"My Locations"]);
-        }
-
-        }
-         */
-
+        def paramsList = new HashMap();
         def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         String query = ""
         if(springSecurityService.currentUser){
@@ -2412,13 +2383,13 @@ println "*******************************************"
         }
         query += searchFieldsConfig.LOCATION_EXACT+":"+params.term+'*'?:'*';
 
-        paramsList.add("q", query);
-        paramsList.add("fl", searchFieldsConfig.LOCATION_EXACT+','+searchFieldsConfig.LATLONG+','+searchFieldsConfig.TOPOLOGY);
-        paramsList.add("start", 0);
-        paramsList.add("rows", 20);
+        paramsList.put("q", query);
+        paramsList.put("fl", searchFieldsConfig.LOCATION_EXACT+','+searchFieldsConfig.LATLONG+','+searchFieldsConfig.TOPOLOGY);
+        paramsList.put("start", 0);
+        paramsList.put("rows", 20);
         //paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc,'+searchFieldsConfig.SCORE + " desc ");
-        paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc');
-        paramsList.add("sort", searchFieldsConfig.SCORE + " desc ");
+        paramsList.put("sort", searchFieldsConfig.UPDATED_ON+' desc');
+        paramsList.put("sort", searchFieldsConfig.SCORE + " desc ");
         def results = [];
         Map temp = [:]
         if(paramsList) {
@@ -2753,7 +2724,6 @@ println "*******************************************"
      */
     def getObservationList(params, max, offset, String action, List eagerFetchProperties=null){
 		if(Utils.isSearchAction(params, action)){
-            //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
             def res = []
             idList.each { obvId ->
