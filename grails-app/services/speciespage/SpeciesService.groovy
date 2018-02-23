@@ -3,10 +3,7 @@ package speciespage
 
 import java.util.List
 import java.text.DateFormat
-import org.apache.solr.common.util.DateUtil;
 import org.apache.commons.logging.LogFactory
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
 import grails.plugin.springsecurity.SpringSecurityUtils;
@@ -102,15 +99,16 @@ class SpeciesService extends AbstractObjectService  {
         List result = new ArrayList();
         def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            /*NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
             }
+        */
         }
         return result;
     }
-
+/*
     def search(params) {
         def result;
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -286,14 +284,14 @@ class SpeciesService extends AbstractObjectService  {
             //queryParams = queryResponse.responseHeader.params
             result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()]
             return result;
-        } catch(SolrException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
 
         result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
         return result;
     }
-
+*/
     private boolean isValidSortParam(String sortParam) {
         if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
             return true;

@@ -6,7 +6,6 @@ import grails.converters.XML
 
 import java.util.List;
 
-import org.apache.solr.common.util.NamedList
 
 import species.Species;
 import species.TaxonomyDefinition;

@@ -6,9 +6,7 @@ import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
-import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
-import org.apache.solr.common.util.NamedList;
 import species.utils.Utils;
 import species.AbstractObjectService;
 
@@ -219,12 +217,12 @@ class ProjectService extends AbstractObjectService {
 
 		def queryResponse = projectSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+/*            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Project Pages"]);
             }
-        }
+*/        }
 		return result;
 	}
 
@@ -234,6 +232,7 @@ class ProjectService extends AbstractObjectService {
 	 * @param params
 	 * @return
 	 */
+/*
 	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -327,14 +326,14 @@ class ProjectService extends AbstractObjectService {
 			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), projectInstanceList:projectInstanceList, snippets:queryResponse.getHighlighting()]
 			log.debug "result returned from search: "+ result
 			return result;
-		} catch(SolrException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
 		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
-	
+*/	
 	private boolean isValidSortParam(String sortParam) {
 		if(sortParam.equalsIgnoreCase("grantee") || sortParam.equalsIgnoreCase('lastUpdated'))
 			return true;

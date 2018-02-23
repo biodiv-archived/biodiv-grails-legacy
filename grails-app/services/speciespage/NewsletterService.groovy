@@ -2,8 +2,6 @@ package speciespage
 
 import java.util.Map;
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 
@@ -18,7 +16,7 @@ class NewsletterService {
 
 	def nameTerms(params) {
 		List result = new ArrayList();
-
+/*
 		def queryResponse = newsletterSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
             NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
@@ -28,9 +26,9 @@ class NewsletterService {
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Pages"]);
             }
         }
-		return result;
+*/		return result;
 	}
-
+/*
 	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -127,4 +125,5 @@ println queryResponse.getHighlighting();
 		result = [queryParams:queryParams, total:0, instanceList:[]];
 		return result;
 	}
+*/
 }

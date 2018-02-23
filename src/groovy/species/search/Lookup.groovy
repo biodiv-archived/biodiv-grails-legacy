@@ -5,11 +5,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import org.apache.lucene.util.PriorityQueue;
-
 abstract class Lookup <E>{
-	
+
 	/**
-	 * 
+	 *
 	 * @author sravanthi
 	 *
 	 */
@@ -60,10 +59,9 @@ abstract class Lookup <E>{
 	}
 
 	abstract boolean add(String key, Object value);
-		
-	abstract List<LookupResult> lookup(String key, boolean onlyMorePopular, int num, String nameFilter);
-	
-	abstract List<Object> get(String key);
-	
-}
 
+	abstract List<LookupResult> lookup(String key, boolean onlyMorePopular, int num, String nameFilter);
+
+	abstract List<Object> get(String key);
+
+}

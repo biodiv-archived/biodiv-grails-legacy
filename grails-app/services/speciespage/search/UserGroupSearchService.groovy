@@ -7,15 +7,6 @@ import java.util.Date;
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
-
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
 
@@ -67,7 +58,6 @@ class UserGroupSearchService extends AbstractSearchService {
 		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-		// Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 
     List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
 
@@ -76,7 +66,6 @@ class UserGroupSearchService extends AbstractSearchService {
 		ugs.each { ug ->
 			log.debug "Reading usergroup : "+ug.id;
 
-				// SolrInputDocument doc = new SolrInputDocument();
         Map<String,Object> doc=new HashMap<String,Object>();
 
               //  doc.setDocumentBoost(3);

@@ -7,13 +7,6 @@ import java.util.Date;
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-
 import species.CommonNames
 import species.Habitat;
 import species.NamesParser
@@ -25,7 +18,6 @@ import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import utils.Newsletter;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class NewsletterSearchService extends AbstractSearchService {
 
@@ -73,7 +65,6 @@ class NewsletterSearchService extends AbstractSearchService {
 		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-	//	Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
     List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
 
 		Map names = [:];
@@ -81,7 +72,6 @@ class NewsletterSearchService extends AbstractSearchService {
 		obvs.each { obv ->
 			log.debug "Reading Newsletter : "+obv.id;
 
-				//SolrInputDocument doc = new SolrInputDocument();
         Map<String,Object> doc=new HashMap<String,Object>();
                 //doc.setDocumentBoost(1.5);
                 println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()

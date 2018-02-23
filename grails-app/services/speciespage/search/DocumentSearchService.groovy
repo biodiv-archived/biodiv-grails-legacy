@@ -7,24 +7,12 @@ import java.util.Date;
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-
 import content.eml.Document;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class DocumentSearchService extends AbstractSearchService {
 
     static transactional = false
 
-    /**
-	 *
-	 */
 	def publishSearchIndex() {
 		log.info "Initializing publishing to ufiles search index"
 
@@ -53,20 +41,12 @@ class DocumentSearchService extends AbstractSearchService {
 		log.info "Time taken to publish documents search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
 
-	/**
-	 *
-	 * @param ufiles
-	 * @param commit
-	 * @return
-	 */
 	def publishSearchIndex(List<Document> documents, boolean commit) {
 		if(!documents) return;
 		log.info "Initializing publishing to Documents search index : "+documents.size();
 
         def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
         def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
-
-        //Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
 
         List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
 
@@ -75,9 +55,7 @@ class DocumentSearchService extends AbstractSearchService {
         documents.each { document ->
             log.debug "Reading Document : "+document.id;
 
-          //  SolrInputDocument doc = new SolrInputDocument();
-              Map<String,Object> doc=new HashMap<String,Object>();
-          //  doc.setDocumentBoost(1.5);
+            Map<String,Object> doc=new HashMap<String,Object>();
             doc.put(searchFieldsConfig.ID, document.id.toString());
             doc.put(searchFieldsConfig.OBJECT_TYPE, document.class.simpleName);
             doc.put(searchFieldsConfig.TITLE, document.title);

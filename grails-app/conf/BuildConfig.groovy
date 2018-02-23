@@ -70,16 +70,19 @@ grails.project.dependency.resolution = {
 
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        compile ('org.apache.solr:solr-solrj:4.10.0') {
+        /*compile ('org.apache.solr:solr-solrj:4.10.0') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
-        }
+        }*/
+        compile group: 'org.apache.lucene', name: 'lucene-core', version: '4.10.0'
+        compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '4.10.0'
+        compile group: 'org.apache.lucene', name: 'lucene-suggest', version: '4.10.0'
 
-        if (Environment.current == Environment.DEVELOPMENT) {
+/*        if (Environment.current == Environment.DEVELOPMENT) {
             compile ('org.apache.solr:solr-core:4.10.0') {
                 excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j', 'geronimo-stax-api_1.0_spec', 'hadoop-hdfs', 'hadoop-auth', 'hadoop-annotations', 'hadoop-common'
             }
         }
-
+*/
         compile 'org.restlet.jee:org.restlet:2.1.1'
         compile 'org.restlet.jee:org.restlet.ext.servlet:2.1.1'
 
@@ -246,5 +249,5 @@ grails.project.dependency.resolution = {
 }
 
 development{
-    grails.server.port.http=8080
+    grails.server.port.http=8085
 }

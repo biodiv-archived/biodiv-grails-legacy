@@ -7,14 +7,6 @@ import java.util.Date;
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import org.springframework.transaction.annotation.Transactional
 
 import species.CommonNames
@@ -78,14 +70,13 @@ class ResourceSearchService extends AbstractSearchService {
 
         //def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 
-        //Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
         List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
 
         Map docsMap = [:]
 
         resources.each { r ->
             log.debug "Reading Resource : "+r.id;
-            Map<String,Object> doc = getSolrDocument(r);
+            Map<String,Object> doc = getDocument(r);
           
             eDocs.add(doc);
         }
@@ -96,10 +87,9 @@ class ResourceSearchService extends AbstractSearchService {
 
     /**
      */
-    public Map<String,Object> getSolrDocument(Resource r) {
+    public Map<String,Object> getDocument(Resource r) {
         def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
-        //SolrInputDocument doc = new SolrInputDocument();
-          Map<String,Object> doc=new HashMap<String,Object>();
+        Map<String,Object> doc=new HashMap<String,Object>();
         doc.put(searchFieldsConfig.ID, r.id.toString());
         doc.put(searchFieldsConfig.OBJECT_TYPE, r.class.simpleName);
 

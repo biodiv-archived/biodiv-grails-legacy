@@ -9,19 +9,9 @@ import java.util.Map
 
 import org.hibernate.SessionFactory;
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-import org.apache.solr.common.SolrInputDocument
-  import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.apache.solr.core.CoreContainer;
 import groovyx.net.http.HTTPBuilder
 
 import groovyx.net.http.ContentType
@@ -32,38 +22,25 @@ abstract class AbstractSearchService {
     static transactional = false
 
     def grailsApplication;
-    def utilsServiceBean;
+   // def utilsServiceBean;
+    def utilsService;
 
-    @Autowired
-    ApplicationContext applicationContext
+  //  @Autowired
+  //  ApplicationContext applicationContext
 
     SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    SolrServer solrServer = null;
 	SessionFactory sessionFactory;
     int BATCH_SIZE = 10;
     int INDEX_DOCS = -1;
-
+/*
     def getUtilsServiceBean() {
         if(!utilsServiceBean) {
             utilsServiceBean = applicationContext.getBean("utilsService");
         }
         return utilsServiceBean;
     }
-
-    org.apache.solr.client.solrj.SolrServer  getSolrServer() {
-        println "++++++++++++++++++++++++++++++++++++++++++++++++++"
-        if(!solrServer) {
-            log.debug "Initializing sole contianer and biodivSolrServer"
-            solrServer = applicationContext.getBean("biodivSolrServer");
-        }
-        return solrServer;
-    }
-
-    void setSolrServer (org.apache.solr.client.solrj.SolrServer solrServer) {
-        this.solrServer = solrServer;
-    }
-
+*/
     /**
      *
      */
@@ -83,7 +60,7 @@ abstract class AbstractSearchService {
     /**
     *
     */
-    void postToElastic(List doc,String index){
+    public void postToElastic(List doc,String index){
       if(!doc) return;
         def searchConfig = grailsApplication.config.speciesPortal
         def URL=searchConfig.search.nakshaURL;
@@ -102,39 +79,12 @@ abstract class AbstractSearchService {
     }
 
 
-    public boolean commitDocs(List<SolrInputDocument> docs, boolean commit = true) {
-        if(docs) {
-            try {
-                solrServer.add(docs);
-                if(commit) {
-                    //commit ...server is configured to do an autocommit after 10000 docs or 1hr
-                    if(solrServer instanceof ConcurrentUpdateSolrServer) {
-                        solrServer.blockUntilFinished();
-                    }
-                    solrServer.commit();
-                    log.info "Finished committing to ${this.getClass().getName()} solr core"
-                    return true;
-                }
-            } catch(SolrServerException e) {
-                e.printStackTrace();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
-
     /**
      *
      * @param query
      * @return
      */
     def search(params) {
-        //def params = SolrParams.toSolrParams(query);
-
-
-    
-
 
         def searchConfig = grailsApplication.config.speciesPortal
         def URL=searchConfig.search.biodivApiURL;
@@ -175,9 +125,9 @@ abstract class AbstractSearchService {
     def delete(String id) {
         log.info "Deleting ${this.getClass().getName()} from search index"
         try {
-            solrServer.deleteByQuery("id:${id}");
-            solrServer.commit();
-        } catch(SolrException e) {
+            //solrServer.deleteByQuery("id:${id}");
+            //solrServer.commit();
+        } catch(Exception e) {
             log.error "Error: ${e.getMessage()}"
         }
 
@@ -188,16 +138,8 @@ abstract class AbstractSearchService {
      */
     def deleteIndex() {
         log.info "Deleting  ${this.getClass().getName()} search index"
-        solrServer.deleteByQuery("*:*")
-        solrServer.commit();
-    }
-
-    /**
-     * @return
-     */
-    def optimize() {
-        log.info "Optimizing ${this.getClass().getName()} search index"
-        solrServer.optimize();
+        //solrServer.deleteByQuery("*:*")
+        //solrServer.commit();
     }
 
     /**
@@ -206,7 +148,7 @@ abstract class AbstractSearchService {
      */
     def terms(query, field, limit) {
         field = field ?: "autocomplete";
-        SolrParams q = new SolrQuery().setQueryType("/terms")
+/*        SolrParams q = new SolrQuery().setQueryType("/terms")
         .set(TermsParams.TERMS, true).set(TermsParams.TERMS_FIELD, field)
         .set(TermsParams.TERMS_LOWER, query)
         .set(TermsParams.TERMS_LOWER_INCLUSIVE, true)
@@ -215,9 +157,9 @@ abstract class AbstractSearchService {
         .set(TermsParams.TERMS_LIMIT, limit)
         .set(TermsParams.TERMS_RAW, true);
         log.info "Running observation terms query : "+q
-        def result;
+*/        def result;
         try{
-            result = solrServer.query( q );
+            //result = solrServer.query( q );
         } catch(Exception e) {
             log.error "Query: ${query} - Error: ${e.getMessage()}"
         }

@@ -3,8 +3,6 @@ package species
 import grails.converters.JSON;
 import grails.converters.XML;
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import static org.springframework.http.HttpStatus.*;
 
 import species.utils.Utils;
@@ -86,6 +84,7 @@ class SearchController {
     /**
     *
     */
+    /*
     def search() {
         NamedList paramsList = new NamedList()
         params.each {key,value ->
@@ -95,19 +94,8 @@ class SearchController {
 
         println result;
         println "++++++++++++++++++++++++++++++++++++++++++"
-/*        def facetResults = [];
-        if(result.getFacetField(params['facet.field'])) {
-        List objectTypeFacets = result.getFacetField(params['facet.field'])?.getValues()
-        if(objectTypeFacets) {
-        objectTypeFacets.each {
-            //TODO: sort on name
-            facetResults <<  [name:it.getName(), count:it.getCount()]
 
-        }
-        }
-        }
-*/
         render result as JSON
     }
-
+*/
 }
