@@ -1711,7 +1711,7 @@ def dataSource;
         render rules as JSON
     }
 }
-
+/*
 class UserGroupCommand {
 	String name
 	String webaddress
@@ -1723,5 +1723,6 @@ class UserGroupCommand {
 		name nullable: false, blank:false
 		webaddress nullable: false, blank:false, validator: UserGroupController.webaddressValidator
 		description nullable: false, blank:false
+
 	}
-}
+}*/
