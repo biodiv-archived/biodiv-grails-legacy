@@ -1637,7 +1637,7 @@ grails.hibernate.cache.queries=false
 grails.cache.clearAtStartup = true
 grails{
     cache {
-        enabled = true
+        enabled = false
         ehcache {
 //            ehcacheXmlLocation = 'classpath:ehcache.xml' // conf/ehcache.xml
             reloadable = true
@@ -1645,7 +1645,7 @@ grails{
         }
     }
 }
-
+/*
 grails.cache.config = {
     defaults {
         maxElementsInMemory 10000
@@ -1742,7 +1742,7 @@ grails.cache.config = {
     }
 
 }
-
+*/
 /*
 grails {
     redis {

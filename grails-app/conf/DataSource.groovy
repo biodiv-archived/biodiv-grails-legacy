@@ -25,14 +25,13 @@ dataSource {
 }
 
 hibernate {
-    cache.use_second_level_cache = true
+    cache.use_second_level_cache = false
     cache.use_query_cache = true
 //    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
 
-    cache.region.factory_class = 'grails.plugin.cache.ehcache.hibernate.BeanEhcacheRegionFactory' // For Hibernate before 4.0
-    //cache.provider_class = 'net.sf.ehcache.hibernate.EhCacheProvider'
-    generate_statistics=true
-    cache.use_structured_entries=true
+//    cache.region.factory_class = 'grails.plugin.cache.ehcache.hibernate.BeanEhcacheRegionFactory' // For Hibernate before 4.0
+//    generate_statistics=true
+//    cache.use_structured_entries=true
 }
 
 // environment specific settings
