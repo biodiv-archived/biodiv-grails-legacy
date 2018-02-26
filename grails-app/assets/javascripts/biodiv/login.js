@@ -19,12 +19,12 @@ function updateLoginInfo(){
 
 function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler, cancelHandler) {
     if (xhr.status == 401) {
-        var now = new Date().getTime();
         var brToken = $.cookie("BRToken");
-        var baTokenExpiresCookie = $.cookie("BATokenExpires");
-        baTokenExpiresCookie = baTokenExpiresCookie ? baTokenExpiresCookie : 0;
-        var timeleft = baTokenExpiresCookie + (5*24*60*60*1000) - now;
-        if(brToken == null || timeleft <= 0) {
+        var now = new Date().getTime();
+        var timeLeftForRToken = (new Date(localStorage.get('last_login_date'))).getTime() + (30*24*60*60*1000) - now;//issued at+30 days - now
+        //if only 5 days are left to validate refresh token we will
+        //propmt the user to login again to progress his login window
+        if(brToken == null || timeleft <= (5*24*60*60*1000)) {
             show_login_dialog(successHandler, errorHandler, cancelHandler);
         } else {
             ajaxLoginSuccessCallbackFunction = successHandler;
@@ -137,6 +137,7 @@ function clearAllCookies() {
     localStorage.removeItem("id");
     localStorage.removeItem("pic");
     localStorage.removeItem("name");
+    localStorage.removeItem("last_login_date");
 }
 
 function callAuthSuccessUrl(url, p) {
@@ -152,7 +153,7 @@ function callAuthSuccessUrl(url, p) {
                 window.top.postMessage( JSON.stringify({signin: 'error', 'error':data.msg, 'isAjax':window.isAjax}), '*' );
                 $('.loginMessage').html(data.msg).removeClass('alert alert-info').addClass('alter alert-error').show();
             }
-        },  error: function(xhr, ajaxOptions, thrownError) {
+        }, error: function(xhr, ajaxOptions, thrownError) {
                 window.top.postMessage( JSON.stringify({signin: 'error', 'error':xhr.responseText}), '*' );
                 $('.loginMessage').html(xhr.responseText).removeClass('alert alert-info').addClass('alter alert-error').show();
         }
@@ -194,14 +195,15 @@ function isLoggedIn() {
 function setLoginInfo(data, isAjax) {
 console.log(data);
     var decoded = jwt_decode(data.access_token);
-    var expires_in = new Date();
-    expires_in.setTime(decoded.exp);
+    var expires_in = new Date(decoded.exp*1000);
+    var rToken_expires_in = new Date(Date.now()+(30*24*60*60*1000));//30 days
 
     $.cookie("BAToken", data.access_token, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain, expires : expires_in});
-    $.cookie("BRToken", data.refresh_token, {path : window.params.login.api.cookie.path, domain:window.params.login.api.cookie.domain, expires : 60});//setting for 60 days
-    localStorage.setItem("id", data.id);
+    $.cookie("BRToken", data.refresh_token, {path : window.params.login.api.cookie.path, domain:window.params.login.api.cookie.domain, expires : rToken_expires_in});//setting for 60 days
+    localStorage.setItem("id", parseInt(decoded.id));
     localStorage.setItem("pic", data.pic);
-    localStorage.setItem("name", data.name);
+    localStorage.setItem("name", data.username);
+    localStorage.setItem("last_login_date", new Date(decoded.iat*1000));
 
     if(typeof isAjax === 'undefined')
        isAjax = $("#ajaxLogin").is(':visible'); 
