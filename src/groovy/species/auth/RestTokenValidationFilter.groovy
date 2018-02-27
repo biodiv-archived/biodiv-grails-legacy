@@ -114,11 +114,6 @@ class RestTokenValidationFilter extends grails.plugin.springsecurity.rest.RestTo
             Authentication authentication = SecurityContextHolder.context.authentication
         //    processReadRequest(httpRequest);
              boolean isAllowed = webInvocationPrivilegeEvaluator.isAllowed(httpRequest.contextPath, actualUri, httpRequest.method, authentication);
-            println "******************************************************************"
-            println actualUri +"   "+ httpRequest.method+"    "
-            println authentication
-            println isAllowed
-            println "******************************************************************"
             if (authentication && authentication instanceof AbstractAuthenticationToken && isAllowed) {
                 log.debug "Request is already authenticated as anonymous request. Continuing the filter chain"
                 chain.doFilter(request, response)

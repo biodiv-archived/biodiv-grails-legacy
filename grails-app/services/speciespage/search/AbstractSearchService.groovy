@@ -44,7 +44,7 @@ abstract class AbstractSearchService {
     /**
      *
      */
-    def abstract publishSearchIndex();
+    public def abstract publishSearchIndex();
 
     def publishSearchIndex(def obj, boolean commit) {
         return publishSearchIndex([obj], commit);

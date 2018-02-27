@@ -193,16 +193,16 @@ function isLoggedIn() {
 }
 
 function setLoginInfo(data, isAjax) {
-console.log(data);
+    console.log("setting login info ...");
     var decoded = jwt_decode(data.access_token);
     var expires_in = new Date(decoded.exp*1000);
     var rToken_expires_in = new Date(Date.now()+(30*24*60*60*1000));//30 days
-
+console.log(expires_in);
     $.cookie("BAToken", data.access_token, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain, expires : expires_in});
     $.cookie("BRToken", data.refresh_token, {path : window.params.login.api.cookie.path, domain:window.params.login.api.cookie.domain, expires : rToken_expires_in});//setting for 60 days
     localStorage.setItem("id", parseInt(decoded.id));
     localStorage.setItem("pic", data.pic);
-    localStorage.setItem("name", data.username);
+    localStorage.setItem("name", decoded.username);
     localStorage.setItem("last_login_date", new Date(decoded.iat*1000));
 
     if(typeof isAjax === 'undefined')

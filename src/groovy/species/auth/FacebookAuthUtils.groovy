@@ -86,7 +86,6 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
                 }
             }
 
-            println "AccessToken response: $data"
             /*println responseStr
             Map data = [:]
             response.split('&').each {
@@ -148,11 +147,6 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
     def authenticate(String jwtToken) {
         def authenticator =  new JwtAuthenticator(new org.pac4j.jwt.config.signature.SecretSignatureConfiguration(JWT_SALT));
         CommonProfile profile = authenticator.validateToken(jwtToken);
-        println "******************************"
-        println "******************************"
-        println profile;
-        println "******************************"
-        println "******************************"
         def token = new JwtAuthToken();
         if(profile) {
             def user = SUser.findByEmail(profile.email);
