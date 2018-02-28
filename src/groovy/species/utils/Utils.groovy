@@ -236,7 +236,7 @@ class Utils {
 
 	static String getIBPServerDomain() {
 		def config = grails.util.Holders.config;
-		return "http://$config.ibp.domain";
+		return config.grails.serverURL;//"http://$config.ibp.domain";
 	}
 
 	static String getIBPServerCookieDomain() {
