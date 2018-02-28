@@ -29,7 +29,7 @@ instanceList.each{ iL ->
 				<g:each in="${inst.value}" status="i" var="trait_instance">
 				<div data-isNotObservation="${trait_instance.isNotObservationTrait}">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;border:0px !important;">
-                    <r:render template="/trait/showTraitTemplate" model="['traitInstance':trait_instance, 'factInstance':factInstance, object:instance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable, 'ifOwns':ifOwns, 'filterable':filterable, numericTraitMinMax:numericTraitMinMax]"/>
+                    <g:render template="/trait/showTraitTemplate" model="['traitInstance':trait_instance, 'factInstance':factInstance, object:instance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable, 'ifOwns':ifOwns, 'filterable':filterable, numericTraitMinMax:numericTraitMinMax]"/>
 					</li>
 					</div>
 				</g:each>
