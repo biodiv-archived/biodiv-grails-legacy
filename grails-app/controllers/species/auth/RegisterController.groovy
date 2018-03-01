@@ -123,7 +123,9 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			if(command.facebookUser) {
 				log.debug "registering facebook user"
 				def token = session["LAST_FACEBOOK_USER"]
-				facebookAuthService.registerFacebookUser token, user
+                if(token) {
+				    facebookAuthService.registerFacebookUser token, user
+                }
 			} else {
 			    SUserService.assignRoles(user);
             }

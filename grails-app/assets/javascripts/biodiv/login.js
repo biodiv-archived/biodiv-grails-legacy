@@ -217,7 +217,7 @@ console.log(expires_in);
 var loginPopupWindow;
 $(document).ready(function() {
    $('.fbJustConnect').click(function() {
-        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id="+window.params.login.api.facebook.apiKey+"&redirect_uri="+window.params.login.api.facebook.redirect_uri+"&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_website%2Cuser_work_history&state=biodiv-api-state");
+        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id="+window.params.login.api.facebook.apiKey+"&redirect_uri="+window.params.login.api.facebook.redirect_uri+"&scope=email%2Cuser_location%2Cuser_website&state=biodiv-api-state");
         /*$.ajax({
             async: true,
             crossDomain: true,
