@@ -1,41 +1,4 @@
-<%@ page import="utils.Newsletter"%>
-<%@page import="species.utils.Utils"%>
-
-<html>
-<head>
-<g:set var="canonicalUrl" value="${uGroup.createLink([controller:'newsletter', action:'show', id:newsletterInstance.id, base:Utils.getIBPServerDomain()])}"/>
-<g:set var="title" value="${newsletterInstance.title}"/>
-<g:set var="description" value="${Utils.stripHTML(newsletterInstance.newsitem?:'')}" />
-<g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl]"/>
-
-<style>
-.newsletter_wrapper {
-	padding: 30px;
-	margin-left: auto;
-	margin-right: auto;
-	background-color: #e8f6f0;
-	font-family: 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans,
-		sans-serif;
-}
-
-.newsletter_wrapper .body {
-	background-color: #ffffff;
-	padding: 10px;
-}
-
-.newsletter_wrapper .body h1 {
-	padding: 10px;
-	border-bottom: 2px solid #60c59e;
-}
-
-.newsletter_wrapper .body .date {
-	font-size: 10px;
-	font-style: italic;
-}
-</style>
-</head>
-<body>
-	<div id="pageContent" class="observation  span8"  style="margin-left:0px;">
+<div id="pageContent" class="observation  span8"  style="margin-left:0px;">
 		<div class="page-header clearfix">
 			<h1>
 				${fieldValue(bean: newsletterInstance, field: "title")}
@@ -95,5 +58,3 @@
 			</g:if>
 		</div>
 	</div>
-</body>
-</html>
