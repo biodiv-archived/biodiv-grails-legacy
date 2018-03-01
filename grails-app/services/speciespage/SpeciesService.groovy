@@ -354,6 +354,7 @@ class SpeciesService extends AbstractObjectService  {
             def newSpeciesFieldInstance = (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
             newSpeciesFieldInstance.species = speciesInstance;
             newSpeciesFieldInstance.field = fieldInstance;
+            newSpeciesFieldInstance.description = null;
             return newSpeciesFieldInstance;
     }
 
