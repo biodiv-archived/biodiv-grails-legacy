@@ -90,7 +90,7 @@ class DocumentSearchService extends AbstractSearchService {
             }
 
             String memberInfo = ""
-            List allMembers = utilsServiceBean.getParticipants(document)
+            List allMembers = utilsService.getParticipants(document)
             allMembers.each { mem ->
                 if(mem == null) return;
                 memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()

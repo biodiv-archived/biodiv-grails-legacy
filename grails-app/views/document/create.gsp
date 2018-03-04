@@ -461,7 +461,7 @@ function getScientificNames(){
             filePath=uploadFile_value;
        }
    $.ajax({
-    url:"http://gnrd.globalnames.org/name_finder.json?url="+filePath,
+    url:"https://gnrd.globalnames.org/name_finder.json?url="+filePath,
     success:function(result)
         {
     console.log(result.token_url)

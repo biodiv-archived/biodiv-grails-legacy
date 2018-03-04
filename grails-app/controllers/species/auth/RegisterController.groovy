@@ -95,12 +95,15 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		
 		log.debug "Registering user $command"
 		if (springSecurityService.isLoggedIn()) {
+            log.debug "isLoggedIn already"
 			redirect uri:request.scheme+"://"+request.serverName+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;
 		}
 		
 		def conf = SpringSecurityUtils.securityConfig
 		if (command.hasErrors()) {
+            log.debug "has errors ${command} ... redirecting ..."
+            command.errors.allErrors.each { log.error it } 
 			redirectModel.command = command
 			render view: 'index', model: redirectModel
 			return
@@ -120,7 +123,9 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			if(command.facebookUser) {
 				log.debug "registering facebook user"
 				def token = session["LAST_FACEBOOK_USER"]
-				facebookAuthService.registerFacebookUser token, user
+                if(token) {
+				    facebookAuthService.registerFacebookUser token, user
+                }
 			} else {
 			    SUserService.assignRoles(user);
             }
@@ -648,6 +653,14 @@ class CustomRegisterCommand {
 				return 'reCaptcha.invalid.message'
 			}
 		}
+        username nullable:true
+        website nullable:true
+        aboutMe nullable:true
+        sexType nullable:true
+        occupationType nullable:true
+        institutionType nullable:true
+        profilePic nullable:true
+        openId nullable:true
 	}
 
 	/* (non-Javadoc)
@@ -692,7 +705,12 @@ class CustomRegisterCommand2 {
         //location blank:false, nullable:false, validator : RegisterController.locationValidator
         //latitude blank:false, nullable:false, validator : RegisterController.latitudeValidator
         //longitude blank:false, nullable:false, validator : RegisterController.longitudeValidator
-
+        username nullable:true
+        website nullable:true
+        aboutMe nullable:true
+        sexType nullable:true
+        occupationType nullable:true
+        institutionType nullable:true
 	}
 
 	/* (non-Javadoc)

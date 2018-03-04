@@ -88,9 +88,15 @@ class DocumentService extends AbstractMetadataService {
 	Document update(Document document, params, klass = null) {
 		params.remove('latitude')
 		params.remove('longitude')
+        
+        println params.uFile
+
 		def locationScale = params.remove('locationScale')
         
         document = super.update(document, params, Document.class);
+
+        if(!params.uFile.path)
+            document.uFile = null;
 
 		document.group = null
 		document.habitat = null
@@ -636,9 +642,10 @@ println queryParts.queryParams
         if(sourceFile.exists()){
             def config = grails.util.Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir
-            File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
+            File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents', contentRootDir)
             try{
                 Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
+                println "++++++++++++UUUUUFFFFIIIILLLLEEEE++++++"
                 UFile f = new UFile()
                 f.size = destinationFile.length()
                 f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "")

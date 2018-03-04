@@ -11,10 +11,12 @@
         //Available variables: id, fileName, responseJSON
         
         if(responseJSON.success) {
+            console.log(responseJSON);
             $('#${name}_uploaded').show();
             $('#${name}_file').attr('href',responseJSON.fileURL);
             $('#${name}_file').html(fileName);
             $('#${name}_path').val(responseJSON.filePath);
+            $('#${name}_size').val(responseJSON.fileSize);
             $('#${name}_name').val(fileName);
             if(responseJSON.xlsxFileUrl) {
                 //dont reset these fields if the upload is for images dir

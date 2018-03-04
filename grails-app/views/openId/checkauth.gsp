@@ -63,8 +63,8 @@
         $(document).ready(function(){
             var loginInfo = {
                 "access_token":"${access_token}",
-                "expires_in":"${expires_in}",
-                "refresh_token":"${refresh_token}"
+                "refresh_token":"${refresh_token}",
+                "pic":"${pic}"
             };
             window.setLoginInfo(loginInfo);
             window.location.href='/';

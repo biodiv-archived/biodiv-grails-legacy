@@ -10,7 +10,6 @@
 <div class="alert alert-info"><g:message code="default.content.msg" />  <a href="javascript:void(0);" class="clickcontent btn btn-mini" data-target="clickcontent_${speciesFieldInstance.language.id}">${speciesFieldInstance.language.threeLetterCode?.toUpperCase()}</a></div>
 </g:if>
 
-
 <div class="speciesField ${(speciesFieldInstance.description)?'':'dummy hide'} ${speciesFieldInstance.language.id == userLanguage?.id ?:'hide clickcontent_'+speciesFieldInstance.language.id}" data-name="speciesField" data-act ="${speciesFieldInstance.description ? (speciesFieldInstance.language.id == userLanguage.id ? 'edit':''):'add'}" data-speciesid="${speciesInstance?.id}" data-pk="${speciesFieldInstance.id?:speciesFieldInstance.field.id}">
     <g:if test="${isSpeciesContributor}">
     <!--a style="margin-right: 5px;" class="pull-right speciesFieldMedia btn" onclick='getSpeciesFieldMedia("${speciesInstance?.id}","${speciesFieldInstance.id?:speciesFieldInstance.field.id}", "fromSingleSpeciesField","${createLink(controller:'species',  action:'getSpeciesFieldMedia')}" )'>Add Media</a-->

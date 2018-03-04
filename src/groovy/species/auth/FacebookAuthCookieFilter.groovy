@@ -75,11 +75,11 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
             Cookie cookie = facebookAuthUtils.getAuthCookie(request)
             Cookie fbLoginCookie = facebookAuthUtils.getFBLoginCookie(request);
             Cookie jwtTokenCookie = facebookAuthUtils.getJwtTokenCookie(request);
-            logger.debug ("Got jwtToken : ${jwtTokenCookie}");
+            //logger.debug ("Got jwtToken : ${jwtTokenCookie}");
             def token;
             if(jwtTokenCookie != null) {
                 token = facebookAuthUtils.buildJwtToken(jwtTokenCookie.value);
-                logger.debug ("Got jwtToken : ${token}");
+                //logger.debug ("Got jwtToken : ${token}");
             }
 
             if (cookie != null && fbLoginCookie != null) {
@@ -91,7 +91,7 @@ class FacebookAuthCookieFilter extends GenericFilterBean implements ApplicationE
                 //logger.debug("Found fbsr & fb_login cookie");
                 try {
                     //if (token != null) {
-                        logger.debug("Got fbAuthToken $token");
+                        //logger.debug("Got fbAuthToken $token");
                         //token = request.getSession().getAttribute("LAST_FACEBOOK_USER");
                         //logger.debug("Got fbAuthToken user ${token?.user}");
                         Authentication authentication = null

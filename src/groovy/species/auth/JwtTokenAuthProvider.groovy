@@ -36,17 +36,11 @@ public class JwtTokenAuthProvider  implements AuthenticationProvider, Initializi
         if(token.jwtToken != null) {
             def authenticator =  new JwtAuthenticator(new org.pac4j.jwt.config.signature.SecretSignatureConfiguration(JWT_SALT));
             CommonProfile profile = authenticator.validateToken(token.jwtToken);
-            println "******************************"
-            println "******************************"
-            println profile;
-            println "******************************"
-            println "******************************"
 
             if(profile) {
                 String email = null;
                 if(profile instanceof org.pac4j.oauth.profile.google2.Google2Profile) {
                     final List list = profile.getEmails();
-                    println list;
                     if (list != null && !list.isEmpty()) {
                         email= list.get(0).email;
                     }

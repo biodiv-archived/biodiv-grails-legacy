@@ -1633,13 +1633,12 @@ grails.plugin.springsecurity.oauth.domainClass = 'species.auth.OAuthID'
 grails.plugin.springsecurity.oauth.registration.askToLinkOrCreateAccountUri = '/login/openIdCreateAccount'
 
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
-grails.hibernate.cache.queries=false
+/*grails.hibernate.cache.queries=false
 grails.cache.clearAtStartup = true
 grails{
-    cache {
-        enabled = true
-        ehcache {
-//            ehcacheXmlLocation = 'classpath:ehcache.xml' // conf/ehcache.xml
+     cache {
+        enabled = false
+         ehcache {
             reloadable = true
             keyGenerator='customCacheKeyGenerator'
         }
@@ -1742,7 +1741,7 @@ grails.cache.config = {
     }
 
 }
-
+*/
 /*
 grails {
     redis {

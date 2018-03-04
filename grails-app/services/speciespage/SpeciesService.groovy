@@ -354,6 +354,7 @@ class SpeciesService extends AbstractObjectService  {
             def newSpeciesFieldInstance = (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
             newSpeciesFieldInstance.species = speciesInstance;
             newSpeciesFieldInstance.field = fieldInstance;
+            newSpeciesFieldInstance.description = null;
             return newSpeciesFieldInstance;
     }
 
@@ -2508,13 +2509,13 @@ def checking(){
             List traitIcons = [];
             factInstances?.each { f ->
                 if(f.traitValue) { 
-                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                    traitIcons << [f.traitValue.value, f.traitInstance.name, f.traitValue.mainImage()?.fileName, f.traitInstance.dataTypes.value()]
                 } else if(f.value && f.toValue) {
-                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value+":"+f.toValue, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.fromDate && f.toDate) {
-                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.value) {
-                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 }
             }
 

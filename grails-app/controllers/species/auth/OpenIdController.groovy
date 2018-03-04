@@ -449,7 +449,7 @@ class OpenIdLinkAccountCommand {
 	String password = ""
 
 	static constraints = {
-		username blank: false
-		password blank: false
+		username blank: false,nullable:false
+		password blank: false, nullable:false
 	}
 }
