@@ -74,7 +74,8 @@ class ObservationsSearchService extends AbstractSearchService {
 
         obvs.each { obv ->
             log.debug "Reading Observation : "+obv.id;
-            List edoc=getJson(obv);
+            Map edoc=getJson(obv);
+            postToElastic(edoc)
 //            docs.addAll(edoc);
         }
 
@@ -90,99 +91,96 @@ class ObservationsSearchService extends AbstractSearchService {
 
         String query = """
         SELECT obs.id,
-        obs.version,
-        obs.author_id as authorId,
-        su.name as authorName,
-        su.profile_pic as authorProfilePic,
-        obs.created_on as createdOn,
-        obs.group_id as speciesGroupId,
-        sg.name as speciesGroupName,
-        obs.latitude,
-        obs.longitude,
-        obs.notes,
-        obs.from_date as fromDate,
-        obs.place_name as placeName,
-        obs.rating,
-        obs.reverse_geocoded_name as reverseGeocodedName,
-        obs.flag_count as flagCount,
-        obs.geo_privacy as geoPrivacy,
-        obs.habitat_id as habitatId,
-        h.name as habitatName,
-        obs.is_deleted as isDeleted,
-        obs.last_revised as lastRevised,
-        obs.location_accuracy as locationAccuracy,
-        obs.visit_count as visitCount,
-        obs.search_text as searchText,
-        obs.max_voted_reco_id as maxVotedrecoId,
-        obs.agree_terms as agreeTerms,
-        obs.is_checklist as isCheckList,
-        obs.is_showable as isShowable,
-        obs.source_id as sourceId,
-        obs.to_date as toDate,
-        obs.topology,
-        obs.checklist_annotations as checklistAnnotations,
-        obs.feature_count as featureCount,
-        obs.is_locked as isLocked,
-        obs.license_id as licenseId,
-        ll.name as licenseName,
-        obs.language_id as languageId,
-        l.name as languageName,
-        obs.location_scale as locationScale,
-        obs.access_rights as accessRights,
-        obs.catalog_number as catalogNumber,
-        obs.dataset_id as datasetId,
-        obs.external_dataset_key as externalDatasetKey,
-        obs.external_id as externalId,
-        obs.external_url as externalUrl,
-        obs.information_withheld as informationWithHeld,
-        obs.last_crawled as lastCrawled,
-        obs.last_interpreted as lastInterpreted,
-        obs.original_author as originalAuthor,
-        obs.publishing_country as publishingCountry,
-        obs.repr_image_id as reprImageId,
-        obs.via_code viaCode,
-        obs.via_id ViaId,
-        obs.protocol,
-        obs.traits,
-        obs.basis_of_record as basisOfRecord,
-        obs.no_of_images as noOfImages,
-        obs.no_of_videos as noOfVideos,
-        obs.no_of_audio as noOfAudio,
-        obs.no_of_identifications as noOfIdentifications,
-        r.name as name,
-        r.taxon_concept_id as taxonConceptId,
-        r.accepted_name_id as acceptednameId,
-        t.canonical_form as taxonomyCanonicalForm,
-        t.status,
-        t.position,
-        t.rank,
-        tres.path as path,
-        tres.classification_id as classificationId,
-        resp.file_name as thumbnail,
-        array_remove(array_agg(DISTINCT ug.id) ,null) as userGroupId,
-        array_remove(array_agg(DISTINCT ug.name) ,null) as userGroupName,
-        array_remove(array_agg(DISTINCT res.file_name),null ) as imageResource
-        FROM observation obs
-        LEFT JOIN language l ON obs.language_id = l.id
-        LEFT JOIN suser su ON obs.author_id = su.id
-        LEFT JOIN habitat h ON obs.habitat_id = h.id
-        LEFT JOIN species_group sg ON obs.group_id = sg.id
-        LEFT JOIN license ll ON obs.license_id = ll.id
-        LEFT JOIN recommendation r ON obs.max_voted_reco_id = r.id
-        LEFT JOIN taxonomy_definition t ON r.accepted_name_id = t.id
-        LEFT JOIN user_group_observations ugo ON obs.id = ugo.observation_id
-        LEFT JOIN user_group ug ON ug.id = ugo.user_group_id
-        LEFT JOIN resource as resp ON obs.repr_image_id=resp.id
-        LEFT JOIN observation_resource obvres ON obs.id= obvres.observation_id
-        LEFT JOIN resource as res ON obvres.resource_id= res.id
-        LEFT JOIN taxonomy_registry as tres ON tres.taxon_definition_id = t.id
-        where  (classification_id=265799 or classification_id is null) and obs.is_deleted =false and obs.id="""+obv.id+"""
-        GROUP BY obs.id, su.name, su.profile_pic, sg.name, h.name, ll.name, l.name,
-        r.name, t.canonical_form,res.file_name, r.taxon_concept_id,r.accepted_name_id,tres.path,tres.classification_id,t.status,t.position,t.rank,resp.file_name
-            """;
-
-
-
+      obs.version,
+      obs.author_id AS authorid,
+      su.name AS authorname,
+      case when su.icon is null then su.profile_pic else su.icon end,
+      obs.created_on AS createdon,
+      obs.group_id AS speciesgroupid,
+      sg.name AS speciesgroupname,
+      obs.latitude,
+      obs.longitude,
+      obs.notes,
+      obs.from_date AS fromdate,
+      obs.place_name AS placename,
+      obs.rating,
+      obs.reverse_geocoded_name AS reversegeocodedname,
+      obs.flag_count AS flagcount,
+      obs.geo_privacy AS geoprivacy,
+      obs.habitat_id AS habitatid,
+      h.name AS habitatname,
+      obs.is_deleted AS isdeleted,
+      obs.last_revised AS lastrevised,
+      obs.location_accuracy AS locationaccuracy,
+      obs.visit_count AS visitcount,
+      obs.search_text AS searchtext,
+      obs.max_voted_reco_id AS maxvotedrecoid,
+      obs.agree_terms AS agreeterms,
+      obs.is_checklist AS ischecklist,
+      obs.is_showable AS isshowable,
+      obs.source_id AS sourceid,
+      obs.to_date AS todate,
+      obs.topology,
+      obs.checklist_annotations AS checklistannotations,
+      obs.feature_count AS featurecount,
+      obs.is_locked AS islocked,
+      obs.license_id AS licenseid,
+      ll.name AS licensename,
+      obs.language_id AS languageid,
+      l.name AS languagename,
+      obs.location_scale AS locationscale,
+      obs.access_rights AS accessrights,
+      obs.catalog_number AS catalognumber,
+      obs.dataset_id AS datasetid,
+      obs.external_dataset_key AS externaldatasetkey,
+      obs.external_id AS externalid,
+      obs.external_url AS externalurl,
+      obs.information_withheld AS informationwithheld,
+      obs.last_crawled AS lastcrawled,
+      obs.last_interpreted AS lastinterpreted,
+      obs.original_author AS originalauthor,
+      obs.publishing_country AS publishingcountry,
+      obs.repr_image_id AS reprimageid,
+      obs.via_code AS viacode,
+      obs.via_id AS viaid,
+      obs.protocol,
+      obs.traits,
+      obs.basis_of_record AS basisofrecord,
+      obs.no_of_images AS noofimages,
+      obs.no_of_videos AS noofvideos,
+      obs.no_of_audio AS noofaudio,
+      obs.no_of_identifications AS noofidentifications,
+      r.name,
+      r.taxon_concept_id AS taxonconceptid,
+      r.accepted_name_id AS acceptednameid,
+      t.canonical_form AS taxonomycanonicalform,
+      t.status,
+      t."position",
+      t.rank,
+      tres.path,
+      tres.classification_id AS classificationid,
+      resp.file_name AS thumbnail,
+      array_remove(array_agg(DISTINCT ug.id), NULL::bigint) AS usergroupid,
+      array_remove(array_agg(DISTINCT ug.name), NULL::character varying) AS usergroupname,
+      array_remove(array_agg(DISTINCT res.file_name), NULL::character varying) AS imageresource,
+      array_remove(array_agg(DISTINCT res.url), NULL::character varying) AS urlresource
+     FROM observation obs
+     LEFT JOIN observation_resource obvres ON obs.id = obvres.observation_id
+     LEFT JOIN resource resp ON obs.repr_image_id = resp.id
+     LEFT JOIN resource res ON obvres.resource_id = res.id
+     LEFT JOIN language l ON obs.language_id = l.id
+     LEFT JOIN suser su ON obs.author_id = su.id
+     LEFT JOIN habitat h ON obs.habitat_id = h.id
+     LEFT JOIN species_group sg ON obs.group_id = sg.id
+     LEFT JOIN license ll ON obs.license_id = ll.id
+     LEFT JOIN recommendation r ON obs.max_voted_reco_id = r.id
+     LEFT JOIN taxonomy_definition t ON r.accepted_name_id = t.id
+     LEFT JOIN user_group_observations ugo ON obs.id = ugo.observation_id
+     LEFT JOIN user_group ug ON ug.id = ugo.user_group_id
+     LEFT JOIN taxonomy_registry tres ON tres.taxon_definition_id = t.id
+    WHERE (tres.classification_id = 265799 OR tres.classification_id IS NULL) and obs.is_deleted=false and obs.id="""+obv.id+"""
+    GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, r.name, t.canonical_form, r.taxon_concept_id, r.accepted_name_id, tres.path
+  , tres.classification_id, t.status, t."position", t.rank, resp.file_name """;
 
         println "Running sql for getting observation json";
 
@@ -191,40 +189,45 @@ class ObservationsSearchService extends AbstractSearchService {
             Map<String,Object> eData=new HashMap<String,Object>();
             obvRow.each { k, v ->
                 if(k=="usergroupid"){
-
                     eData.put(k, v.getArray());
                 }
                 else if(k=="imageresource"){
-                    eData.put(k, v.getArray());                }
-                else if(k=="usergroupname"){
-
                     eData.put(k, v.getArray());
-    }
-    else if(k=="todate"){
-        print v.class
-        eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
-    }
-    else if(k=="fromdate"){
-        print v.class
-        eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
-    }
-    else if(k=="lastrevised"){
-        print v.class
-        eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
-    }
-    else if(k=="createdon"){
-        print v.class
-        eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
-    }
-    else{
-        eData.put(k, v.toString());
-    }
+                  }
+                else if(k=="usergroupname"){
+                    eData.put(k, v.getArray());
+                 }
+                 else if(k==" urlresource"){
+                   eData.put(k,v.getArray());
+                 }
+                else if(k=="todate"){
+                    print v.class
+                    eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
+                }
+                else if(k=="fromdate"){
+                    print v.class
+                    eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
+                }
+                else if(k=="lastrevised"){
+                    print v.class
+                    eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
+                }
+                else if(k=="createdon"){
+                    print v.class
+                    eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
+                }
+                else{
+                    eData.put(k, v.toString());
+                }
 
 
 }
 
 def fromdate=obvRow.get("fromdate");
-def location="["+obvRow.get("longitude")+","+ obvRow.get("latitude")+"]";
+def geoPrivacyAdjust = Utils.getRandomFloat()
+def longitude = obvRow.get("longitude") + geoPrivacyAdjust
+def latitude = obvRow.get("latitude") + geoPrivacyAdjust
+def location="["+longitude+","+ latitude+"]";
 
 
 
@@ -250,7 +253,7 @@ if(traits) {
     }
 }
 eData.remove('traits');
-postToElastic(eData)
+return eData;
 }
 
 }
