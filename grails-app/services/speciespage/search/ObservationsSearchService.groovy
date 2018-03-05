@@ -94,7 +94,7 @@ class ObservationsSearchService extends AbstractSearchService {
       obs.version,
       obs.author_id AS authorid,
       su.name AS authorname,
-      case when su.icon is null then su.profile_pic else su.icon end,
+      case when su.icon is null then su.profile_pic else su.icon end  as authorprofilepic,
       obs.created_on AS createdon,
       obs.group_id AS speciesgroupid,
       sg.name AS speciesgroupname,
