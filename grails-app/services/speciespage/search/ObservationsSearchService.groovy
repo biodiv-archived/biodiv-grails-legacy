@@ -19,6 +19,7 @@ import species.participation.Observation;
 import species.participation.Checklists;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
+import species.utils.Utils;
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
 import species.UtilsService
@@ -86,7 +87,7 @@ class ObservationsSearchService extends AbstractSearchService {
         super.delete(Observation.simpleName +"_"+id.toString());
     }
 
-    List getJson(Observation obv) {
+    Map getJson(Observation obv) {
         def sql =  Sql.newInstance(dataSource);
 
         String query = """
@@ -169,7 +170,7 @@ class ObservationsSearchService extends AbstractSearchService {
      LEFT JOIN resource resp ON obs.repr_image_id = resp.id
      LEFT JOIN resource res ON obvres.resource_id = res.id
      LEFT JOIN language l ON obs.language_id = l.id
-     LEFT JOIN suser su ON obs.author_id = su.id
+     LEFT JOIN suser su ON obeDatas.author_id = su.id
      LEFT JOIN habitat h ON obs.habitat_id = h.id
      LEFT JOIN species_group sg ON obs.group_id = sg.id
      LEFT JOIN license ll ON obs.license_id = ll.id
@@ -197,7 +198,7 @@ class ObservationsSearchService extends AbstractSearchService {
                 else if(k=="usergroupname"){
                     eData.put(k, v.getArray());
                  }
-                 else if(k==" urlresource"){
+                 else if(k=="urlresource"){
                    eData.put(k,v.getArray());
                  }
                 else if(k=="todate"){
@@ -219,19 +220,13 @@ class ObservationsSearchService extends AbstractSearchService {
                 else{
                     eData.put(k, v.toString());
                 }
-
-
-}
+              }
 
 def fromdate=obvRow.get("fromdate");
 def geoPrivacyAdjust = Utils.getRandomFloat()
 def longitude = obvRow.get("longitude") + geoPrivacyAdjust
 def latitude = obvRow.get("latitude") + geoPrivacyAdjust
 def location="["+longitude+","+ latitude+"]";
-
-
-
-
 eData.put("location",location);
 eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));
 
@@ -255,9 +250,7 @@ if(traits) {
 eData.remove('traits');
 return eData;
 }
-
 }
-
 
     void postToElastic(Map doc) {
       if(!doc) return;
