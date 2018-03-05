@@ -1796,7 +1796,6 @@ class ObservationController extends AbstractObjectController {
                 obv.errors.allErrors.each { log.error it }
             }
             utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
-            observationsSearchService.publishSearchIndex(obv, COMMIT);
             def result = ['msg': msg]
             render result as JSON
         } else {
