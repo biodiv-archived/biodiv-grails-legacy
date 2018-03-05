@@ -75,9 +75,9 @@ class ObservationsSearchService extends AbstractSearchService {
 
         obvs.each { obv ->
             log.debug "Reading Observation : "+obv.id;
-            Map edoc=getJson(obv);
-            postToElastic(edoc)
-//            docs.addAll(edoc);
+            List edoc=getJson(obv);
+
+
         }
 
 //        return commitDocs(docs, commit);
@@ -87,7 +87,7 @@ class ObservationsSearchService extends AbstractSearchService {
         super.delete(Observation.simpleName +"_"+id.toString());
     }
 
-    Map getJson(Observation obv) {
+    List getJson(Observation obv) {
         def sql =  Sql.newInstance(dataSource);
 
         String query = """
@@ -170,7 +170,7 @@ class ObservationsSearchService extends AbstractSearchService {
      LEFT JOIN resource resp ON obs.repr_image_id = resp.id
      LEFT JOIN resource res ON obvres.resource_id = res.id
      LEFT JOIN language l ON obs.language_id = l.id
-     LEFT JOIN suser su ON obeDatas.author_id = su.id
+     LEFT JOIN suser su ON obs.author_id = su.id
      LEFT JOIN habitat h ON obs.habitat_id = h.id
      LEFT JOIN species_group sg ON obs.group_id = sg.id
      LEFT JOIN license ll ON obs.license_id = ll.id
@@ -248,7 +248,8 @@ if(traits) {
     }
 }
 eData.remove('traits');
-return eData;
+
+postToElastic(eData);
 }
 }
 
