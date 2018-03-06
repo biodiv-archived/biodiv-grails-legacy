@@ -229,6 +229,8 @@ def latitude = obvRow.get("latitude") + geoPrivacyAdjust
 def location="["+longitude+","+ latitude+"]";
 eData.put("location",location);
 eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));
+eData.put("checklistannotations",null);
+
 
 
 def traits = obvRow.get("traits");
