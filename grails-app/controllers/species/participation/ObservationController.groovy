@@ -1,6 +1,7 @@
 package species.participation
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
@@ -1795,6 +1796,10 @@ class ObservationController extends AbstractObjectController {
             if(!obv.save(flush:true)){
                 obv.errors.allErrors.each { log.error it }
             }
+            List<Observation> validobvs=new ArrayList<Observation>();
+            validobvs.add(obv);
+            observationsSearchService.publishSearchIndex(validobvs,true);
+
             utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
             def result = ['msg': msg]
             render result as JSON
@@ -1803,6 +1808,9 @@ class ObservationController extends AbstractObjectController {
             render result as JSON
             return;
         }
+
+
+
     }
 
     @Secured(['ROLE_USER'])
