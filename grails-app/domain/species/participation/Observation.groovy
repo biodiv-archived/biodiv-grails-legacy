@@ -453,9 +453,9 @@ class Observation extends DataObject {
 	private void updateResources() {
         println "Observation updateResources";
 		noOfImages = noOfVideos = noOfAudio = 0;
-
-        resource.each {
-
+		  	println this.resource
+        this.resource.each {
+					println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
             if(it.type == ResourceType.IMAGE) noOfImages++;
             else if(it.type == ResourceType.VIDEO) noOfVideos++;
             else if(it.type == ResourceType.AUDIO) noOfAudio++;
