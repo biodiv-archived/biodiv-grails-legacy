@@ -22,25 +22,25 @@ abstract class AbstractSearchService {
     static transactional = false
 
     def grailsApplication;
-   // def utilsServiceBean;
+   def utilsServiceBean;
     def utilsService;
 
-  //  @Autowired
-  //  ApplicationContext applicationContext
+   @Autowired
+   ApplicationContext applicationContext
 
     SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 	SessionFactory sessionFactory;
     int BATCH_SIZE = 10;
     int INDEX_DOCS = -1;
-/*
+
     def getUtilsServiceBean() {
         if(!utilsServiceBean) {
             utilsServiceBean = applicationContext.getBean("utilsService");
         }
         return utilsServiceBean;
     }
-*/
+
     /**
      *
      */
