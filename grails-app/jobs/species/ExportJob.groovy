@@ -106,8 +106,14 @@ class ExportJob {
 			return null
 		}
 		scheduledTaskList.each { DownloadLog dl ->
-			setStatus(dl, ObvUtilService.EXECUTING)
+			switch (dl.sourceType) {
+				case [OBSERVATION_LIST, UNIQUE_SPECIES]: 
+					return;
+				default :
+					setStatus(dl, ObvUtilService.EXECUTING);
+			}
 		}
+		
 		
 		return scheduledTaskList
 	}
