@@ -322,7 +322,7 @@ def updateDescriptionJSON(ActivityFeed feedInstance) {
       update activity_feed
       set description_json = row_to_json(row)
       from (select af.id as aid , af.activity_descrption as description , af.activity_type as activity_performed,'true' as is_migrated from activity_feed af) row
-      where  row.aid = id and activity_type = 'Suggested species name' and id=:id;
+      where  row.aid = id and activity_type = 'Suggestion removed' and id=:id;
       """,[id:feedInstance.id]);
         break
 
