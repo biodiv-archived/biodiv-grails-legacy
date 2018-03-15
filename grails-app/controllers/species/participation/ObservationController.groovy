@@ -1647,7 +1647,7 @@ class ObservationController extends AbstractObjectController {
     def downloadFile() {
         log.debug(params)
         def dl = DownloadLog.read(params.id.toLong())
-        if(dl && dl.author == springSecurityService.currentUser){
+        if(dl && (dl.author == springSecurityService.currentUser || utilsService.isAdmin())){
             File file = new File(dl.filePath)
             response.contentType  = 'text/csv'
             response.setHeader("Content-disposition", "filename=${file.getName()}")

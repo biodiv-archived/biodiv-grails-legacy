@@ -449,7 +449,6 @@ CKEDITOR.replace('description', config);
  
 function getScientificNames(){
      $("#documentFormSubmit").addClass("disabled")
- //console.log("${filePath}"+"=========================");
        var urlField_value=$( "#link-fetch" ).val();
        var uploadFile_value=$("#ufilepath_file").attr("href");
        var filePath=null;
@@ -461,14 +460,16 @@ function getScientificNames(){
             filePath=uploadFile_value;
        }
    $.ajax({
-    url:"https://gnrd.globalnames.org/name_finder.json?url="+filePath,
+    url:"http://gnrd.globalnames.org/name_finder.json?url="+filePath,
     success:function(result)
         {
-    console.log(result.token_url)
         $("#gnrd_tokenURL").val(result.token_url);
         $("#documentFormSubmit").removeClass("disabled")
        }
 
+    }, error:function (xhr, ajaxOptions, thrownError){
+        console.log('error');
+        $("#documentFormSubmit").removeClass("disabled")
     });//ended ajax
 
 }

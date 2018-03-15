@@ -100,6 +100,7 @@ class FactController extends AbstractObjectController {
                     p['contributor'] = springSecurityService.currentUser.email;
                     p['attribution'] = springSecurityService.currentUser.email;
                     p['license'] = License.LicenseType.CC_BY.value();
+                    p['traitInstance'] = traitInstance;
                     Map traits = factService.getTraits(params.traits);
                     if(traits && traits[traitInstance.id+'']) {
                         p.putAll(traits);
