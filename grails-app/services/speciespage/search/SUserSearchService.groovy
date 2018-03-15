@@ -103,6 +103,6 @@ class SUserSearchService extends AbstractSearchService {
 
     def delete(long id) {
         String className = org.hibernate.Hibernate.getClass(suser).getSimpleName()
-        super.delete(className.simpleName +"_"+id.toString());
+        super.delete("suser",id.toString());
     }
 }

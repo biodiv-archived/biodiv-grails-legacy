@@ -98,7 +98,7 @@ class DocumentSearchService extends AbstractSearchService {
             }
 
             doc.put(searchFieldsConfig.DOC_TYPE, document.type);
-          
+
             eDocs.add(doc);
 
         }
@@ -108,6 +108,6 @@ class DocumentSearchService extends AbstractSearchService {
 	}
 
     def delete(long id) {
-        super.delete(Document.simpleName +"_"+id.toString());
+        super.delete("document",id.toString());
     }
 }

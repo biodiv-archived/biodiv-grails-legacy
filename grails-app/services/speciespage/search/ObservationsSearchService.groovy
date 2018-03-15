@@ -84,7 +84,7 @@ class ObservationsSearchService extends AbstractSearchService {
     }
 
     def delete(long id) {
-        super.delete(Observation.simpleName +"_"+id.toString());
+        super.delete("observation",id.toString());
     }
 
     List getJson(Observation obv) {

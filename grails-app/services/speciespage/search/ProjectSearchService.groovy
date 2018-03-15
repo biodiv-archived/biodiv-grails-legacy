@@ -103,6 +103,6 @@ class ProjectSearchService extends AbstractSearchService {
 	}
 
     def delete(long id) {
-        super.delete(Project.simpleName +"_"+id.toString());
+        super.delete("project",id.toString());
     }
 }

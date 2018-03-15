@@ -17,6 +17,8 @@ import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.ContentType
 import static groovyx.net.http.Method.POST
 import static groovyx.net.http.Method.GET
+import static groovyx.net.http.Method.DELETE
+
 abstract class AbstractSearchService {
 
     static transactional = false
@@ -122,12 +124,24 @@ abstract class AbstractSearchService {
      * @param id
      * @return
      */
-    def delete(String id) {
+    def delete(String index,String id) {
         log.info "Deleting ${this.getClass().getName()} from search index"
+        def searchConfig = grailsApplication.config.speciesPortal
+        def URL=searchConfig.search.biodivApiURL;
         try {
-            //solrServer.deleteByQuery("id:${id}");
-            //solrServer.commit();
+          def http = new HTTPBuilder()
+          http.request(URL,DELETE, groovyx.net.http.ContentType.JSON) {
+              uri.path = "/biodiv-api/naksha/${index}/${index}/${id}";
+              response.success = { resp, reader ->
+                  log.debug "Successfully deletd observation ${id} to elastic"
+              }
+              response.'404' = {
+                println 'Not found';
+                log.debug "Error in deleting observation to elastic : Not found";
+              }
+          }
         } catch(Exception e) {
+          e.printStackTrace()
             log.error "Error: ${e.getMessage()}"
         }
 

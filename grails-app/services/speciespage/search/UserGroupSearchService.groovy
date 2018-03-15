@@ -87,7 +87,7 @@ class UserGroupSearchService extends AbstractSearchService {
                     memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
                     doc.put(searchFieldsConfig.MEMBERS, memberInfo);
                 }
-              
+
                 eDocs.add(doc);
 
 		}
@@ -96,6 +96,6 @@ class UserGroupSearchService extends AbstractSearchService {
 	}
 
     def delete(long id) {
-        super.delete(UserGroup.simpleName +"_"+id.toString());
+        super.delete("usergroup",id.toString());
     }
 }

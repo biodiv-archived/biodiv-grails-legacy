@@ -222,7 +222,7 @@ class SpeciesSearchService extends AbstractSearchService {
 
             //List resourceDocs = getResourcesDocs(s);
 
-          
+
 			eDocs.add(doc);
 			//eDocs.addAll(resourceDocs);
 		}
@@ -293,6 +293,6 @@ class SpeciesSearchService extends AbstractSearchService {
     }
 */
     def delete(long id) {
-        super.delete(Species.simpleName +"_"+id.toString());
+        super.delete("species",id.toString());
     }
 }
