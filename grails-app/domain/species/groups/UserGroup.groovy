@@ -475,7 +475,7 @@ class UserGroup implements Taggable {
         List<FilterRule> filterRules = [];
         if(this.filterRule) {
             JSON.parse(this.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 if(rule.fieldName.equalsIgnoreCase('topology') && rule.ruleName.equalsIgnoreCase('dwithin')) {
                     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
                     if(rule.ruleValues[0]) {
@@ -503,7 +503,7 @@ class UserGroup implements Taggable {
         String topologyFilterRule;
         if(this.filterRule) {
             JSON.parse(this.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 if(rule.fieldName.equalsIgnoreCase('topology') && rule.ruleName.equalsIgnoreCase('dwithin')) {
                     topologyFilterRule = rule.ruleValues[0];
                     return;
