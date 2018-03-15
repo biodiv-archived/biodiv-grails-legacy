@@ -41,7 +41,7 @@ class ExportJob {
 					case [OBSERVATION_LIST, UNIQUE_SPECIES]:
 					//Observation download is happeing from biodiv-api and elastic code
 						//f = obvUtilService.export(dl.fetchMapFromText(), dl)
-						break
+						return
 					case CHECKLIST:
 						f = checklistService.export(dl.fetchMapFromText(), dl)
 						break
