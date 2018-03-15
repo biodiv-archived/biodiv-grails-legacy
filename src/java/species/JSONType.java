@@ -14,9 +14,6 @@ import org.hibernate.engine.SessionImplementor;
 import org.hibernate.util.ReflectHelper;
 import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
-import org.postgresql.util.PGobject;
-
-
 
 public class JSONType implements UserType {
 
