@@ -780,10 +780,17 @@ class XMLConverter extends SourceConverter {
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
                 if(field.connection == 81 ){
-					def ref = new Reference(title:data);
-                    speciesField.addToReferences(ref);                	
+					//def ref = new Reference(title:data);
+                    //speciesField.addToReferences(ref);                	
+					references.each { 
+                        log.debug "Adding reference to field 81 ${it}"
+                        speciesField.addToReferences(it); 
+                    }
             	}else{
-					references.each { speciesField.addToReferences(it); }            		
+					references.each { 
+                        log.debug "Adding reference to field 81 ${it}"
+                        speciesField.addToReferences(it); 
+                    }	
             	}
             
                 speciesField.language = language;

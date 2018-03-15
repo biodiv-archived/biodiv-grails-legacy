@@ -296,10 +296,10 @@ class DataTableService extends AbstractMetadataService {
                 feedDesc += "Marking got changed ... so reuploading the sheet for new marking";
                 feedDesc += "\n Changed Marking : ${dataTable.changedCols}"
             }
-            //HACK to reupload species on edit
+            //HACK to reupload species on edit ... disabled by isMarkingDirty=false;
             switch(dataTable.dataTableType.ordinal()) {
                 case DataTableType.SPECIES.ordinal(): 
-                dataTable.isMarkingDirty = true;
+                dataTable.isMarkingDirty = false;
                 break;
             }
 
@@ -352,7 +352,7 @@ class DataTableService extends AbstractMetadataService {
                 def config = Holders.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
-                File imagesDir = new File(contentRootDir, dataTable.imagesFile.path);
+                File imagesDir = dataTable.imagesFile ? new File(contentRootDir, dataTable.imagesFile.path) : null;
                 if(dataTableFile.exists() && !dataTableFile.isDirectory()) {
                     File mappingFile = new File(dataTableFile.getParentFile(), 'mappingFile.tsv');
 

@@ -342,7 +342,10 @@ function saveColumnOrder(columnOrder) {
 
 function getHeaderMetadata() {
     var headerMetadata = $('#headerMetadata').val();
-    return JSON.parse(headerMetadata);
+    if(headerMetadata != undefined) {
+        return JSON.parse(headerMetadata);
+    }
+    return;
 }
 
 function saveHeaderMetadata(headerMetadata) {

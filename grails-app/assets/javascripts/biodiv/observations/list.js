@@ -456,7 +456,7 @@ $(document).ready(function(){
 
 
             // a selector that matches page contents
-            content : '.mainContent:first',
+            content : '.mainContent',
 
             //insertBefore: 'div.checklist_list_main > .table > .table-footer', 
             appendTo : ele,

@@ -365,7 +365,8 @@ class UtilsService {
 
                 case [FACT_UPDATE]:
                     println "fact update mail"
-                    def user = springSecurityService.currentUser;
+                    def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
+//                    def user = springSecurityService.currentUser;
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
                     templateMap["traitInstance"] = otherParams["trait"]
@@ -422,8 +423,9 @@ class UtilsService {
                 mailSubject = "Species uploaded"
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/speciesContributor"
                 templateMap["link"] = otherParams["link"]
-                def user = springSecurityService.currentUser;                
-                templateMap["contributor"] = user.name
+                def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
+//                def user = springSecurityService.currentUser;                
+                templateMap["contributor"] = user?.name
                 templateMap["speciesCreated"] = otherParams["speciesCreated"]
                 templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
                 templateMap["stubsCreated"] = otherParams["stubsCreated"]
