@@ -77,7 +77,7 @@ class ResourceSearchService extends AbstractSearchService {
         resources.each { r ->
             log.debug "Reading Resource : "+r.id;
             Map<String,Object> doc = getDocument(r);
-          
+
             eDocs.add(doc);
         }
         postToElastic(eDocs,"resource")
@@ -135,6 +135,6 @@ class ResourceSearchService extends AbstractSearchService {
     }
 
     def delete(long id) {
-        super.delete(Resource.simpleName +"_"+id.toString());
+        super.delete("resource",id.toString());
     }
 }

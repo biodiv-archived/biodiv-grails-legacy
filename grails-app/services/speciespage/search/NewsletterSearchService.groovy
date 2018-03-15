@@ -92,7 +92,7 @@ class NewsletterSearchService extends AbstractSearchService {
 //				obv.tags.each { tag ->
 //					doc.put(searchFieldsConfig.TAG, tag);
 //				}
-  
+
 				eDocs.add(doc);
 
 		}
@@ -103,7 +103,7 @@ class NewsletterSearchService extends AbstractSearchService {
 	}
 
     def delete(long id) {
-        super.delete(Newsletter.simpleName +"_"+id.toString());
+        super.delete("newsletter",id.toString());
     }
 
 }

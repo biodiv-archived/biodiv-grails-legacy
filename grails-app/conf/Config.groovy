@@ -521,7 +521,7 @@ environments {
             app.rootDir = "${userHome}/git/biodiv/app-conf"
             search.serverURL = "http://10.0.0.11/solr"
             search.biodivApiURL="http://localhost:8090"
-            search.nakshaURL = "http://localhost:8080"
+            search.nakshaURL = "http://localhost:8081"
             //names.parser.serverURL = "10.0.0.10"
         }
         google.analytics.enabled = false

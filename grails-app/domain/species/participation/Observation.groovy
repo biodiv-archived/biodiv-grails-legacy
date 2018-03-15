@@ -32,7 +32,7 @@ import species.groups.UserGroup.FilterRule;
 import species.dataset.DataTable;
 
 class Observation extends DataObject {
-	
+
 	def dataSource
 	def commentService;
 	def springSecurityService;
@@ -64,7 +64,7 @@ class Observation extends DataObject {
 			return this.value;
 		}
 	}
-    
+
 	public enum BasisOfRecord {
 		PRESERVED_SPECIMEN ("Preserved Specimen"),
 		FOSSIL_SPECIMEN ("Fossil Specimen"),
@@ -74,7 +74,7 @@ class Observation extends DataObject {
         MATERIAL_SAMPLE("Material Sample"),
         OBSERVATION("Observation"),
         UNKNOWN("Unknown")
-		
+
 		private String value;
 
 		BasisOfRecord(String value) {
@@ -84,13 +84,13 @@ class Observation extends DataObject {
 		String value() {
 			return this.value;
 		}
-		
+
 		static BasisOfRecord getEnum(value){
 			if(!value) return null
-			
+
 			if(value instanceof BasisOfRecord)
 				return value
-			
+
 			value = value.toUpperCase().trim()
 			switch(value){
 				case 'PRESERVED_SPECIMEN':
@@ -107,9 +107,9 @@ class Observation extends DataObject {
 					return BasisOfRecord.MATERIAL_SAMPLE
 				case 'OBSERVATION':
 					return BasisOfRecord.OBSERVATION
-	
+
 				default:
-					return BasisOfRecord.UNKNOWN	
+					return BasisOfRecord.UNKNOWN
 			}
 		}
 	}
@@ -130,13 +130,13 @@ class Observation extends DataObject {
 		String value() {
 			return this.value;
 		}
-		
+
 		static ProtocolType getEnum(value){
 			if(!value) return null
-			
+
 			if(value instanceof ProtocolType)
 				return value
-			
+
 			value = value.toUpperCase().trim()
 			switch(value){
 				case 'DWC_ARCHIVE':
@@ -154,7 +154,7 @@ class Observation extends DataObject {
 				case 'OTHER':
 					return ProtocolType.OTHER
 				default:
-					return null	
+					return null
 			}
 		}
 	}
@@ -166,14 +166,14 @@ class Observation extends DataObject {
     boolean isLocked = false;
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
-	
+
 	//if true observation comes on view otherwise not
 	boolean isShowable;
 	//if observation representing checklist then this flag is true
 	boolean isChecklist = false;
 	//observation generated from checklist will have source as checklist other will point to themself
 	Long sourceId;
-	
+
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
     BasisOfRecord basisOfRecord = BasisOfRecord.HUMAN_OBSERVATION;
@@ -203,11 +203,11 @@ class Observation extends DataObject {
 		//to insert observation without db exception
 		sourceId nullable:true
 		resource validator : { val, obj ->
-			//XXX ignoring validator for checklist and its child observation. 
+			//XXX ignoring validator for checklist and its child observation.
 			//all the observation generated from checklist will have source id in advance based on that we are ignoring validation.
 			// Genuine observation will not have source id and checklist as false
-			if(!obj.sourceId && !obj.isChecklist && !obj.externalId && obj.protocol!=ProtocolType.LIST) 
-				val && val.size() > 0 
+			if(!obj.sourceId && !obj.isChecklist && !obj.externalId && obj.protocol!=ProtocolType.LIST)
+				val && val.size() > 0
 		}
 		latitude nullable: false
 		longitude nullable:false
@@ -232,8 +232,8 @@ class Observation extends DataObject {
 		checklistAnnotations type:'text'
 		autoTimestamp false
 		tablePerHierarchy false
-        id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "observation_id_seq"] 
-	 } 
+        id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "observation_id_seq"]
+	 }
 
 	/**
 	 * TODO: return resources in rating order and choose first
@@ -249,7 +249,7 @@ class Observation extends DataObject {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	RecommendationVote fetchOwnerRecoVote(){
@@ -288,7 +288,7 @@ class Observation extends DataObject {
 			return null
 		}
 		def recoIds = []
-        
+
         this.noOfIdentifications = 0;
 
 		int maxCount = res[0]["votecount"]
@@ -308,7 +308,7 @@ class Observation extends DataObject {
 		def recoVote = RecommendationVote.find(query, [observation:this, recoIds:recoIds])
 		updateChecklistAnnotation(recoVote)
 		return recoVote.recommendation
-        
+
 	}
 
 	void calculateMaxVotedSpeciesName(){
@@ -364,7 +364,7 @@ class Observation extends DataObject {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	def getRecommendationVotes(int limit, long offset) {
@@ -390,18 +390,18 @@ class Observation extends DataObject {
 
 	//XXX: comment this method before checklist migration
 	def beforeUpdate() {
-        log.debug 'Observation beforeUpdate'
+        println 'Observation beforeUpdate'
 		if(isDirty() && !isDirty('visitCount') && !isDirty('version')){
             updateResources();
 			updateIsShowable()
-			
+
 			if(isDirty('topology')) {
 				updateLatLong()
 			}
 			lastRevised = new Date();
 		}
 	}
-	
+
 	def beforeInsert() {
         println 'Observation beforeInsert'
 		updateLocationScale()
@@ -409,27 +409,27 @@ class Observation extends DataObject {
         updateResources();
 		updateIsShowable()
 	}
-	
+
 	def afterInsert() {
         println 'Observation afterInsert'
 		sourceId = sourceId ?:id
 	}
-	
+
 	def afterUpdate(){
         println 'Observation afterUpdate'
 		//XXX uncomment this method when u actully abt to change isShowable variable
 		// (ie. if media added to obv of checklist then this method should be uncommented)
 		//activityFeedService.updateIsShowable(this)
     }
-	
+
 	def getPageVisitCount(){
 		return visitCount;
 	}
-	
+
 	public static int getCountForGroup(groupId){
 		return Observation.executeQuery("select count(*) from Observation obv where obv.group.id = :groupId ", [groupId: groupId])[0]
 	}
- 
+
     List fetchAllFlags(){
         def fList = Flag.findAllWhere(objectId:this.id,objectType:this.class.getCanonicalName());
         return fList;
@@ -440,24 +440,31 @@ class Observation extends DataObject {
 //		//Suppressing all checklist generated observation even if they have media
 //		boolean isChecklistObs = (id && sourceId != id) ||  (!id && sourceId)
 //		isShowable = (isChecklist || (!isChecklistObs && resource && !resource.isEmpty())) ? true : false
-//		
-		
+//
+
 		//showing all observation those have media
 		isShowable = (isChecklist || (noOfImages || noOfVideos || noOfAudio)) ? true : false
 
 		//updating protocol
-        if(isChecklist || (sourceId  && (id != sourceId))) 
+        if(isChecklist || (sourceId  && (id != sourceId)))
             this.protocol = ProtocolType.LIST;
 	}
-	
+
 	private void updateResources() {
-        log.debug "Observation updateResources";
+        println "Observation updateResources";
 		noOfImages = noOfVideos = noOfAudio = 0;
-        resource.each {
+		  	println this.resource
+        this.resource.each {
+					println "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
             if(it.type == ResourceType.IMAGE) noOfImages++;
             else if(it.type == ResourceType.VIDEO) noOfVideos++;
             else if(it.type == ResourceType.AUDIO) noOfAudio++;
         }
+
+				println "((((((((((((((((()))))))))))))))))"
+				println noOfAudio;
+				println noOfImages;
+				println noOfVideos;
         utilsService.evictInCache('resources', 'observation-'+this.id);
         updateReprImage();
 	}
@@ -479,9 +486,9 @@ class Observation extends DataObject {
             println r.averageRating
         }
         def res = highestRatedResource;//listResourcesByRating(1)
-        if(res && !res.fileName.equals('i')) 
+        if(res && !res.fileName.equals('i'))
             res = res
-		else 
+		else
 			res = null;//group?.icon(ImageType.ORIGINAL)
         this.reprImage = res;
     }
@@ -491,7 +498,7 @@ class Observation extends DataObject {
 		if(!m){
 			return
 		}
-		
+
         if(isChecklist && sourceId && !datasetId) {
             Checklists cl = Checklists.read(sourceId)
             if(cl.sciNameColumn && recoVote.recommendation.isScientificName){
@@ -504,11 +511,11 @@ class Observation extends DataObject {
             checklistAnnotations = m as JSON
         }
 	}
-	
+
 	private updateLocationScale(){
 		locationScale = locationScale?:Metadata.LocationScale.APPROXIMATE
 	}
-	
+
 	String fetchFormattedSpeciesCall() {
         if(!maxVotedReco) return "Unknown"
 
@@ -518,25 +525,25 @@ class Observation extends DataObject {
 
             if(maxVotedReco.taxonConcept.status=="SYNONYM" && maxVotedReco.isScientificName) {
            		return '<i>'+maxVotedReco.taxonConcept.name+'</i> - <small>Synonym of</small> <i>'+this.maxVotedReco.taxonConcept.italicisedForm+'</i>';
-           	}           
+           	}
             return '<i>'+maxVotedReco.taxonConcept.italicisedForm+'</i>'
         } else //common name
 		    return maxVotedReco.name
 	}
-	
+
 	String fetchSpeciesCall() {
 		if(maxVotedReco?.taxonConcept && maxVotedReco?.isScientificName) { //sciname from dirty list
 
             if(maxVotedReco.taxonConcept.status=="SYNONYM" && maxVotedReco.isScientificName) {
            		return maxVotedReco.taxonConcept.name+'- Synonym of '+this.maxVotedReco.taxonConcept.normalizedForm;
-           	}           
+           	}
             return maxVotedReco.taxonConcept.normalizedForm
         } else //common name
 	        return maxVotedReco ? maxVotedReco?.name : "Unknown"
     }
 
 	String title() {
-		String title = fetchSpeciesCall() 
+		String title = fetchSpeciesCall()
 		if(!title || title.equalsIgnoreCase('Unknown')) {
 			title = 'Help Identify'
 		}
@@ -557,18 +564,18 @@ class Observation extends DataObject {
 	def fetchCommentCount(){
 		return commentService.getCount(null, this, null, null)
 	}
-	
+
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
-	
+
 	def Map fetchExportableValue(SUser reqUser=null){
 		Map res = [:]
 		res[ObvUtilService.OBSERVATION_ID] = "" + id
 		res[ObvUtilService.OBSERVATION_URL] = utilsService.createHardLink('observation', 'show', this.id)
 		res[ObvUtilService.IMAGE_PATH] = fetchImageUrlList().join(", ")
-		
-		
+
+
 		def snName = ""
 		def cnName = ""
 		def totalVotes, maxVotedRecoCount
@@ -582,29 +589,29 @@ class Observation extends DataObject {
 			totalVotes = RecommendationVote.countByObservation(this)
 			maxVotedRecoCount = RecommendationVote.findAllByRecommendationAndObservation(maxVotedReco, this).size()
 		}
-		
+
 		res[ObvUtilService.SN] =snName
 		res[ObvUtilService.CN] =cnName
 		res[ObvUtilService.NUM_IDENTIFICATION_AGREEMENT] = maxVotedRecoCount ? "" + maxVotedRecoCount : "0"
 		res[ObvUtilService.NUM_IDENTIFICATION_DISAGREEMENT] = totalVotes ? "" + (totalVotes - maxVotedRecoCount) : "0"
 		res[ObvUtilService.HELP_IDENTIFY] = maxVotedReco ? "NO" : "YES"
-		
-		
+
+
 		res[ObvUtilService.SPECIES_GROUP] = group.name
 		res[ObvUtilService.HABITAT] = habitat.name
 		res[ObvUtilService.OBSERVED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(fromDate)
-		
-				
+
+
 		res[ObvUtilService.LOCATION] = placeName
 		res[ObvUtilService.LOCATION_SCALE] = locationScale?.value()
-		
+
 		def geoPrivacyAdjust = fetchGeoPrivacyAdjustment(reqUser)
 		res[ObvUtilService.LONGITUDE] = "" + (this.longitude + geoPrivacyAdjust)
 		res[ObvUtilService.LATITUDE] = "" + (this.latitude + geoPrivacyAdjust)
 		res[ObvUtilService.GEO_PRIVACY] = "" + geoPrivacy
-		
+
 		res[ObvUtilService.NOTES] = notes
-		
+
 		//XXX: During download of large number of observation some time following exception coming
 		//an assertion failure occured (this may indicate a bug in Hibernate, but is more likely due to unsafe use of the session)
 		try{
@@ -616,31 +623,31 @@ class Observation extends DataObject {
 			}
 		}
 		def ugList = []
-		
+
 		this.userGroups.each{ ug ->
 			ugList.add(ug.name)
 		}
-		
+
 		res[ObvUtilService.USER_GROUPS] = ugList.join(", ")
-		
+
 		def config = grails.util.Holders.config
 		//def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
 		res[ObvUtilService.AUTHOR_NAME] = author.name
-		res[ObvUtilService.AUTHOR_URL] = utilsService.createHardLink('user', 'show', author.id) 
-		
+		res[ObvUtilService.AUTHOR_URL] = utilsService.createHardLink('user', 'show', author.id)
+
 		res[ObvUtilService.CREATED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(createdOn)
 		res[ObvUtilService.UPDATED_ON] = new SimpleDateFormat("dd/MM/yyyy").format(lastRevised)
 
-		return res 
+		return res
 	}
-	
+
 	private fetchImageUrlList(){
-		
+
 		def res = []
-		
+
 		def config = grails.util.Holders.config
 		String base = config.speciesPortal.observations.serverURL
-		
+
 		Iterator iterator = resource?.iterator();
 		while(iterator.hasNext()) {
 			def reprImage = iterator.next();
@@ -670,7 +677,7 @@ class Observation extends DataObject {
 
         def queryParams = [:];
         queryParams['obvId'] = this.id;
-        
+
         def query = "select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='$type' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref where observation_id=:obvId order by avg desc, resource_id asc";
         if(max && max > 0) {
             query += " limit :max"
@@ -681,11 +688,11 @@ class Observation extends DataObject {
         def idList = results.collect { it[0] }
 
         if(idList) {
-            def instances = Resource.withCriteria {  
-                inList 'id', idList 
+            def instances = Resource.withCriteria {
+                inList 'id', idList
                 cache params.cache
             }
-            results.collect {  r-> instances.find { i -> r[0] == i.id } }                           
+            results.collect {  r-> instances.find { i -> r[0] == i.id } }
         } else {
             []
         }
@@ -699,11 +706,11 @@ class Observation extends DataObject {
 */
         return [[ResourceType.IMAGE, noOfImages], [ResourceType.VIDEO, noOfVideos], [ResourceType.AUDIO,noOfAudio]];
 	}
-	
+
 	def fetchRecoVoteOwnerCount(){
 		return noOfIdentifications;//RecommendationVote.countByObservation(this)
 	}
-	
+
 	def fetchChecklistAnnotation(){
 		def res = [:]
 		Checklists cl = Checklists.read(sourceId)
@@ -734,7 +741,7 @@ class Observation extends DataObject {
             Map dwcObvMapping = [:];
             int l=0;
             dwcObvMappingFile.eachLine { line ->
-                if(l++>0) { 
+                if(l++>0) {
                     String[] parts = line.split(/\t/)
                     if(parts.size()>=8 && (parts[6] || parts[7])) {
                         dwcObvMapping[parts[2].replace('1','').toLowerCase()] = ['name':parts[0], 'url':parts[1], 'field':parts[7], 'order':Float.parseFloat(parts[6])];
@@ -760,7 +767,7 @@ class Observation extends DataObject {
         res['id'] = this.id;
         res['type'] = 'observation';
         if(this.maxVotedReco && this.maxVotedReco.taxonConcept) {
-            res['speciesid'] = this.maxVotedReco.taxonConcept?.findSpeciesId(); 
+            res['speciesid'] = this.maxVotedReco.taxonConcept?.findSpeciesId();
             res['title'] = this.maxVotedReco.taxonConcept?.canonicalForm;
         }else if(this.maxVotedReco) {
             res['title'] = this.maxVotedReco.name;
@@ -771,7 +778,7 @@ class Observation extends DataObject {
 	}
 
 
-//	
+//
 //	def fetchSourceChecklistTitle(){
 //		activityFeedService.getDomainObject(sourceType, sourceId).title
 //	}
@@ -779,7 +786,7 @@ class Observation extends DataObject {
     def getObservationFeatures() {
         return observationService.getObservationFeatures(this);
     }
-	
+
 	def fetchList(params, max, offset, action){
 		return observationService.getObservationList(params, max, offset, action)
 	}
@@ -812,12 +819,12 @@ class Observation extends DataObject {
         def taxCon = this.maxVotedReco?.taxonConcept
         if(!taxCon){return}
         def speWithThisTaxon = Species.findAllByTaxonConcept(taxCon)
-        speWithThisTaxon.each{ sp ->   
+        speWithThisTaxon.each{ sp ->
             obvRes.each{ obres ->
                 sp.removeFromResources(obres)
             }
             if(!sp.save(flush:true)){
-                sp.errors.allErrors.each { log.error it } 
+                sp.errors.allErrors.each { log.error it }
             }
         }
     }
@@ -830,9 +837,9 @@ class Observation extends DataObject {
     }
 
     SpeciesGroup fetchSpeciesGroup() {
-        return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+        return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
 	}
-	
+
 	def boolean isObvFromChecklist(){
 		return (id != sourceId)
 	}
@@ -850,12 +857,12 @@ class Observation extends DataObject {
         boolean isValid = true;
         filterRule.each { fRule ->
             switch(fRule.fieldName) {
-                case 'topology' : 
+                case 'topology' :
                 if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
                     isValid = isValid && fRule.ruleValues[0].covers(this[fRule.fieldName]);
                 }
                 break;
-                case 'taxon' : 
+                case 'taxon' :
                 if(fRule.ruleName.equalsIgnoreCase('scope')) {
                     //isValid = fRule.ruleValues[0].covers(instance[fRule.fieldName]);
                 }
