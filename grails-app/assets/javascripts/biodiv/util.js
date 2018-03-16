@@ -137,7 +137,7 @@ function loadGoogleMapsAPI(mapCanvasEle, callback) {
         if(google != undefined) {
             console.log("loading google maps")
                 console.log(mapCanvasEle);
-            google.load("maps", "3.28", {
+            google.load("maps", "3.31", {
                 'callback':function() {
                     //google.maps.visualRefresh = true;
                     //new google.maps.Map(mapCanvasEle, {});
