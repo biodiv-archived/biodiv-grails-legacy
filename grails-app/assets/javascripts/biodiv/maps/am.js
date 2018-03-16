@@ -12,38 +12,38 @@ function getWorkspace() {
     if (getHost() === 'thewesternghats.indiabiodiversity.org' || getHost() === 'wgp.saturn.strandls.com') { 
     	return 'wgp';
     }
-    return 'ibp';
+    return 'biodiv';
 }
 
 function getWWWBase() {
-    var www = 'http://' + getGeoserverHost() + '/geoserver/www/';
+    var www = 'https://' + getGeoserverHost() + '/geoserver/www/';
     return www;
 }
 
 // get the wms 
 function getWMS() {
-    var wms = 'http://' + getGeoserverHost() + '/geoserver/wms';
+    var wms = 'https://' + getGeoserverHost() + '/geoserver/wms';
     return wms;
 }
 
 function getWorkspaceWMS() {
-    var wms = 'http://' + getGeoserverHost() + '/geoserver/' + getWorkspace() + '/wms';
+    var wms = 'https://' + getGeoserverHost() + '/geoserver/' + getWorkspace() + '/wms';
     return wms;
 }
 
 function getWorkspaceOWS() {
-    var wms = 'http://' + getGeoserverHost() + '/geoserver/' + getWorkspace() + '/ows';
+    var wms = 'https://' + getGeoserverHost() + '/geoserver/' + getWorkspace() + '/ows';
     return wms;
 }
 
 // get the wfs 
 function getWFS() {
-    var wfs = 'http://' + getGeoserverHost() + '/geoserver/' + getWorkspace() + '/wfs';
+    var wfs = 'https://' + getGeoserverHost() + '/geoserver/' + getWorkspace() + '/wfs';
     return wfs;
 }
 
 function getSummaryColumns(layer) {
-    var url = 'http://' + getGeoserverHost() + '/map/getSummaryColumns';
+    var url = 'https://' + getGeoserverHost() + '/map/getSummaryColumns';
     
     var params = {
         request:'getSummaryColumns',
@@ -81,7 +81,7 @@ function getSummaryColumns(layer) {
 }
 
 function getColumnTitle(layer, columnName) {
-    var url = 'http://' + getGeoserverHost() + '/map/getColumnTitle';
+    var url = 'https://' + getGeoserverHost() + '/map/getColumnTitle';
     
     var params = {
         request:'getColumnTitle',
@@ -119,7 +119,7 @@ function getColumnTitle(layer, columnName) {
 function getThemeNames(theme_type) {
 
     /*
-    var url = 'http://' + getGeoserverHost() + '/geoserver/ows';
+    var url = 'https://' + getGeoserverHost() + '/geoserver/ows';
     
     var params = {
         request:'getThemeNames',
@@ -171,7 +171,7 @@ function getThemeNames(theme_type) {
 }
 
 function getLayersByTheme(theme) {
-    var url = 'http://' + getGeoserverHost() + '/map/getLayersByTheme';
+    var url = 'https://' + getGeoserverHost() + '/map/getLayersByTheme';
     
     var params = {
         request:'getLayersByTheme',
@@ -206,7 +206,7 @@ function getLayersByTheme(theme) {
 }
 
 function getLayerColumns(layer) {
-    var url = 'http://' + getGeoserverHost() + '/map/getLayerColumns';
+    var url = 'https://' + getGeoserverHost() + '/map/getLayerColumns';
     
     var params = {
         request:'getLayerColumns',
@@ -241,7 +241,7 @@ function getLayerColumns(layer) {
 }
 
 function getLayerAttribution(layer) {
-    var url = 'http://' + getGeoserverHost() + '/map/getLayerAttribution';
+    var url = 'https://' + getGeoserverHost() + '/map/getLayerAttribution';
     
     var params = {
         request:'getLayerAttribution',
@@ -276,7 +276,7 @@ function getLayerAttribution(layer) {
 }
 
 function getLayerSummary(layer) {
-    var url = 'http://' + getGeoserverHost() + '/map/getLayerSummary';
+    var url = 'https://' + getGeoserverHost() + '/map/getLayerSummary';
     
     var params = {
         request:'getLayerSummary',
@@ -311,7 +311,7 @@ function getLayerSummary(layer) {
 }
 
 function getLayerDetails(layer) {
-    var url = 'http://' + getGeoserverHost() + '/map/getLayerDetails';
+    var url = 'https://' + getGeoserverHost() + '/map/getLayerDetails';
     
     var params = {
         request:'getLayerDetails',
@@ -345,7 +345,7 @@ function getLayerDetails(layer) {
 }
 
 function getLayerLinkTables(layer) {
-    var url = 'http://' + getGeoserverHost() + '/map/getLayerLinkTables';
+    var url = 'https://' + getGeoserverHost() + '/map/getLayerLinkTables';
     
     var params = {
         request:'getLayerLinkTables',
@@ -379,7 +379,7 @@ function getLayerLinkTables(layer) {
 }
 
 function getLayersAccessStatus() {
-    var url = 'http://' + getGeoserverHost() + '/map/getLayersAccessStatus';
+    var url = 'https://' + getGeoserverHost() + '/map/getLayersAccessStatus';
     
     var params = {
         request:'getLayersAccessStatus',
@@ -751,7 +751,7 @@ function showAjaxLinkPopup(url, title) {
 }
 
 function getLinkTableEntries(feature_id, layer_tablename, link_tablename) {
-    var url = 'http://' + getHost() + '/map/getLinkTableEntries?layerdata_id=' + feature_id + '&layer_tablename=' + layer_tablename + '&link_tablename=' + link_tablename;
+    var url = 'https://' + getHost() + '/map/getLinkTableEntries?layerdata_id=' + feature_id + '&layer_tablename=' + layer_tablename + '&link_tablename=' + link_tablename;
     
     var layer_link_table_entries;
     
@@ -780,7 +780,7 @@ function getLinkTableEntries(feature_id, layer_tablename, link_tablename) {
 
 function isAuthorisedUser() {
 
-   var url = 'http://' + getHost() + '/biodiv/SUser/isLoggedIn';
+   var url = 'https://' + getHost() + '/biodiv/SUser/isLoggedIn';
     
     var isLoggedIn = false;
 
@@ -968,18 +968,18 @@ function AugmentedMap(map_div, options) {
 
 	if (d.length === 2) {
                 if(d[0] === "observation"){
-                        var url = "http://" + getHost() + "/biodiv/observation/show/" + d[1];
+                        var url = "https://" + getHost() + "/biodiv/observation/show/" + d[1];
                         return "<a href='" + url + "'>Observation</a>";
                 }
                 if(d[0] === "checklist"){
-                        var url = "http://" + getHost() + "/biodiv/checklist/show/" + d[1];
+                        var url = "https://" + getHost() + "/biodiv/checklist/show/" + d[1];
                         return "<a href='" + url + "'>Checklist</a>";
                 }
 
         }
 
 	if (d.length === 3 && d[0] === "checklist"){
-		var url = "http://" + getHost() + "/node/" + d[2];
+		var url = "https://" + getHost() + "/node/" + d[2];
 		return "<a href='" + url + "'>" + d[1] + "</a>";			
 	}
 
@@ -1631,7 +1631,7 @@ function createDownloadBox(divId, layer, isAuthorisedUser) {
     }
 
     html = html + '<ul class="download_formats_list">';
-    //http://localhost:8080/geoserver/ibp/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=ibp:lyr_118_india_foresttypes&outputFormat=json
+    //https://localhost:8080/geoserver/ibp/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=ibp:lyr_118_india_foresttypes&outputFormat=json
     
     var wfs_url = getWorkspaceOWS() + '?service=WFS&version=1.0.0&request=GetFeature&typeName=' + layer; 
     var kml_url = getWorkspaceWMS() + '/kml?layers=' + layer; 
@@ -1684,7 +1684,7 @@ function createLayerLinkBox(divId, layer, title) {
 
     html = html + '<a style="float:right;" href="#" onclick="hideLayerLinkBox(\'' + divId + '\')">close</a>';
     html = html + '<span style="font-weight:bold;">Direct URL link to this layer</span><br>';
-    var url = 'http://' + getHost() + '/map?layers=' + layer + '&title=' + title;
+    var url = 'https://' + getHost() + '/map?layers=' + layer + '&title=' + title;
     html = html + '<textarea rows=3 cols=30>' + url + '</textarea>';
 
     return html;
@@ -2016,7 +2016,7 @@ function generateHTMLForLayersAsList(layers, hasMap) {
 function getLicenseImage(license) {
     var html = '';
     var lic = license.replace('(', '').replace(')', '');
-    html = html + '<div class="license"><a title="Creative Commons License" href="http://creativecommons.org/licenses/'+license['license']+'/3.0/" target="_blank"><img src="http://i.creativecommons.org/l/'+lic+'/3.0/80x15.png"></img></a></div>'
+    html = html + '<div class="license"><a title="Creative Commons License" href="https://creativecommons.org/licenses/'+license['license']+'/3.0/" target="_blank"><img src="https://i.creativecommons.org/l/'+lic+'/3.0/80x15.png"></img></a></div>'
       
     
     return html; 
@@ -2606,7 +2606,7 @@ function generateEmbeddableMapCode(map) {
     var map_div = 'map' + new Date().getTime();
     html = html + '<div id="' + map_div + '"></div>';
     html = html + '<style>.olLayerGoogleCopyright {display:none;}</style>';
-    html = html + '<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>'; 
+    html = html + '<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>'; 
     html = html + '<script type="text/javascript" src="' + getWWWBase() + 'OpenLayers-2.10/OpenLayers.js"></script>';
     html = html + '<script type="text/javascript" src="' + getWWWBase() + 'scripts/jquery-1.7.1.min.js"></script>';
     html = html + '<script type="text/javascript" src="' + getWWWBase() + 'scripts/jquery-ui-1.8.15.custom.min.js"></script>'; 
