@@ -12,7 +12,7 @@ function getWorkspace() {
     if (getHost() === 'thewesternghats.indiabiodiversity.org' || getHost() === 'wgp.saturn.strandls.com') { 
     	return 'wgp';
     }
-    return 'ibp';
+    return 'biodiv';
 }
 
 function getWWWBase() {
