@@ -1704,7 +1704,7 @@ def dataSource;
         if(userGroupInstance.filterRule) {
             def filterRuleJson = JSON.parse(userGroupInstance.filterRule);
             JSON.parse(userGroupInstance.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 rules << rule
             }
         }
