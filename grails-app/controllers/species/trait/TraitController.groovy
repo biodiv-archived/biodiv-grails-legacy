@@ -102,7 +102,7 @@ class TraitController extends AbstractObjectController {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'trait.label', default: 'Trait'), params.id])}"
             redirect(uGroup.createLink(action: "list", controller:"trait", 'userGroupWebaddress':params.webaddress))
         }  else {
-            render(view: "create", model: [traitInstance: traitInstance , traitValues:TraitValue.findAllByTrait(traitInstance), field: field.concept+'|'+field.category])
+            render(view: "create", model: [traitInstance: traitInstance , traitValues:TraitValue.findAllByTraitInstance(traitInstance), field: field.concept+'|'+field.category])
         }
         return;
     }
@@ -267,7 +267,7 @@ println "===================+"
             def coverage = traitInstance.taxon
             def traitValue = [];
             Field field;
-            traitValue = TraitValue.findAllByTraitAndIsDeleted(traitInstance,false);
+            traitValue = TraitValue.findAllByTraitInstanceAndIsDeleted(traitInstance,false);
             field = Field.findById(traitInstance.fieldId);
             def model = getList(params);
             model['traitInstance'] = traitInstance
