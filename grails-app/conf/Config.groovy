@@ -630,9 +630,9 @@ environments {
             info    'org.hibernate.jdbc.ConnectionManager'
             */
             info   'com.grailsrocks.emailconfirmation'
-            info   'com.odobo.grails.plugin.springsecurity.rest'
-            info   'com.odobo.grails.plugin.springsecurity.openid'
-            info   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
+            debug   'com.odobo.grails.plugin.springsecurity.rest'
+            debug   'com.odobo.grails.plugin.springsecurity.openid'
+            debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
             info   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
 			debug   'grails.app.services.speciespage.SpeciesUploadService'
@@ -1606,8 +1606,10 @@ grails.plugins.dynamicController.mixins = [
 //'securityContextPersistenceFilter',
 //'rememberMeAuthenticationFilter',
 grails.plugin.springsecurity.filterChain.filterNames = [
-    'logoutFilter',
+    
+    'restLogoutFilter', 'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
+      'restAuthenticationFilter',
          'anonymousAuthenticationFilter',
             'exceptionTranslationFilter', 'filterInvocationInterceptor'
             ]

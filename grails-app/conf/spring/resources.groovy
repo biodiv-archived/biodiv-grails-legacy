@@ -305,7 +305,10 @@ beans = {
         statusCode = conf.rest.login.failureStatusCode?:HttpServletResponse.SC_FORBIDDEN
     }
 
-    restAuthenticationTokenJsonRenderer(BiodivRestAuthenticationTokenJsonRenderer)
+    restAuthenticationTokenJsonRenderer(BiodivRestAuthenticationTokenJsonRenderer) {
+        grailsApplication = ref('grailsApplication')
+    }
+
     restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler) {
         renderer = ref('restAuthenticationTokenJsonRenderer')
     }
