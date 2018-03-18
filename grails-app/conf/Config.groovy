@@ -807,14 +807,14 @@ environments {
     }
     kk {
         servername = 'indiabiodiversity.org'
-        grails.serverURL = "http://${servername}"
+        grails.serverURL = "https://${servername}"
 
         speciesPortal {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
-            search.biodivApiUrl="http://localhost:8081"
-            search.nakshaURL = "http://localhost:8081"
+            search.biodivApiUrl="http://localhost:8080"
+            search.nakshaURL = "http://localhost:8080"
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
