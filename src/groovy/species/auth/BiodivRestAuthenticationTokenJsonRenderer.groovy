@@ -16,6 +16,7 @@ import static org.springframework.http.HttpStatus.*;
 
 class BiodivRestAuthenticationTokenJsonRenderer  implements AccessTokenJsonRenderer {//extends DefaultRestAuthenticationTokenJsonRenderer {
     def utilsService;
+    def grailsApplication;
 
     @Override
     String generateJson(AccessToken restAuthenticationToken) {
@@ -42,7 +43,7 @@ class BiodivRestAuthenticationTokenJsonRenderer  implements AccessTokenJsonRende
             }
         }
 
-        utilsService = grails.util.Holders.getApplication().getMainContext().getBean("utilsService");
+        utilsService = grailsApplication.getMainContext().getBean("utilsService");
         def model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), result);
         def jsonResult = model as JSON
 

@@ -251,7 +251,3 @@ grails.project.dependency.resolution = {
 development{
     grails.server.port.http=8080
 }
-
-development {
-    grails.server.port.http = 8090
-} 
