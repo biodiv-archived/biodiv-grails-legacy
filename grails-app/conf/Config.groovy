@@ -813,7 +813,7 @@ environments {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
-            search.biodivApiUrl="http://localhost:8080"
+            search.biodivApiURL="http://localhost:8080"
             search.nakshaURL = "http://localhost:8080"
             resources {
                 rootDir = "${app.rootDir}/img"
