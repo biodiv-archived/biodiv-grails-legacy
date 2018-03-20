@@ -332,8 +332,13 @@ beans = {
     commentV1Renderer(CommentRenderer, Comment, v1_MIME_TYPE) {
     }
  */
-
-    restTokenValidationFilter(RestTokenValidationFilter) {
+println "#################################"
+println "#################################"
+println "#################################"
+println ref('tokenReader').class
+println "#################################"
+println "#################################"
+   /* restTokenValidationFilter(RestTokenValidationFilter) {
         grailsApplication = ref('grailsApplication')
         webInvocationPrivilegeEvaluator = ref('webInvocationPrivilegeEvaluator')
         headerName = conf.rest.token.validation.headerName
@@ -344,7 +349,7 @@ beans = {
         authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
         authenticationFailureHandler = ref('restAuthenticationFailureHandler')
         restAuthenticationProvider = ref('restAuthenticationProvider')
-    }
+    }*/
     webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
     entityInterceptor(species.MyEntityInterceptor);
 

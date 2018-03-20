@@ -48,7 +48,7 @@ class BiodivRestAuthenticationTokenJsonRenderer  implements AccessTokenJsonRende
         def jsonResult = model as JSON
 
         log.debug "Generated JSON:\n ${jsonResult.toString(true)}"
-
+println jsonResult
         return jsonResult.toString()
 
     }
