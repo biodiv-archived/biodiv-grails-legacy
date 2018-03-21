@@ -99,6 +99,7 @@ $(document).ready(function() {
                 }
             },
             error:function (xhr, ajaxOptions, thrownError){
+                console.log(xhr);
                 return false;
             } 
         });
