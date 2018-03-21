@@ -303,8 +303,6 @@ class UtilsService {
     }
 
     Language getCurrentLanguage(request = null,cuRLocale = null){
-       // println "====================================="+request
-        
         if(!defaultLanguage) defaultLanguage = Language.getLanguage(Language.DEFAULT_LANGUAGE);
         String langStr = (cuRLocale)?:LCH.getLocale()
         def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
@@ -364,7 +362,6 @@ class UtilsService {
                 break
 
                 case [FACT_UPDATE]:
-                    println "fact update mail"
                     def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
 //                    def user = springSecurityService.currentUser;
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
@@ -1035,17 +1032,6 @@ class UtilsService {
     }
 
 	boolean ifOwns(SUser user) {
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println springSecurityService.isLoggedIn()
-        println springSecurityService.currentUser?.id
-        println user.id
-        println  SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
         if(!user) return false
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
@@ -1276,7 +1262,6 @@ class UtilsService {
         filterMap = [:];
         if(filterFile.exists()) {
             filterFile.eachLine { line ->
-                println line;
                 def (level,filter) = line.tokenize('-');
                 level = level?.replaceAll("<(.|\n)*?>", '')?.trim();
                 filter = (filter?.replaceAll("</?p>", ''))?.trim();
@@ -1360,7 +1345,6 @@ class UtilsService {
         Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateStr)
         Format formatter = new SimpleDateFormat("MMMM"); 
             String s = formatter.format(date);
-                System.out.println(s);
                 return s;
     }
     

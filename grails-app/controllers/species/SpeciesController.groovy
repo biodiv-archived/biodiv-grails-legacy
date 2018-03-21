@@ -345,7 +345,6 @@ class SpeciesController extends AbstractObjectController {
                     utilsService.benchmark('mapSpeciesInstanceFields') {
                         map = mapSpeciesInstanceFields(speciesInstance, speciesInstance.fields, map.map, map.fieldsConnectionArray,fieldFromName);
                     }
-                    println map
                     //def relatedObservations = observationService.getRelatedObservationByTaxonConcept(speciesInstance.taxonConcept.id, 1,0);
                     //def observationInstanceList = relatedObservations?.observations?.observation
                     //def instanceTotal = relatedObservations?relatedObservations.count:0
@@ -658,7 +657,6 @@ class SpeciesController extends AbstractObjectController {
         if(!(params.name && params.pk) && !params.otherParams) {
         	msg=messageSource.getMessage("default.species.error.fieldOrname", null, RCU.getLocale(request))
             render ([success:false, msg:msg] as JSON)
-            println "=======HERE========= "
             return;
         }
          
@@ -668,7 +666,6 @@ class SpeciesController extends AbstractObjectController {
             def value = params.value;
             userLanguage = utilsService.getCurrentLanguage(request);
             params.locale_language = userLanguage;
-            println "near switch case=================="
             switch(params.name) {
                 case "contributor":
                 long cid = params.cid?params.long('cid'):null;
@@ -883,14 +880,12 @@ class SpeciesController extends AbstractObjectController {
                         utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParamsForMail);
                     }
                 }
-                println "---------RESULT---- " + result
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
                 result.remove('synonymInstance');
                 result.remove('taxonConcept');
             }
-			println "--------------final result at synonym update " +  result
             render result as JSON
             return;
         } catch(Exception e) {
@@ -1373,8 +1368,6 @@ class SpeciesController extends AbstractObjectController {
         else{
             result = ['success'  : false]
         }
-        println "---------------------------"
-        println result
         render result as JSON
     }
 
@@ -1441,7 +1434,6 @@ class SpeciesController extends AbstractObjectController {
 	def editSpeciesPage(){
 		Long taxonId = params.taxonId ? params.taxonId.toLong() : TaxonomyDefinition.findByMatchId(params.colId)?.id
 		def result = [taxonRanks:getTaxonRankForUI(), 'success':true]
-		println "======================== parasm " + params + "  taxon id " + taxonId
 		
 		if(taxonId){
 			def taxon = TaxonomyDefinition.read(taxonId)
@@ -1450,7 +1442,6 @@ class SpeciesController extends AbstractObjectController {
 				species = speciesUploadService.createSpeciesStub(taxon)
 			}
 			result.id = species?.id
-			println "result after create stub " + result
 			render result as JSON
 			return
 		}
@@ -1555,8 +1546,6 @@ class SpeciesController extends AbstractObjectController {
 				def taxonRegistry
                 Map r = getTaxon(params.page, rank);
 				
-				println "-----------------------------------ddd   " + r
-				
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
 					List taxonList = r.taxonList
@@ -1631,8 +1620,6 @@ class SpeciesController extends AbstractObjectController {
         NamesParser namesParser = new NamesParser();
         List<TaxonomyDefinition> names = namesParser.parse([name]);
         TaxonomyDefinition page = names[0];
-        println "=============NamesParser========page==================="
-        println page
         if(page && page.canonicalForm) {
 			if((rank == TaxonomyRank.SPECIES.ordinal() || rank == TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()) && !page.binomialForm) { //TODO:check its not uninomial
             	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
@@ -1809,8 +1796,6 @@ class SpeciesController extends AbstractObjectController {
 
     def testingCount() {
         def sp = Species.read(228424L);
-        println "=========!ST COUNT ====== " + sp.fetchResourceCount();
-        println "===NEXT COUNT ==== " + sp.fetchSpeciesFieldResourceCount();
     }
 
     def test() {
@@ -1874,7 +1859,6 @@ class SpeciesController extends AbstractObjectController {
     def postSpeices(){
         String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
 	    def m = [author:"1", userGroups:params.userGroupId, objectType:Species.class.getCanonicalName(), submitType:(params.submitType?:'post'), objectIds: new File(file).text]
-	    println m
 	    userGroupService.updateResourceOnGroup(m, params.sendMail?:false)
         render "done";
     }
