@@ -352,5 +352,5 @@ beans = {
     jwtTokenAuthProvider(JwtTokenAuthProvider) {
         coreUserDetailsService = ref('userDetailsService')
     }
-//    'cors-headers'(CorsFilter);
+    'cors-headers'(CorsFilter);
 }
