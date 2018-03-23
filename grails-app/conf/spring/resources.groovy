@@ -8,6 +8,7 @@ import species.auth.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao;
+import com.brandseye.cors.CorsFilter
 
 import javax.servlet.http.HttpServletResponse
 import species.auth.ConsumerManager;
@@ -332,12 +333,7 @@ beans = {
     commentV1Renderer(CommentRenderer, Comment, v1_MIME_TYPE) {
     }
  */
-println "#################################"
-println "#################################"
-println "#################################"
-println ref('tokenReader').class
-println "#################################"
-println "#################################"
+
    /* restTokenValidationFilter(RestTokenValidationFilter) {
         grailsApplication = ref('grailsApplication')
         webInvocationPrivilegeEvaluator = ref('webInvocationPrivilegeEvaluator')
@@ -356,4 +352,5 @@ println "#################################"
     jwtTokenAuthProvider(JwtTokenAuthProvider) {
         coreUserDetailsService = ref('userDetailsService')
     }
+    'cors-headers'(CorsFilter);
 }
