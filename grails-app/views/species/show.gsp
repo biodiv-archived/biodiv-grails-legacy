@@ -145,8 +145,8 @@
         window.is_species_admin = ${SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')} 
         </script>
 
-        <script type="text/javascript"
-            src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
+        <!-- <script type="text/javascript"
+            src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script> -->
 
         <asset:script>
 
