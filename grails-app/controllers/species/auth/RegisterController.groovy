@@ -702,6 +702,9 @@ class CustomRegisterCommand2 {
 		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
+        location nullable:true
+        latitude nullable:true
+        longitude nullable:true
         //location blank:false, nullable:false, validator : RegisterController.locationValidator
         //latitude blank:false, nullable:false, validator : RegisterController.latitudeValidator
         //longitude blank:false, nullable:false, validator : RegisterController.longitudeValidator
