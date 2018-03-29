@@ -153,6 +153,12 @@ class DataTableService extends AbstractMetadataService {
                         }
                     }
                     File imagesFile;
+                    println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+                    println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+                    println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+                    println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+                    println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+                    println params.imagesFilePath
                     if(params.imagesFilePath) {
                         imagesFile = new File(params.imagesFilePath);
                     } else if(params.imagesFile.path) {
@@ -166,7 +172,7 @@ class DataTableService extends AbstractMetadataService {
                             def ant = new AntBuilder().unzip( src: imagesFile, dest: destDir, overwrite:true)
                             imagesFile = destDir;
                         }
-
+println "^^^^^^^^^^^^^^^^^^^^^^^^^^"
                         UFile f = new UFile()
                         f.size = imagesFile.length()
                         f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
@@ -174,6 +180,10 @@ class DataTableService extends AbstractMetadataService {
                         if(f.save()) {
                             instance.imagesFile = f
                         }
+                    } else {
+                        println "_----------------------"
+                        println instance.imagesFile
+                        instance.imagesFile = null;
                     }
 
                 } catch(e){
