@@ -1769,7 +1769,7 @@ grails {
 grails.assets.bundle=true
 grails.assets.minifyJs=false
 cors.enabled = true;
-cors.enable.logging = true
+cors.enable.logging = false
 //cors.url.pattern = '/api/*'
 cors.allow.origin.regex = '.*\\.indiabiodiversity\\.org'
 cors.headers = ['Access-Control-Allow-Origin':'*', 'Access-Control-Allow-Headers': 'origin, authorization, accept, content-type, x-requested-with, X-Auth-Token, X-AppKey' ]
