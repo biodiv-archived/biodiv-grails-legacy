@@ -251,7 +251,7 @@ class UFileController {
             return
         }
 
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        def config = grails.util.Hodlers.config
         def file = new File(config.speciesPortal.content.rootDir+ufile.path)
         if (file.exists()) {
             log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"

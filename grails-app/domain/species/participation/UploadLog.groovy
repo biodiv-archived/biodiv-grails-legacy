@@ -124,7 +124,7 @@ paramsMapAsText type:'text';
             println "===================="
             println filePath
 
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = grails.utils.Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir;
             File ipFile = new File(filePath);
             String tmpFileName = ipFile.getName()+".log";

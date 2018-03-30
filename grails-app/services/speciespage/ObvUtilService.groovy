@@ -1244,7 +1244,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
     Map uploadDwCDataset(Map params) {
         def resultModel = [:]
         String file = params.path?:params.uFile?.path;
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        def config = grails.util.Holders.config
         file = config.speciesPortal.content.rootDir + file;
 
         File f = new File(file);

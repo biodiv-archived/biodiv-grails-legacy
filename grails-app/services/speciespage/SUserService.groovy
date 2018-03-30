@@ -89,7 +89,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
 			return null
 		}
-		SUserSearchService.publishSearchIndex(user, true);
+		//SUserSearchService.publishSearchIndex(user, true);
 		return user
 	}
 
@@ -160,7 +160,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				if (mailSubject.contains('$')) {
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 				}
-
+println templateMap;
 					try {
 						def userLanguage = utilsService.getCurrentLanguage();
 						mailService.sendMail {
