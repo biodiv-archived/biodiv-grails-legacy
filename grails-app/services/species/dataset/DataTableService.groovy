@@ -124,7 +124,15 @@ class DataTableService extends AbstractMetadataService {
             instance.properties = params;
 
             instance.clearErrors();
-
+println instance.uploadLog
+println instance.uploadLog?.logFile
+println instance.uFile
+println instance.uFile?.path
+println instance.traitValueFile
+println instance.imagesFile;
+println instance.imagesFile?.path;
+            if(instance.imagesFile && instance.imagesFile.path == null) instance.imagesFile = null;
+            if(instance.traitValueFile && instance.traitValueFile.path == null) instance.traitValueFile = null;
             instance.initParams(params);
 
             if(params.dataset) {
