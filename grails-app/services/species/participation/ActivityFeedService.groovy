@@ -143,7 +143,15 @@ class ActivityFeedService {
 	def messageSource;
   def dataSource;
 	def getActivityFeeds(params){
-//		log.debug params;
+		log.debug params;
+        if(params.webaddress && (!params.rootHolderId && !params.rootHolderType)) {
+        println "Fecthing activity feeds for group ${params.webaddress}";
+           UserGroup ug = utilsService.getUserGroup(params);
+           println ug
+            params.rootHolderId = ug.id.toString();
+            params.rootHolderType = UserGroup.class.getCanonicalName();
+        }
+
 		def feeds = ActivityFeed.fetchFeeds(params)
 		if(params.feedOrder == OLDEST_FIRST){
 			feeds = feeds.reverse()

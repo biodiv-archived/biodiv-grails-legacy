@@ -8,7 +8,7 @@
 <div class="feedFilterDiv">
 	<div class="btn-group pull-right" style="z-index: 10; clear:both">
 		<button id="feedFilterButton" class="btn dropdown-toggle" data-toggle="dropdown" href="#" rel="tooltip"
-			data-original-title="${g.message(code:'showfeedfilter.filter.by')}"> <g:message code="default.group.label" /> <span class="caret"></span>
+			data-original-title="${g.message(code:'showfeedfilter.filter.by')}"> <g:message code="default.all.label" /> <span class="caret"></span>
 		</button>
 		
 		<ul id="feedFilter" class="dropdown-menu" style="width: auto;">
