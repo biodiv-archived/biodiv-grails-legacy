@@ -2366,7 +2366,7 @@ class XMLConverter extends SourceConverter {
     static int getTaxonRank(String rankStr) {
 		return ScientificName.TaxonomyRank.getTaxonRank(rankStr);
         /* // moved to TaxonRank
-        MessageSource messageSource = grails.util.Holders.application.mainContext.getBean('messageSource')
+        MessageSource messageSource = grails.util.Holders.grailsApplication.mainContext.getBean('messageSource')
         def request = null;
         try {
             request = RequestContextHolder.currentRequestAttributes().request
