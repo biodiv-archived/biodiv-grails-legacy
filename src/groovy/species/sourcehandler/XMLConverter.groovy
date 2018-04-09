@@ -813,7 +813,7 @@ class XMLConverter extends SourceConverter {
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
-        return dataNode.text()?:"";
+        return dataNode.localText().size() > 0 ? dataNode.localText()[0]:"";
     }
 
     /**
