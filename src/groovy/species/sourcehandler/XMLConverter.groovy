@@ -1571,7 +1571,7 @@ class XMLConverter extends SourceConverter {
             Language lang = getLanguage(n.language?.name?.text(), n.language?.threeLetterCode?.text());
 
             def criteria = CommonNames.createCriteria();
-            String cleanName = Utils.cleanName(n.text().trim()).capitalize();
+            String cleanName = Utils.cleanName(n.localText()[0].trim()).capitalize();
             CommonNames sfield = criteria.get {
                 lang ? eq("language", lang): isNull("language");
                 ilike("name", cleanName);
@@ -1580,7 +1580,7 @@ class XMLConverter extends SourceConverter {
             }
 
             if(!sfield) {
-                log.debug "Saving common name :"+n.text();
+                log.debug "Saving common name :"+n.localText()[0];
                 sfield = new CommonNames();
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
@@ -1657,7 +1657,7 @@ class XMLConverter extends SourceConverter {
             RelationShip rel = getRelationship(n.relationship?.text());
             if(rel) {
 				try{
-	                def cleanName = Utils.cleanName(n.text()?.trim());
+	                def cleanName = Utils.cleanName(n.localText()[0]?.trim());
 	                def parsedNames = namesParser.parse([cleanName]);
 	                def viaDatasource = null;
 	                if(n.viaDatasource) {
