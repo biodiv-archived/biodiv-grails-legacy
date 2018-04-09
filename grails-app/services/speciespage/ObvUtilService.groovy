@@ -1381,8 +1381,8 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
         uploadLog << "Starting import of GBIF Observations data";
         def conn = new Sql(dataSource)
 
-        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        dataSource.setUnreturnedConnectionTimeout(0);
+//        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//        dataSource.setUnreturnedConnectionTimeout(0);
 	
 
         def tmpBaseDataTable = "gbifdata";
@@ -1687,8 +1687,8 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             //conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);	
         } finally {
             //conn.close();
-            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
-            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+//            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
         }
 
         uploadLog << "\n\n----------------------------------------------------------------------";

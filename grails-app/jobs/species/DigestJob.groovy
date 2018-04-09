@@ -15,7 +15,7 @@ class DigestJob {
     }
 
     def execute() {
-		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
 //		dataSource.setUnreturnedConnectionTimeout(200);
 		try{
 	        println "============SENDING DIGEST MAIL STARTED==================="
@@ -24,7 +24,7 @@ class DigestJob {
 		}catch(e){
 			e.printStackTrace()
 		}finally{
-			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		}
     } 
 

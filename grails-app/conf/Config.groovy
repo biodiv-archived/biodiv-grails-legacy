@@ -652,6 +652,7 @@ environments {
             debug 'org.apache.http.wire'
             //debug  'org.codehaus.groovy.grails.orm.hibernate.cfg'
             trace 'grails.plugin.springsecurity.SpringSecurityUtils'
+            debug 'com.zaxxer.hikari.pool.HikariPool'
         }
         logHibernateStats = 'ALWAYS' // From ALWAYS, ALLOWED, NEVER
     }
@@ -932,6 +933,7 @@ environments {
             info   'grails.app.services.speciespage.ObservationService'
             info   'grails.app.services.speciespage'
             info   'grails.app.services.species'
+            debug 'com.zaxxer.hikari'
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']
