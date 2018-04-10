@@ -39,8 +39,9 @@ class ExportJob {
 				
 				switch (dl.sourceType) {
 					case [OBSERVATION_LIST, UNIQUE_SPECIES]:
-						f = obvUtilService.export(dl.fetchMapFromText(), dl)
-						break
+					//Observation download is happeing from biodiv-api and elastic code
+						//f = obvUtilService.export(dl.fetchMapFromText(), dl)
+						return
 					case CHECKLIST:
 						f = checklistService.export(dl.fetchMapFromText(), dl)
 						break
@@ -105,8 +106,14 @@ class ExportJob {
 			return null
 		}
 		scheduledTaskList.each { DownloadLog dl ->
-			setStatus(dl, ObvUtilService.EXECUTING)
+			switch (dl.sourceType) {
+				case [OBSERVATION_LIST, UNIQUE_SPECIES]: 
+					return;
+				default :
+					setStatus(dl, ObvUtilService.EXECUTING);
+			}
 		}
+		
 		
 		return scheduledTaskList
 	}

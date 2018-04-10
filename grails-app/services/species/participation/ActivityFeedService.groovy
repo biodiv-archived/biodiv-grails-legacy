@@ -143,7 +143,15 @@ class ActivityFeedService {
 	def messageSource;
   def dataSource;
 	def getActivityFeeds(params){
-//		log.debug params;
+		log.debug params;
+        if(params.webaddress && (!params.rootHolderId && !params.rootHolderType)) {
+        println "Fecthing activity feeds for group ${params.webaddress}";
+           UserGroup ug = utilsService.getUserGroup(params);
+           println ug
+            params.rootHolderId = ug.id.toString();
+            params.rootHolderType = UserGroup.class.getCanonicalName();
+        }
+
 		def feeds = ActivityFeed.fetchFeeds(params)
 		if(params.feedOrder == OLDEST_FIRST){
 			feeds = feeds.reverse()
@@ -322,7 +330,7 @@ def updateDescriptionJSON(ActivityFeed feedInstance) {
       update activity_feed
       set description_json = row_to_json(row)
       from (select af.id as aid , af.activity_descrption as description , af.activity_type as activity_performed,'true' as is_migrated from activity_feed af) row
-      where  row.aid = id and activity_type = 'Suggested species name' and id=:id;
+      where  row.aid = id and activity_type = 'Suggestion removed' and id=:id;
       """,[id:feedInstance.id]);
         break
 

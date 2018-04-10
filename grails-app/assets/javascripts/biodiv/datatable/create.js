@@ -27,7 +27,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
 
                     var contributorId = $('#contributorUserIds').data('contributorid'); 
                     var contributorName = $('#contributorUserIds').data('contributorname'); 
-                    if(contributorId != '' )
+                    if(contributorId != ''  && dataTable_contributor_autofillUsersComp[0])
                         dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
 
                     $('.addDataTable #speciesGroupFilter button').click(function(e){
@@ -243,7 +243,9 @@ function getMarkedColumns() {
 }
 
 function viewSpeciesGrid() {
-    $("#myGrid").hide();
+    //$("#myGrid").hide();
+    $("#myGrid").empty();
+    $("#tagHeaders tr:not(:first-child)").remove();
     var input = $("#dataTableFile_path").val();
     var res = "species";
     if(input){

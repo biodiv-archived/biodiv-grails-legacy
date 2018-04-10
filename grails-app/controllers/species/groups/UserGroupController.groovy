@@ -1445,8 +1445,8 @@ def dataSource;
 	   def res = createFromFile(params.file, areIds)
 	   def oldUsers = res[0]
 	   def newUsers = res[1]
-       int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-       dataSource.setUnreturnedConnectionTimeout(100000);
+//       int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//       dataSource.setUnreturnedConnectionTimeout(100000);
 
        SUser.withTransaction() { 
            newUsers.each { user ->
@@ -1472,8 +1472,8 @@ def dataSource;
                }
            }
        }
-       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
-       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+//       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 
 	   render "== done"
    }
@@ -1704,7 +1704,7 @@ def dataSource;
         if(userGroupInstance.filterRule) {
             def filterRuleJson = JSON.parse(userGroupInstance.filterRule);
             JSON.parse(userGroupInstance.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 rules << rule
             }
         }

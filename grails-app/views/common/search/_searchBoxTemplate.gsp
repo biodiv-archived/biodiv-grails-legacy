@@ -69,7 +69,7 @@ $(document).ready(function() {
             'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}",
             'hasPermissionToCreateSpeciesPageUrl':"${uGroup.createLink(controller:'species', action:'hasPermissionToCreateSpeciesPage')}"
         },
-        //'loginUrl':"uGroup.createLink(controller:'login','userGroup':userGroupInstance)}",
+        'loginUrl':"${uGroup.createLink(controller:'login','userGroup':userGroupInstance)}",
         'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
         'login' : {
             'googleApiKey' : "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.apikey}",

@@ -169,7 +169,7 @@ class FactService extends AbstractObjectService {
                 key = key.trim();
 
                 switch(key) {
-                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts', 'dataTable', ObvUtilService.LOCATION, ObvUtilService.TOPOLOGY, ObvUtilService.LATITUDE, ObvUtilService.LONGITUDE, ObvUtilService.LOCATION_SCALE, ObvUtilService.OBSERVED_ON, ObvUtilService.TO_DATE, ObvUtilService.DATE_ACCURACY, ObvUtilService.AUTHOR_EMAIL] : break;
+                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts', 'dataTable', ObvUtilService.LOCATION, ObvUtilService.TOPOLOGY, ObvUtilService.LATITUDE, ObvUtilService.LONGITUDE, ObvUtilService.LOCATION_SCALE, ObvUtilService.OBSERVED_ON, ObvUtilService.TO_DATE, ObvUtilService.DATE_ACCURACY, ObvUtilService.AUTHOR_EMAIL, 'traitInstance'] : break;
                     default :
                     value = (value && value instanceof String)? value.trim() : null ;
 
@@ -180,10 +180,10 @@ class FactService extends AbstractObjectService {
                         case 'species.Species':
                         pageTaxon = object.taxonConcept;
                         if(pageTaxon) {
-                            println m.traitId
+                            println m.traitInstance
                             writeLog("validate if this trait ${key} can be given to this pageTaxon ${pageTaxon} as per traits taxon scope");
-                            if(m.traitId) {
-                                Trait t  = Trait.read(Long.parseLong(m.traitId));
+                            if(m.traitInstance) {
+                                Trait t  = m.traitInstance;//Trait.read(Long.parseLong(m.traitId));
                                 println t
                                 if(Trait.isValidTrait(t, pageTaxon)) {
                                     traitInstance = t;

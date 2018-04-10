@@ -96,7 +96,9 @@ class ActivityFeed {
 		if(!refTime){
 			return isCountQuery?0:Collections.EMPTY_LIST
 		}
-
+println "++++++++++++++++++"
+println "++++++++++++++++++"
+println "++++++++++++++++++"
 		def map = [:]
 		String selectClause  = isCountQuery? "select count(*) as c " :"select af.id as id, af.last_updated as updatetime "
 		String fromClause = " from activity_feed af "
@@ -156,7 +158,7 @@ class ActivityFeed {
 
 		//if query without group
 		queryList = queryList?:[selectClause + fromClause + whereClause + orderClause]
-
+println queryList
 		def result =  new ActivityFeed().getResult(queryList, map, isCountQuery, params.max)
 //		println "=============== final reustls ==================================="
 //		println result
@@ -168,14 +170,14 @@ class ActivityFeed {
 		def result = []
 		def sql =  Sql.newInstance(dataSource)
 		queryList.each { q ->
-//			println "================= Query =========== "
-//			println q
-//			println m
-//			println "================= Query =========== "
+			println "================= Query =========== "
+			println q
+			println m
+			println "================= Query =========== "
 			result.addAll(sql.rows(q, m))
-		}
+	 	}
 
-//		println "====== raw result  = " + result
+		println "====== raw result  = " + result
 
 		if(isCountQuery){
 			int c = 0
@@ -200,7 +202,7 @@ class ActivityFeed {
 		}
 
 		return limitedResult
-	}
+	} 
 
 
 
@@ -227,10 +229,14 @@ class ActivityFeed {
 				break
 
 			case ActivityFeedService.GROUP_SPECIFIC:
+            println "++++++++++++++++++++++++"
+            println params
 				if(!params.rootHolderType || params.rootHolderType.trim() != UserGroup.class.getCanonicalName()){
 					return false
 				}
+            println "11111"
 				params.userGroupList = [UserGroup.read(params.rootHolderId.toLong())]
+                println params.userGroupList
 				break
 
 			case ActivityFeedService.MY_FEEDS:

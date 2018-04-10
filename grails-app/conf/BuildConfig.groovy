@@ -134,7 +134,7 @@ grails.project.dependency.resolution = {
         compile 'org.apache.sanselan:sanselan:0.97-incubator'
         compile 'jmimemagic:jmimemagic:0.1.2'
         //compile 'net.sf.jtidy:jtidy:r938'
-        compile 'com.mchange:c3p0:0.9.5.2'
+        //compile 'com.mchange:c3p0:0.9.5.2'
         runtime ('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
@@ -150,7 +150,7 @@ grails.project.dependency.resolution = {
 
         runtime "org.pac4j:pac4j-jwt:2.1.0"
         compile "org.pac4j:pac4j-oauth:2.1.0"
-
+        compile "com.zaxxer:HikariCP:3.0.0" 
     }
 
     plugins { 

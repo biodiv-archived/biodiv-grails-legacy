@@ -780,10 +780,17 @@ class XMLConverter extends SourceConverter {
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
                 if(field.connection == 81 ){
-					def ref = new Reference(title:data);
-                    speciesField.addToReferences(ref);                	
+					//def ref = new Reference(title:data);
+                    //speciesField.addToReferences(ref);                	
+					references.each { 
+                        log.debug "Adding reference to field 81 ${it}"
+                        speciesField.addToReferences(it); 
+                    }
             	}else{
-					references.each { speciesField.addToReferences(it); }            		
+					references.each { 
+                        log.debug "Adding reference to field 81 ${it}"
+                        speciesField.addToReferences(it); 
+                    }	
             	}
             
                 speciesField.language = language;
@@ -806,7 +813,7 @@ class XMLConverter extends SourceConverter {
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
-        return dataNode.text()?:"";
+        return dataNode.localText().size() > 0 ? dataNode.localText()[0]:"";
     }
 
     /**
@@ -1564,7 +1571,7 @@ class XMLConverter extends SourceConverter {
             Language lang = getLanguage(n.language?.name?.text(), n.language?.threeLetterCode?.text());
 
             def criteria = CommonNames.createCriteria();
-            String cleanName = Utils.cleanName(n.text().trim()).capitalize();
+            String cleanName = Utils.cleanName(n.localText()[0].trim()).capitalize();
             CommonNames sfield = criteria.get {
                 lang ? eq("language", lang): isNull("language");
                 ilike("name", cleanName);
@@ -1573,7 +1580,7 @@ class XMLConverter extends SourceConverter {
             }
 
             if(!sfield) {
-                log.debug "Saving common name :"+n.text();
+                log.debug "Saving common name :"+n.localText()[0];
                 sfield = new CommonNames();
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
@@ -1650,7 +1657,7 @@ class XMLConverter extends SourceConverter {
             RelationShip rel = getRelationship(n.relationship?.text());
             if(rel) {
 				try{
-	                def cleanName = Utils.cleanName(n.text()?.trim());
+	                def cleanName = Utils.cleanName(n.localText()[0]?.trim());
 	                def parsedNames = namesParser.parse([cleanName]);
 	                def viaDatasource = null;
 	                if(n.viaDatasource) {
@@ -2359,7 +2366,7 @@ class XMLConverter extends SourceConverter {
     static int getTaxonRank(String rankStr) {
 		return ScientificName.TaxonomyRank.getTaxonRank(rankStr);
         /* // moved to TaxonRank
-        MessageSource messageSource = grails.util.Holders.application.mainContext.getBean('messageSource')
+        MessageSource messageSource = grails.util.Holders.grailsApplication.mainContext.getBean('messageSource')
         def request = null;
         try {
             request = RequestContextHolder.currentRequestAttributes().request

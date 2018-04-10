@@ -13,7 +13,7 @@ class EmailConfirmationService extends com.grailsrocks.emailconfirmation.EmailCo
 	def makeURL(token, userGroupInstance) {
 		//@todo this needs to change to do a reverse mapping lookup
 		//@todo also if uri already exists in binding, append token to it
-		def grailsApplication = Holders.application
+		def grailsApplication = Holders.getGrailsApplication()
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
 		return uGroup.createLink(controller:'emailConfirmation', action:'index', id:token.encodeAsURL(), userGroup:userGroupInstance, absolute:true);		
 	}
@@ -21,7 +21,7 @@ class EmailConfirmationService extends com.grailsrocks.emailconfirmation.EmailCo
 	def sendConfirmation(String emailAddress, String thesubject,
 		Map binding = null, String userToken = null) {
 		def conf = new PendingEmailConfirmation(emailAddress:emailAddress, userToken:userToken)
-		conf.makeToken()
+		makeToken(conf);
 		if (!conf.save()) {
 			throw new IllegalArgumentException( "Unable to save pending confirmation: ${conf.errors}")
 		}

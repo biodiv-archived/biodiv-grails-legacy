@@ -8,6 +8,7 @@ import species.auth.OpenIdUserDetailsService;
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 
 import com.the6hours.grails.springsecurity.facebook.DefaultFacebookAuthDao;
+import com.brandseye.cors.CorsFilter
 
 import javax.servlet.http.HttpServletResponse
 import species.auth.ConsumerManager;
@@ -45,6 +46,9 @@ import species.MyEntityInterceptor;
 import species.auth.AjaxAwareAuthenticationEntryPoint;
 import grails.plugin.springsecurity.SecurityFilterPosition
 import species.auth.JwtTokenAuthProvider;
+import java.util.Properties;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 // Place your Spring DSL code here
 beans = {
@@ -241,7 +245,7 @@ beans = {
         contextRelative = conf.redirectStrategy.contextRelative // false
     }
 
-    dataSource(ComboPooledDataSource) { bean ->
+/*    dataSource(ComboPooledDataSource) { bean ->
         bean.destroyMethod = 'close'
         user =  CH.config.dataSource.username
         password = CH.config.dataSource.password
@@ -260,6 +264,23 @@ beans = {
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
      }
+*/
+
+    dataSource(HikariDataSource) { bean ->
+        def hp = new Properties()
+        hp.username = CH.config.dataSource.username
+        hp.password = CH.config.dataSource.password
+        hp.minimumIdle = 5
+        hp.connectionTimeout = 30000//ms
+        hp.maximumPoolSize = 30
+        hp.idleTimeout = 30000//ms
+        hp.jdbcUrl = CH.config.dataSource.url
+        hp.driverClassName = CH.config.dataSource.driverClassName
+        hp.connectionTestQuery='SELECT 1'
+
+        HikariConfig hc = new HikariConfig(hp)
+        bean.constructorArgs = [hc]
+    }
 
     /*if (Environment.current == Environment.DEVELOPMENT) {
     log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
@@ -305,7 +326,10 @@ beans = {
         statusCode = conf.rest.login.failureStatusCode?:HttpServletResponse.SC_FORBIDDEN
     }
 
-    restAuthenticationTokenJsonRenderer(BiodivRestAuthenticationTokenJsonRenderer)
+    restAuthenticationTokenJsonRenderer(BiodivRestAuthenticationTokenJsonRenderer) {
+        grailsApplication = ref('grailsApplication')
+    }
+
     restAuthenticationSuccessHandler(RestAuthenticationSuccessHandler) {
         renderer = ref('restAuthenticationTokenJsonRenderer')
     }
@@ -330,7 +354,7 @@ beans = {
     }
  */
 
-    restTokenValidationFilter(RestTokenValidationFilter) {
+   /* restTokenValidationFilter(RestTokenValidationFilter) {
         grailsApplication = ref('grailsApplication')
         webInvocationPrivilegeEvaluator = ref('webInvocationPrivilegeEvaluator')
         headerName = conf.rest.token.validation.headerName
@@ -341,11 +365,12 @@ beans = {
         authenticationSuccessHandler = ref('restAuthenticationSuccessHandler')
         authenticationFailureHandler = ref('restAuthenticationFailureHandler')
         restAuthenticationProvider = ref('restAuthenticationProvider')
-    }
+    }*/
     webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
     entityInterceptor(species.MyEntityInterceptor);
 
     jwtTokenAuthProvider(JwtTokenAuthProvider) {
         coreUserDetailsService = ref('userDetailsService')
     }
+    'cors-headers'(CorsFilter);
 }

@@ -303,8 +303,6 @@ class UtilsService {
     }
 
     Language getCurrentLanguage(request = null,cuRLocale = null){
-       // println "====================================="+request
-        
         if(!defaultLanguage) defaultLanguage = Language.getLanguage(Language.DEFAULT_LANGUAGE);
         String langStr = (cuRLocale)?:LCH.getLocale()
         def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
@@ -364,8 +362,8 @@ class UtilsService {
                 break
 
                 case [FACT_UPDATE]:
-                    println "fact update mail"
-                    def user = springSecurityService.currentUser;
+                    def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
+//                    def user = springSecurityService.currentUser;
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
                     templateMap["traitInstance"] = otherParams["trait"]
@@ -422,8 +420,9 @@ class UtilsService {
                 mailSubject = "Species uploaded"
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/speciesContributor"
                 templateMap["link"] = otherParams["link"]
-                def user = springSecurityService.currentUser;                
-                templateMap["contributor"] = user.name
+                def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
+//                def user = springSecurityService.currentUser;                
+                templateMap["contributor"] = user?.name
                 templateMap["speciesCreated"] = otherParams["speciesCreated"]
                 templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
                 templateMap["stubsCreated"] = otherParams["stubsCreated"]
@@ -1033,17 +1032,6 @@ class UtilsService {
     }
 
 	boolean ifOwns(SUser user) {
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println springSecurityService.isLoggedIn()
-        println springSecurityService.currentUser?.id
-        println user.id
-        println  SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
         if(!user) return false
 		return springSecurityService.isLoggedIn() && (springSecurityService.currentUser?.id == user.id || SpringSecurityUtils.ifAllGranted('ROLE_ADMIN'))
 	}
@@ -1274,7 +1262,6 @@ class UtilsService {
         filterMap = [:];
         if(filterFile.exists()) {
             filterFile.eachLine { line ->
-                println line;
                 def (level,filter) = line.tokenize('-');
                 level = level?.replaceAll("<(.|\n)*?>", '')?.trim();
                 filter = (filter?.replaceAll("</?p>", ''))?.trim();
@@ -1358,7 +1345,6 @@ class UtilsService {
         Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateStr)
         Format formatter = new SimpleDateFormat("MMMM"); 
             String s = formatter.format(date);
-                System.out.println(s);
                 return s;
     }
     

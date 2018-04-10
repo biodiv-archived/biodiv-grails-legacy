@@ -180,8 +180,8 @@ class NamelistUtilService {
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public void generateStatsInput(File f){
-		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(50000);
+//		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(50000);
 		def sql =  Sql.newInstance(dataSource);
 		def query  = "select id from taxonomy_definition where status = 'ACCEPTED' and is_deleted = false and position = 'WORKING' order by rank,id asc "
 		int i = 0
@@ -217,13 +217,13 @@ class NamelistUtilService {
 			}
 			
 		}
-		dataSource.setUnreturnedConnectionTimeout(oldTimeOut);
+//		dataSource.setUnreturnedConnectionTimeout(oldTimeOut);
 	}
 	
 	
 	public void generateSheetMultipleIBPNameList(File f){
-		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(50000);
+//		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(50000);
 		def sql =  Sql.newInstance(dataSource);
 		def query  = "select taxon_definition_id as id, classification_id, count(*) as c from taxonomy_registry  where  classification_id = 265799 group by taxon_definition_id, classification_id having count(*) > 1;"
 		int i = 0
@@ -253,12 +253,12 @@ class NamelistUtilService {
 			//}
 			
 		}
-		dataSource.setUnreturnedConnectionTimeout(oldTimeOut);
+//		dataSource.setUnreturnedConnectionTimeout(oldTimeOut);
 	}
 	
 	public void verifyAcceptedNamesAndColPath(File inputFile, File outputFile){
-		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(50000);
+//		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(50000);
 		def startTime = new Date()
 		List lines = inputFile.readLines();
 		int i=0;
@@ -298,7 +298,7 @@ class NamelistUtilService {
 			}
 			//out.println "Total failed " + failed.size() + "  start time " + startTime + "  end time " + new Date()
 		}
-		dataSource.setUnreturnedConnectionTimeout(oldTimeOut);
+//		dataSource.setUnreturnedConnectionTimeout(oldTimeOut);
 		
 	}
 	
@@ -340,8 +340,8 @@ class NamelistUtilService {
 	
 	
 	public copyIBPHirAsCOL(){
-		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(50000);
+//		def oldTimeOut = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(50000);
 		def sql =  Sql.newInstance(dataSource);
 		def query  = ''' select tr.id as trId from taxonomy_registry as tr, taxonomy_definition as t where t.status = 'ACCEPTED' and t.position = 'WORKING' and t.is_deleted = false and t.id = tr.taxon_definition_id  and tr.classification_id = 265799 and rank > -1 order by t.rank, t.id '''
 		int i = 0
@@ -386,7 +386,7 @@ class NamelistUtilService {
 			println "map size " + pMap.size()  + " new offset " + offset
 		}
 			
-		dataSource.setUnreturnedConnectionTimeout(oldTimeOut); 
+//		dataSource.setUnreturnedConnectionTimeout(oldTimeOut); 
 	}
 	
 
@@ -419,8 +419,8 @@ class NamelistUtilService {
 	/////////////////////////////////////////////////////////////////////////////////
 	
 	public addIBPHirToRawNames() {
-		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(5000);
+//		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(5000);
 		
 		Date startDate = new Date();
 		List hirList = [Classification.findByName('IUCN Taxonomy Hierarchy (2010)'), Classification.findByName("Author Contributed Taxonomy Hierarchy"), Classification.findByName("FishBase Taxonomy Hierarchy"), Classification.findByName("GBIF Taxonomy Hierarchy")]
@@ -465,7 +465,7 @@ class NamelistUtilService {
 				
 			}
 		}
-		dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//		dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		println "Failed count " + failCount   + "  Total time  " + ((new Date()).getTime() - startDate.getTime())/1000;
 	}
 
@@ -551,8 +551,8 @@ class NamelistUtilService {
 	//migrate synonyms for accepted raw names
 	public migrateSynonymForRawNames(Map replaceMap=[:] ){
 		NamesParser nameParser = new NamesParser()
-		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(5000);
+//		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(5000);
 		
 		def query  = '''select id from taxonomy_definition where status = 'ACCEPTED' and position = 'RAW' order by rank, id '''
 		def sql =  Sql.newInstance(dataSource);

@@ -184,7 +184,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
 				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
 				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
-					//myPrint("================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase()))
+					myPrint("================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase()))
+					myPrint("================== CUSTOM DELIMITER == " + delimiterMap);
+					myPrint("================== CUSTOM FORMAT MAP == " + customFormatMap);
 					fieldName = fieldName.toLowerCase();
 					//String delimiter = delimiterMap.get(fieldName)
 					//Map customFormat = customFormatMap.get(fieldName)
@@ -208,7 +210,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					} else if (category.text().equalsIgnoreCase("video")) {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
-					} else if (concept.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.INFORMATION_LISTING,1,language)) && field.category.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.REFERENCES,1,language))) {
+					} else if (concept.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.INFORMATION_LISTING,1,language)) && field.category.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.REFERENCES,2,language))) {
+
 						fieldName.split(SpreadsheetWriter.FIELD_SEP).each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
 							String delimiter = delimiterMap.get(fieldNameToken);
@@ -295,7 +298,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 
 	protected void createReferences(Node dataNode, Map speciesContent, Map mappedField) {
-        log.debug "Creating References"
+        log.debug "***********************Creating References"
         Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
         def referenceFields = mappedField.get("field name(s)");		
         if(referenceFields) {

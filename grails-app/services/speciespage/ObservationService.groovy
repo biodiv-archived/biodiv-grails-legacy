@@ -2393,7 +2393,7 @@ println "*******************************************"
         def results = [];
         Map temp = [:]
         if(paramsList) {
-            def queryResponse = observationsSearchService.search(paramsList);
+        /*    def queryResponse = observationsSearchService.search(paramsList);
 
             Iterator iter = queryResponse.getResults().listIterator();
             while(iter.hasNext()) {
@@ -2404,7 +2404,7 @@ println "*******************************************"
                     temp[doc.getFieldValue(searchFieldsConfig.LOCATION_EXACT)] = true;
                 }
             }
-        }
+        */}
 
         return results
     }

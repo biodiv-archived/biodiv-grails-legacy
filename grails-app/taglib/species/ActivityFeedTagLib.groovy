@@ -35,7 +35,7 @@ class ActivityFeedTagLib {
 	def showFeedWithFilter = {attrs, body->
 		def model = attrs.model
 		model.feedType = model.feedType ?: activityFeedService.ALL
-		model.feedCategory = model.feedCategory ?: UserGroup.class.canonicalName
+		model.feedCategory = model.feedCategory ?: activityFeedService.ALL;//UserGroup.class.canonicalName
 		out << render(template:"/common/activityfeed/showFeedWithFilterTemplate", model:attrs.model);
 	}
 	

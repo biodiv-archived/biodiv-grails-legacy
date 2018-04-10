@@ -3,6 +3,7 @@
 <%@page import="species.participation.Discussion"%>
 <%@page import="species.participation.Comment"%>
 <%@page import="species.groups.UserGroup"%>
+<%@page import="species.dataset.DataTable"%>
 <%@page import="species.Species"%>
 <%@page import="species.participation.ActivityFeedService"%>
 <%@page import="content.eml.Document"%>
@@ -43,6 +44,9 @@
 		</g:elseif>
 		<g:elseif test="${feedInstance.rootHolderType ==  Document.class.getCanonicalName()}" >
 			<g:render template="/document/showDocumentSnippetTemplate" model="['documentInstance':feedParentInstance]"/>
+		</g:elseif>
+		<g:elseif test="${feedInstance.rootHolderType ==  DataTable.class.getCanonicalName()}" >
+            <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':feedParentInstance, showDetails:true, showTitleDetail:true, hideBody:false, 'userLanguage':userLanguage]"/>
 		</g:elseif>
 		<g:else>
 			${feedInstance.rootHolderType}

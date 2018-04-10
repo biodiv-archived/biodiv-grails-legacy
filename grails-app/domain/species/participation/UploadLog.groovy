@@ -2,7 +2,6 @@ package species.participation
 
 import java.util.Date;
 import grails.converters.JSON;
-import grails.util.Holders;
 
 import species.auth.SUser;
 import speciespage.ObvUtilService;
@@ -10,7 +9,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log;
 import org.apache.log4j.Level;
-
+import grails.util.Holders;
 class UploadLog {
     private static Log log = LogFactory.getLog(this);
 
@@ -124,7 +123,9 @@ paramsMapAsText type:'text';
         if(!logFilePath && filePath) {
             println "===================="
             println filePath
-            String contentRootDir = Holders.config.speciesPortal.content.rootDir;
+
+            def config = Holders.config
+            String contentRootDir = config.speciesPortal.content.rootDir;
             File ipFile = new File(filePath);
             String tmpFileName = ipFile.getName()+".log";
             logFile = ipFile.exists() ? new File(ipFile.getParent(), tmpFileName) : utilsService.createFile(tmpFileName, uploadType, contentRootDir)
