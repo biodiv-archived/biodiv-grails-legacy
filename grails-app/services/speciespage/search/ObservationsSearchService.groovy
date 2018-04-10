@@ -8,6 +8,7 @@ import grails.converters.JSON;
 import java.text.SimpleDateFormat;
 
 import groovy.sql.Sql;
+import groovy.json.JsonSlurper
 import species.CommonNames
 import species.Habitat;
 import species.NamesParser
@@ -20,6 +21,9 @@ import species.participation.Checklists;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
+
+import org.codehaus.groovy.grails.web.json.JSONObject;
+
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
 import species.UtilsService
@@ -72,13 +76,15 @@ class ObservationsSearchService extends AbstractSearchService {
         List docs = new ArrayList();
         Map names = [:];
         Map docsMap = [:]
+        List<Long> ids=new ArrayList<Long>();
 
         obvs.each { obv ->
             log.debug "Reading Observation : "+obv.id;
-            List edoc=getJson(obv);
-
-
+            ids.push(obv.id);
         }
+        List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
+          println ids
+         dataToElastic=getJson(ids);
 
 //        return commitDocs(docs, commit);
     }
@@ -87,9 +93,9 @@ class ObservationsSearchService extends AbstractSearchService {
         super.delete("observation",id.toString());
     }
 
-    List getJson(Observation obv) {
+    List getJson(List<Long> ids) {
         def sql =  Sql.newInstance(dataSource);
-
+          def sids=ids.join(",")
         String query = """
         SELECT obs.id,
             obs.version,
@@ -188,15 +194,19 @@ class ObservationsSearchService extends AbstractSearchService {
            LEFT JOIN user_group ug ON ug.id = ugo.user_group_id
            LEFT JOIN taxonomy_registry tres ON tres.taxon_definition_id = t.id
            LEFT JOIN featured f ON f.object_id = obs.id
-           WHERE (tres.classification_id = 265799 OR tres.classification_id IS NULL) and obs.is_deleted=false and obs.id="""+obv.id+"""
+           WHERE (tres.classification_id = 265799 OR tres.classification_id IS NULL) and obs.is_deleted=false and obs.id in  ( """+sids+""" )
           GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, t.canonical_form,t.normalized_form , r.name,r.taxon_concept_id, r.accepted_name_id, tres.path,
           tres.classification_id, t.status, t.position, t.rank, resp.file_name  """;
 
           println "Running sql for getting observation json";
 
+          println query;
+
         def obvRows = sql.rows(query);
+
         obvRows.each { obvRow ->
             Map<String,Object> eData=new HashMap<String,Object>();
+
             obvRow.each { k, v ->
                 if(k=="usergroupid"){
                     eData.put(k, v.getArray());
@@ -247,6 +257,7 @@ eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));
 eData.put("checklistannotations",null);
 
 def traits = obvRow.get("traits");
+
 if(traits) {
     traits.each {traitDetails ->
         println traitDetails;
@@ -263,7 +274,6 @@ if(traits) {
     }
 }
 eData.remove('traits');
-
 postToElastic(eData);
 }
 }
