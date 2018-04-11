@@ -814,8 +814,10 @@ environments {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
+
             search.biodivApiURL="http://localhost:8080"
             search.nakshaURL = "http://localhost:8080"
+            
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
@@ -1608,10 +1610,10 @@ grails.plugins.dynamicController.mixins = [
 //'securityContextPersistenceFilter',
 //'rememberMeAuthenticationFilter',
 grails.plugin.springsecurity.filterChain.filterNames = [
-    
+
     'restLogoutFilter', 'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
-      'restAuthenticationFilter', 'restTokenValidationFilter', 
+      'restAuthenticationFilter', 'restTokenValidationFilter',
          'anonymousAuthenticationFilter',
             'exceptionTranslationFilter', 'filterInvocationInterceptor'
             ]
