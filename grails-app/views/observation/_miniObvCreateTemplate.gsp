@@ -68,10 +68,3 @@ def form_action = uGroup.createLink(action:'bulkSave', controller:'observation',
         <input class="agreeTerms" type="checkbox" name='agreeTerms' style ="display:none;"/>
     </div>
 </form>
-<asset:script>
-
-$(document).ready(function(){
-
-});
-
-</asset:script>

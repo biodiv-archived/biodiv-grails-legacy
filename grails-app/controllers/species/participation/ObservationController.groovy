@@ -839,7 +839,8 @@ class ObservationController extends AbstractObjectController {
                             }
                         } else {
                             //def output = [:]
-                            def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+                            def miniObvCreateHtml;
+                            miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
                             def model = utilsService.getSuccessModel(msg, null, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml,statusComplete : true]);
                             //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             withFormat {

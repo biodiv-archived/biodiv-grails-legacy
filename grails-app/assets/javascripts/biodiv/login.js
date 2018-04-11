@@ -224,11 +224,11 @@ console.log(expires_in);
 var loginPopupWindow;
 $(document).ready(function() {
    $('.fbJustConnect').click(function() {
-        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id="+window.params.login.api.facebook.apiKey+"&redirect_uri="+window.params.login.api.facebook.redirect_uri+"&scope=email%2Cuser_location%2Cuser_website&state=biodiv-api-state");
+        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id="+window.params.login.api.facebook.apiKey+"&redirect_uri="+window.params.login.api.facebook.redirect_uri+"&scope=email%2Cuser_location&state=biodiv-api-state");
         /*$.ajax({
             async: true,
             crossDomain: true,
-            url: "https://www.facebook.com/dialog/oauth?response_type=code&client_id=115305755799166&redirect_uri=http%3A%2F%2Fapi.local.ibp.org%2Flogin%2Fcallback%3Fclient_name%3DfacebookClient&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_website%2Cuser_work_history&state=biodiv-api-state",
+            url: "https://www.facebook.com/dialog/oauth?response_type=code&client_id=115305755799166&redirect_uri=http%3A%2F%2Fapi.local.ibp.org%2Flogin%2Fcallback%3Fclient_name%3DfacebookClient&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_work_history&state=biodiv-api-state",
             method: "GET",
             headers: {
                 "cache-control": "no-cache",
@@ -259,7 +259,7 @@ $(document).ready(function() {
         /*
          var clickedObject = this;
          var scope = { scope: "" };
-        scope.scope = "email,user_about_me,user_location,user_hometown,user_website";
+        scope.scope = "email,user_about_me,user_location,user_hometown";
 
         window.fbEnsure(function() {
             FB.login(function(response) {
