@@ -652,6 +652,7 @@ environments {
             debug 'org.apache.http.wire'
             //debug  'org.codehaus.groovy.grails.orm.hibernate.cfg'
             trace 'grails.plugin.springsecurity.SpringSecurityUtils'
+            debug 'com.zaxxer.hikari.pool.HikariPool'
         }
         logHibernateStats = 'ALWAYS' // From ALWAYS, ALLOWED, NEVER
     }
@@ -813,8 +814,10 @@ environments {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
+
             search.biodivApiURL="http://localhost:8080"
             search.nakshaURL = "http://localhost:8080"
+            
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
@@ -932,6 +935,7 @@ environments {
             info   'grails.app.services.speciespage.ObservationService'
             info   'grails.app.services.speciespage'
             info   'grails.app.services.species'
+            debug 'com.zaxxer.hikari'
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']
@@ -1606,10 +1610,10 @@ grails.plugins.dynamicController.mixins = [
 //'securityContextPersistenceFilter',
 //'rememberMeAuthenticationFilter',
 grails.plugin.springsecurity.filterChain.filterNames = [
-    
+
     'restLogoutFilter', 'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
-      'restAuthenticationFilter', 'restTokenValidationFilter', 
+      'restAuthenticationFilter', 'restTokenValidationFilter',
          'anonymousAuthenticationFilter',
             'exceptionTranslationFilter', 'filterInvocationInterceptor'
             ]

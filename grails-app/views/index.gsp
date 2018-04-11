@@ -32,7 +32,7 @@
             <div class="navblock" style="margin-top:20px;">
                 <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";><span class="content">${g.message(code:'default.species.label')}</span></div>
                 <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"><span class="content">${g.message(code:'species.observation')}</span></div>
-                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"><span class="content">${g.message(code:'button.maps')}</span></div>
+				<div id="explore" class="entry"  onclick="location.href='/map'"><span class="content">${g.message(code:'button.maps')}</span></div>
 
                 <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">${g.message(code:'button.documents')}</span></div>
                 <div id="groups_entry" class="entry"  onclick="location.href='${uGroup.createLink(controller:'group', action:'list', absolute:true)}'";><span class="content">${g.message(code:'default.groups.label')}</span></div>

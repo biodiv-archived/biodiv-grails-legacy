@@ -960,8 +960,8 @@ private List buildlistResult(rs,classSystem) {
             println "++++++++++++++++++++++++++++++++++++++"
             println "++++++++++++++++++++++++++++++++++++++"
             def sql = new Sql(dataSource)
-            int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-            dataSource.setUnreturnedConnectionTimeout(50000);
+            //int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+            //dataSource.setUnreturnedConnectionTimeout(50000);
             try{
                 rs.taxonid.each { t ->
                     println t
@@ -973,7 +973,7 @@ private List buildlistResult(rs,classSystem) {
             }catch(e){
                 e.printStackTrace()
             }finally{
-                dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+                //dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
             }
         } else {
             render ([success:false, msg:"", errors:[]] as JSON)

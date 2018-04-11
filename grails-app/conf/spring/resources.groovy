@@ -46,6 +46,9 @@ import species.MyEntityInterceptor;
 import species.auth.AjaxAwareAuthenticationEntryPoint;
 import grails.plugin.springsecurity.SecurityFilterPosition
 import species.auth.JwtTokenAuthProvider;
+import java.util.Properties;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 // Place your Spring DSL code here
 beans = {
@@ -242,7 +245,7 @@ beans = {
         contextRelative = conf.redirectStrategy.contextRelative // false
     }
 
-    dataSource(ComboPooledDataSource) { bean ->
+/*    dataSource(ComboPooledDataSource) { bean ->
         bean.destroyMethod = 'close'
         user =  CH.config.dataSource.username
         password = CH.config.dataSource.password
@@ -261,6 +264,23 @@ beans = {
 		maxConnectionAge = 1800 // seconds (30 minutes)
         debugUnreturnedConnectionStackTraces = true
      }
+*/
+
+    dataSource(HikariDataSource) { bean ->
+        def hp = new Properties()
+        hp.username = CH.config.dataSource.username
+        hp.password = CH.config.dataSource.password
+        hp.minimumIdle = 5
+        hp.connectionTimeout = 30000//ms
+        hp.maximumPoolSize = 30
+        hp.idleTimeout = 30000//ms
+        hp.jdbcUrl = CH.config.dataSource.url
+        hp.driverClassName = CH.config.dataSource.driverClassName
+        hp.connectionTestQuery='SELECT 1'
+
+        HikariConfig hc = new HikariConfig(hp)
+        bean.constructorArgs = [hc]
+    }
 
     /*if (Environment.current == Environment.DEVELOPMENT) {
     log4jConfigurer(org.springframework.beans.factory.config.MethodInvokingFactoryBean) {
