@@ -26,7 +26,7 @@ class SUser {
 	public enum SexType implements org.springframework.context.MessageSourceResolvable{
         Male("Male"),
         Female("Female"),
-        
+
 
         private String value;
 
@@ -51,12 +51,12 @@ class SUser {
         String[] getCodes() {
 
             ["${getClass().name}.${name()}"] as String[]
-        }   
+        }
         String getDefaultMessage() { value() }
 
 
     }
-   
+
     public enum OccupationType implements org.springframework.context.MessageSourceResolvable{
         Agriculture("Agriculture"),
 		Business("Business"),
@@ -65,7 +65,7 @@ class SUser {
 		Research("Research"),
 		Student("Student"),
 		Other("Other"),
-        
+
 
         private String value;
 
@@ -95,7 +95,7 @@ class SUser {
         String[] getCodes() {
 
             ["${getClass().name}.${name()}"] as String[]
-        }   
+        }
         String getDefaultMessage() { value() }
 
 
@@ -132,11 +132,11 @@ class SUser {
         String[] getCodes() {
 
             ["${getClass().name}.${name()}"] as String[]
-        }   
+        }
         String getDefaultMessage() { value() }
 
 
-    } 
+    }
 
     SexType sexType;
     OccupationType occupationType;
@@ -203,13 +203,13 @@ class SUser {
 
 	static mapping = {
 		/*
-		 * Just keep in mind that the UUIDHexGenerator is not generating globally unique identifiers, 
-		 * as Java can only acquire the IP address of the machine it’s running on 
-		 * and not the MAC address of the network interface. 
-		 * Also you have to be careful not to run into any conditions where the external system 
+		 * Just keep in mind that the UUIDHexGenerator is not generating globally unique identifiers,
+		 * as Java can only acquire the IP address of the machine it’s running on
+		 * and not the MAC address of the network interface.
+		 * Also you have to be careful not to run into any conditions where the external system
 		 * could create the same IDs that you generate internally.
 		 */
-		id generator:"species.utils.PrefillableUUIDHexGenerator", params:[sequence_name: "suser_id_seq"] 
+		id generator:"species.utils.PrefillableUUIDHexGenerator", params:[sequence_name: "suser_id_seq"]
 
 		password column: '`password`'
 		aboutMe type:"text";
@@ -318,7 +318,7 @@ class SUser {
 		uGroups.each {
             try{
                 log.debug "Checking if user has write permission on ${it}"
-                if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)|| utilsService.isAdmin()) {
+                if( utilsService.isAdmin() || aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
                     userGroups.add(it)
                 }
             } catch(e) {
@@ -333,7 +333,7 @@ class SUser {
 	boolean isUserGroupMember(UserGroup userGroup) {
 		return UserGroupMemberRole.countBySUserAndUserGroup(this, userGroup) ?: 0
 	}
-	
+
 	boolean fetchIsFounderOrExpert(){
 		return UserGroupMemberRole.createCriteria().count {
 			and{
