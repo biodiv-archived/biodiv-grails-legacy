@@ -6,7 +6,14 @@ import species.auth.Role;
 import species.utils.Utils;
 import org.hibernate.FetchMode;
 
-class Recommendation {
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@Cache(region="recommendation", include = "non-lazy")
+@JsonIgnoreProperties([])
+class Recommendation  implements Serializable {
 	
 	String name;
 	TaxonomyDefinition taxonConcept;

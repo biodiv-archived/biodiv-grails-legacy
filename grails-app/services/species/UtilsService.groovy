@@ -1192,14 +1192,14 @@ class UtilsService {
 	}
 
     def getFromCache(String cacheName, String cacheKey) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        def cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Returning from cache ${cache.name}" 
         return cache.get(cacheKey)?.get();
     }
 
     def putInCache(String cacheName, String cacheKey, value) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        def cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
         cache.put(cacheKey,value);

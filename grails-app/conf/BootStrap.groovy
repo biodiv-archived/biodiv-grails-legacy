@@ -28,6 +28,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils;
 import java.security.Provider;
 import java.security.Security;
 import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
+import grails.util.Holders;
 
 class BootStrap {
 
@@ -102,12 +103,12 @@ class BootStrap {
 				enabled: true,
                 language:Language.getLanguage(Language.DEFAULT_LANGUAGE)).save(failOnError: true)
 
-		if (!user.authorities.contains(userRole)) {
+		if (!user.fetchAuthorities().contains(userRole)) {
 			SUserRole.create user, userRole
 		}
 
 		if(isAdmin) {
-			if (!user.authorities.contains(adminRole)) {
+			if (!user.fetchAuthorities().contains(adminRole)) {
 				SUserRole.create user, adminRole
 			}
 		}

@@ -35,7 +35,7 @@ import species.dataset.Dataset1;
 import species.dataset.DataTable;
 
 
-class UserGroup implements Taggable {
+class UserGroup implements Taggable, Serializable {
 	
 	def dataSource;
 	def activityFeedService
@@ -524,5 +524,13 @@ class UserGroup implements Taggable {
             this.ruleValues = ruleValues;
         }
         
+    }
+
+    static long countUserGroups() {
+        def c = UserGroup.createCriteria();
+        def count = c.count {
+            cache true;
+        }
+        return count;
     }
 }

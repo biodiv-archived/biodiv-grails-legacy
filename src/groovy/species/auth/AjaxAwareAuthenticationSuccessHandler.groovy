@@ -109,7 +109,7 @@ grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHa
         profile.setId(user.getId());    
         profile.addAttribute('username', user.getUsername());
         profile.addAttribute("email", user.getUsername());
-        Set roles = user.getAuthorities();
+        Set roles = user.fetchAuthorities();
         for(def role : roles) {        
             profile.addRole(role.getAuthority());
         }

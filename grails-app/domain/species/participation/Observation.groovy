@@ -31,16 +31,32 @@ import species.trait.Fact;
 import species.groups.UserGroup.FilterRule;
 import species.dataset.DataTable;
 
-class Observation extends DataObject {
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+@Cache(region="observation", include = "non-lazy")
+@JsonIgnoreProperties(['userGroups', 'resource', 'recommendationVote', 'annotations'])
+class Observation extends DataObject  implements Serializable {
+
+    @JsonIgnore
 	def dataSource
+    @JsonIgnore
 	def commentService;
+    @JsonIgnore
 	def springSecurityService;
+    @JsonIgnore
     def resourceService;
+    @JsonIgnore
 	def observationsSearchService;
+    @JsonIgnore
     def observationService;
+    @JsonIgnore
     def userGroupService;
+    @JsonIgnore
     def traitService;
+    @JsonIgnore
     def customFieldService;
 
 	public enum OccurrenceStatus {
@@ -164,6 +180,7 @@ class Observation extends DataObject {
     String searchText;
     //if observation locked due to pulling of images in species
     boolean isLocked = false;
+    @JsonIgnore
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
 
@@ -176,7 +193,9 @@ class Observation extends DataObject {
 
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
+    @JsonIgnore
     BasisOfRecord basisOfRecord = BasisOfRecord.HUMAN_OBSERVATION;
+    @JsonIgnore
     ProtocolType protocol = ProtocolType.SINGLE_OBSERVATION;
     String externalDatasetKey;
     Date lastCrawled;
@@ -185,6 +204,7 @@ class Observation extends DataObject {
     String accessRights;
     String informationWithheld;
 
+    @JsonIgnore
     Resource reprImage;
 
     int noOfImages=0;
@@ -194,7 +214,7 @@ class Observation extends DataObject {
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists, Dataset, DataTable]
-    static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
+    //static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
 
  	static constraints = {
 		notes nullable:true
@@ -233,6 +253,7 @@ class Observation extends DataObject {
 		autoTimestamp false
 		tablePerHierarchy false
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "observation_id_seq"]
+        cache include: 'non-lazy'
 	 }
 
 	/**
@@ -328,6 +349,7 @@ class Observation extends DataObject {
         return observationService.suggestedCommonNames(this, recoId);
     }
 
+    @JsonIgnore
 	static String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
 		if(langToCommonName.isEmpty()){
 			return ""
@@ -367,10 +389,12 @@ class Observation extends DataObject {
 	 *
 	 * @return
 	 */
+    @JsonIgnore
 	def getRecommendationVotes(int limit, long offset) {
         return observationService.getRecommendationVotes(this, limit, offset);
 	}
 
+    @JsonIgnore
 	def getRecommendationCount(){
 		Sql sql =  Sql.newInstance(dataSource);
 		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.observation_id = :obvId", [obvId:id])
@@ -422,6 +446,7 @@ class Observation extends DataObject {
 		//activityFeedService.updateIsShowable(this)
     }
 
+    @JsonIgnore
 	def getPageVisitCount(){
 		return visitCount;
 	}
@@ -658,6 +683,7 @@ class Observation extends DataObject {
 		return res
 	}
 
+    @JsonIgnore
 	def getOwner() {
 		return author;
 	}
@@ -783,6 +809,7 @@ class Observation extends DataObject {
 //		activityFeedService.getDomainObject(sourceType, sourceId).title
 //	}
 
+    @JsonIgnore
     def getObservationFeatures() {
         return observationService.getObservationFeatures(this);
     }
@@ -797,6 +824,7 @@ class Observation extends DataObject {
             eq ('isDeleted', false);
             //eq ('isShowable', true);
             eq ('isChecklist', false);
+            cache true;
         }
         return observationCount;
     }
@@ -844,10 +872,12 @@ class Observation extends DataObject {
 		return (id != sourceId)
 	}
 
+    @JsonIgnore
     Map getTraits() {
         return getTraits(true, null, true);
     }
 
+    @JsonIgnore
     Map getCustomFields() {
     	return customFieldService.fetchAllCustomFields(this);
     }
@@ -872,6 +902,7 @@ class Observation extends DataObject {
         return isValid;
     }
 
+    @JsonIgnore
     List<UserGroup> getValidUserGroups() {
         List<UserGroup> userGroups = UserGroup.list();
         List<UserGroup> validUserGroups = [];

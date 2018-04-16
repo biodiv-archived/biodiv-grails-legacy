@@ -54,7 +54,7 @@ class GeographicalCoverage {
 
 	static mapping = {
 		columns {
-			topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
+//			topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
 		}
 	}
 

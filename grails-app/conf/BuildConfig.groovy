@@ -27,7 +27,7 @@ grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
         // uncomment to disable ehcache
-        // excludes 'ehcache'
+        excludes 'ehcache'
         excludes 'xml-apis', 'xercesImpl', 'xmlParserAPIs', 'stax-api', 'lucene-spellchecker', 'lucene-analyzers', 'bcprov-jdk14'
 
     }
@@ -89,8 +89,6 @@ grails.project.dependency.resolution = {
         compile ('org.quartz-scheduler:quartz:2.1.7') {
             excludes 'slf4j-api', 'jcl-over-slf4j', 'c3p0'
         }
-//        compile 'org.apache.lucene:lucene-analyzers:3.4.0'
-//        compile 'org.apache.lucene:lucene-spellchecker:3.4.0'
         compile (group:'org.apache.poi', name:'poi', version:'3.7'){
             excludes 'servlet-api'
         }
@@ -109,54 +107,33 @@ grails.project.dependency.resolution = {
         compile ('com.itextpdf:itextpdf:5.0.6'){
             excludes "bcprov-jdk14"
         }
-        /*   compile('org.hibernatespatial:hibernate-spatial:1.0') {
-             excludes 'slf4j-api', 'jcl-over-slf4j'
-        }
 
-        compile('org.hibernatespatial:hibernate-spatial-postgis:1.0') {
-        excludes 'slf4j-api', 'jcl-over-slf4j'
-        }
-        compile ('org.hibernate:hibernate-core:3.3.2.GA'){
-        excludes 'ehcache', 'xml-apis', 'commons-logging'
-        }
-         */
+	    compile "org.hibernate:hibernate-spatial:4.3"
+        /*
         compile ("org.hibernatespatial:hibernate-spatial-postgis:1.1") {
             excludes 'hibernate-core', 'javassist'
-        }
+        }*/
 
-        //runtime 'postgresql:postgresql:42.2.1'
-        //runtime 'postgresql:postgresql:8.4-702.jdbc4'
-        /*        runtime ('org.postgis:postgis-jdbc:1.3.3') {
-                  exclude 'postgresql'
-        }
-         */
         compile 'org.imgscalr:imgscalr-lib:4.2'
         compile 'org.apache.sanselan:sanselan:0.97-incubator'
         compile 'jmimemagic:jmimemagic:0.1.2'
-        //compile 'net.sf.jtidy:jtidy:r938'
-        //compile 'com.mchange:c3p0:0.9.5.2'
         runtime ('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16') {
             excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
         }
         compile 'com.esotericsoftware:kryo-shaded:3.0.3'
-/*        compile(group: 'org.apache.jena', name: 'jena-tdb', version: '1.1.2') {
-            excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
-        }
-*/
-        //compile 'org.apache.jena:jena-csv:1.0.1'
-        /*compile ('com.github.albaker:GroovySparql:0.9.0') {
-            excludes 'slf4j-log4j12', 'slf4j-api', 'jcl-over-slf4j'
-        }*/
 
         runtime "org.pac4j:pac4j-jwt:2.1.0"
         compile "org.pac4j:pac4j-oauth:2.1.0"
         compile "com.zaxxer:HikariCP:3.0.0" 
+        compile "com.github.debop:hibernate-redis:2.3.2", {
+            excludes "hibernate-core", "hibernate-entitymanager", "logback-classic"
+        }
+
+  	    compile "com.bedatadriven:jackson-datatype-jts:2.4"
     }
 
     plugins { 
-         //build   ":tomcat:7.0.55"
         build ":tomcat8:8.0.5"
-        //build ':jetty:2.0.3'
 
         compile ":scaffolding:2.1.2"
         compile group: 'org.grails.plugins', name: 'platform-core', version: '1.0.0'
@@ -164,15 +141,16 @@ grails.project.dependency.resolution = {
         compile (':cache:1.1.8') {
                 excludes "servlet-api" 
         }
-        compile "org.grails.plugins:cache-ehcache:1.0.5"
+//        compile "org.grails.plugins:cache-ehcache:1.0.5"
 //        runtime ":database-migration:1.4.0"
 
-        runtime (':hibernate:3.6.10.16') {
-            excludes 'ehcache-core'
+        //runtime (':hibernate:3.6.10.16') {
+        runtime (":hibernate4:4.3.5.5" ){// or ":hibernate:3.6.10.17" 
+            //excludes 'ehcache-core'
         }
 
-        runtime ':hibernate-spatial:0.0.4'
-        runtime ':hibernate-spatial-postgresql:0.0.4'
+//        runtime ':hibernate-spatial:0.0.4'
+//        runtime ':hibernate-spatial-postgresql:0.0.4'
 //        runtime ":resources:1.2.8"
         compile ":spring-security-core:2.0-RC3" 
         //compile ":spring-security-core:1.2.7.3" 

@@ -890,8 +890,14 @@ class UserGroupService {
 			order = order?:"desc"
 			query += " "+order
 		}
+        println "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        println "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        println "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        println "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        println "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        //org.codehaus.groovy.runtime.StackTraceUtils.sanitize(new Exception()).printStackTrace();
 		log.debug query + " " + queryParams
-		return Newsletter.executeQuery(query, queryParams);
+		return Newsletter.executeQuery(query, queryParams, [cache:true]);
 
 	}
 

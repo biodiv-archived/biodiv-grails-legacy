@@ -60,7 +60,10 @@ class DocumentController extends AbstractObjectController {
 		//cache "content"
         params.id = params.long('id');
 
-		def documentInstance = params.id ? Document.get(params.id):null;
+		def documentInstance;
+        utilsService.logSql( {
+        documentInstance = params.id ? Document.get(params.id):null;
+        }, 'documentShow');
 		if (!params.id || !documentInstance) {
             def model = utilsService.getErrorModel("${message(code: 'default.not.found.message', args: [message(code: 'document.label', default: 'Document'), params.id])}", null, OK.value());
 

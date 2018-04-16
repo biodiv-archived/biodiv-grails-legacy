@@ -42,7 +42,7 @@
 
             <div id="stats" class="navblock" style="margin-top:-20px">
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countByPercentOfInfoGreaterThan(0)}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countSpecies()}</div>
                 </div>
                 <div class="entry">
                     <div class="stats_number" title="${g.message(code:'title.number.observations')}">${Observation.countObservations()}</div>
@@ -52,14 +52,14 @@
                     <div class="stats_number" title="${g.message(code:'title.number.maps')}">206</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.countDocuments()}</div>
                 </div>
  
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.groups')}">${UserGroup.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.groups')}">${UserGroup.countUserGroups()}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.discussions')}">${Discussion.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.discussions')}">${Discussion.countDiscussions()}</div>
                 </div>
 
             </div>

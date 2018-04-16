@@ -19,7 +19,7 @@ import species.License;
 import species.License.LicenseType;
 
 import species.Contributor;
-import org.hibernatespatial.GeometryUserType
+//import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry;

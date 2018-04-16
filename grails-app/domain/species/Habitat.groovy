@@ -4,7 +4,12 @@ import species.Resource.ResourceType;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
 
-class Habitat {
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@Cache(region="habitat", usage = CacheConcurrencyStrategy.READ_ONLY, include = "non-lazy")
+
+class Habitat  implements Serializable {
 	
 	def grailsApplication;
 	

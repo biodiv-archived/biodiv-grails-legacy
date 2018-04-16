@@ -23,7 +23,7 @@ import species.trait.Fact;
 import content.eml.Document;
 import species.dataset.DataTable;
 
-class Species implements Rateable { 
+class Species implements Rateable, Serializable { 
  	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
@@ -582,6 +582,15 @@ class Species implements Rateable {
 
     SUser getAuthor() {
         return SUser.findByEmail('admin@strandls.com');
+    }
+
+    static long countSpecies() {
+        def c = Species.createCriteria();
+        def count = c.count {
+            gt ('percentOfInfo',  new Float(0.0));
+            cache true;
+        }
+        return count;
     }
 
     @Override
