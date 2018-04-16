@@ -338,7 +338,7 @@ class SUser  implements Serializable {
 		uGroups.each {
             try{
                 log.debug "Checking if user has write permission on ${it}"
-                if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)|| utilsService.isAdmin()) {
+                if(utilsService.isAdmin() || aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
                     userGroups.add(it)
                 }
             } catch(e) {
