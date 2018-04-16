@@ -27,7 +27,7 @@ import speciespage.FacebookAuthService;
 //import org.apache.solr.core.CoreContainer;
 import grails.util.Environment
 
-import com.mchange.v2.c3p0.ComboPooledDataSource
+//import com.mchange.v2.c3p0.ComboPooledDataSource
 import grails.util.Holders as CH
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
