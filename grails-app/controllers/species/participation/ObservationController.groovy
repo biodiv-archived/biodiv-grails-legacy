@@ -815,7 +815,9 @@ class ObservationController extends AbstractObjectController {
                     observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
                     if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
                         mailType = utilsService.OBSERVATION_ADDED;
+                        log.debug "send mail start"
                         utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+                        log.debug "send mail finished"
                     }
 
                     if(!params["createNew"]){
@@ -840,6 +842,8 @@ class ObservationController extends AbstractObjectController {
                         } else {
                             //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+
+                           utilService.logSql { miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance])}
                             def model = utilsService.getSuccessModel(msg, null, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml,statusComplete : true]);
                             //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             withFormat {

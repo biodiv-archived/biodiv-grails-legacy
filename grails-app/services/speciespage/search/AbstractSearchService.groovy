@@ -33,7 +33,7 @@ abstract class AbstractSearchService {
     SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 	SessionFactory sessionFactory;
-    int BATCH_SIZE = 10;
+    int BATCH_SIZE = 10000;
     int INDEX_DOCS = -1;
 
     def getUtilsServiceBean() {
@@ -46,7 +46,7 @@ abstract class AbstractSearchService {
     /**
      *
      */
-    public def abstract publishSearchIndex();
+      public def abstract publishSearchIndex();
 
     def publishSearchIndex(def obj, boolean commit) {
         return publishSearchIndex([obj], commit);

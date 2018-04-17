@@ -817,7 +817,7 @@ environments {
 
             search.biodivApiURL="http://localhost:8080"
             search.nakshaURL = "http://localhost:8080"
-            
+
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
