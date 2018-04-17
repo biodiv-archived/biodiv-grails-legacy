@@ -9,6 +9,13 @@ import grails.util.Holders;
 import species.dataset.DataTable;
 import grails.converters.JSON
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="trait", include = "non-lazy")
+//@JsonIgnoreProperties([])
 class Trait {
 
 
@@ -159,6 +166,7 @@ class Trait {
     static mapping = {
         description type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_id_seq"] 
+        cache include: 'non-lazy'
     }
 
     static TraitTypes fetchTraitTypes(String traitTypes){
@@ -191,6 +199,7 @@ class Trait {
         return null;
     }
 
+    @JsonIgnore
     static Trait getValidTrait(String name, TaxonomyDefinition taxonConcept) {
         List<Trait> traits = Trait.findAllByNameIlike(name);
         if(!traits) {
@@ -297,5 +306,35 @@ class Trait {
         res['isParticipatory'] = this.isParticipatory;
         res['showInObservation'] = this.showInObservation;
         return res
+    }
+
+    public void setUnits(units) {
+        println "units##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.units = units;
+    }
+
+    public void setDataTypes(dataTypes) {
+        println "dataTypes##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.dataTypes = dataTypes;
+    }
+
+    public void setTraitTypes(traitTypes) {
+        println "traitTypes##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.traitTypes = traitTypes;
     }
 }

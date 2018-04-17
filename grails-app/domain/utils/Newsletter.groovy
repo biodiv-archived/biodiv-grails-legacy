@@ -3,6 +3,14 @@ package utils
 import species.groups.UserGroup;
 import species.Language;
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="Newsletter", include = "non-lazy")
+//@JsonIgnoreProperties([])
+
 class Newsletter {
     String title
     Date date    
@@ -27,7 +35,9 @@ class Newsletter {
 	
 	static mappings = {
 		sort displayOrder:"desc"
-	}
+
+        cache include: 'non-lazy'
+	} 
 	
 	def boolean fetchIsHomePage(){
 		if(userGroup?.homePage){

@@ -126,6 +126,7 @@ abstract class Metadata {
 	String locationAccuracy;
 	LocationScale locationScale;
 
+    @JsonIgnore
     Geometry topology; 
 	double latitude;
 	double longitude;

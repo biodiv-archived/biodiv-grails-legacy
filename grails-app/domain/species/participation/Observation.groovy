@@ -180,7 +180,6 @@ class Observation extends DataObject  implements Serializable {
     String searchText;
     //if observation locked due to pulling of images in species
     boolean isLocked = false;
-    @JsonIgnore
 	Recommendation maxVotedReco;
 	boolean agreeTerms = false;
 
@@ -193,9 +192,7 @@ class Observation extends DataObject  implements Serializable {
 
 	//column to store checklist key value pair in serialized object
 	String checklistAnnotations;
-    @JsonIgnore
     BasisOfRecord basisOfRecord = BasisOfRecord.HUMAN_OBSERVATION;
-    @JsonIgnore
     ProtocolType protocol = ProtocolType.SINGLE_OBSERVATION;
     String externalDatasetKey;
     Date lastCrawled;
@@ -204,7 +201,6 @@ class Observation extends DataObject  implements Serializable {
     String accessRights;
     String informationWithheld;
 
-    @JsonIgnore
     Resource reprImage;
 
     int noOfImages=0;
@@ -912,4 +908,5 @@ class Observation extends DataObject  implements Serializable {
         }
         return validUserGroups;
     }
+
 }

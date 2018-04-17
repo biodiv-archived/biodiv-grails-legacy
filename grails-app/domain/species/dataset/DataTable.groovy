@@ -193,11 +193,11 @@ println facts
 
    int getDataObjectsCount() {
        switch(dataTableType) {
-           case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.DOCUMENTS : return Document.countByDataTableAndIsDeleted(this, false);
+           case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.DOCUMENTS : return Document.countByDataTableAndIsDeleted(this, false, [cache:true]);
        }
        return 0;
    }
