@@ -318,7 +318,8 @@ class SUser {
 		uGroups.each {
             try{
                 log.debug "Checking if user has write permission on ${it}"
-                if( utilsService.isAdmin() || aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
+
+                if(utilsService.isAdmin() || aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
                     userGroups.add(it)
                 }
             } catch(e) {
