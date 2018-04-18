@@ -279,7 +279,7 @@ String traitKeyValueQuery =
  """
  select g.traits from (
  	select
- 	 x.object_id, json_agg((json_build_object(x.tid,x.tvalues)))  as traits
+ 	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits
  	from (
  	select f.object_id, t.id as tid ,json_agg(DISTINCT tv.value) AS tvalues from fact f, trait t, trait_value tv
         where f.trait_instance_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation'  group by f.object_id,t.id
@@ -307,16 +307,13 @@ For Numeric Range Query
 
   String traitRangeNumericQuery=
   """
-  select g.item from (
-   select x1.object_id, json_agg(x1.item) as item from (
-	(
+  select g.traits from (
 	select
-	 x.object_id,json_object_agg(x.tid,x.tvalues)  as item from (
+	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']' as traits
+	from (
 	select  f.object_id, t.id as tid,ARRAY[f.value,f.to_value] as tvalues from fact f, trait t
 	where f.trait_instance_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation'
-	 )x group by x.object_id
-	)
-) x1 group by x1.object_id
+) x group by x.object_id
 ) g where g.object_id="""+id;
   def traitrangeNumeric=sql.rows(traitRangeNumericQuery);
 
@@ -334,19 +331,16 @@ For Numeric Range Query
 
     }
 
-
-
-
   String traitColorQuery=
   """
   select g.traits from (
-  	select
-  	 x.object_id, json_agg((json_build_object(x.tid,x.tvalues)))  as traits
-  	 from (
-  	select f.object_id,t.id as tid,  array_agg(DISTINCT f.value) AS tvalues from fact f, trait t
-  	 where  f.trait_instance_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation'  group by f.object_id,t.id
-  ) x group by x.object_id
-  ) g where g.object_id="""+id;
+	select
+	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits
+	 from (
+	select f.object_id,t.id as tid,  array_agg(DISTINCT f.value) AS tvalues from fact f, trait t
+	 where  f.trait_instance_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation'  group by f.object_id,t.id
+) x group by x.object_id
+) g where g.object_id="""+id;
   def traitColor=sql.rows(traitColorQuery);
   traitColor.each { rows ->
     rows.each{ row ->
@@ -384,16 +378,14 @@ For Numeric Range Query
 
   String traitDateQuery=
   """
-  select g.item from (
-   select x1.object_id, json_agg(x1.item) as item from (
-	(
+  select g.traits from (
 	select
-	 x.object_id,json_object_agg(x.tid,x.dates) as item
-	 from (select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t
-	 where f.trait_instance_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation') x group by x.object_id
-	)
-) x1 group by x1.object_id
-) g where g.object_id="""+id;
+	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits
+	 from (
+	select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t
+	 where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units!='MONTH') and f.object_type='species.participation.Observation'
+	) x group by x.object_id
+	) g where g.object_id="""+id;
   def traitDate=sql.rows(traitDateQuery);
 
   traitDate.each { rows ->
@@ -412,16 +404,14 @@ For Numeric Range Query
 
     String traitSeasonDateQuery=
     """
-    select g.item from (
-     select x1.object_id, json_agg(x1.item) as item from (
-  	(
+    select g.traits from (
   	select
-  	 x.object_id,json_object_agg(x.tid,x.dates) as item
-  	 from (select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t
-  	 where f.trait_instance_id = t.id and (t.data_types='DATE')  and (t.units='MONTH') and f.object_type='species.Species') x group by x.object_id
-  	)
-  ) x1 group by x1.object_id
-  ) g where g.object_id"""+id;
+  	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits
+  	 from (
+  	select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t
+  	 where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units='MONTH')  and f.object_type='species.participation.Observation'
+  	) x group by x.object_id
+  	) g where g.object_id="""+id;
     def traitSeasonDate=sql.rows(traitSeasonDateQuery);
 
     traitSeasonDate.each { rows ->
