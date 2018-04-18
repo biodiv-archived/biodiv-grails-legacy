@@ -273,6 +273,7 @@ def id=obvRow.get("id");
 
 Map<String, Object> traits=new HashMap<String,Object>();
 Map<String, Object> traits_json=new HashMap<String,Object>();
+Map<String, Object> traits_season=new HashMap<String,Object>();
 
 String traitKeyValueQuery =
  """
@@ -375,7 +376,7 @@ For Numeric Range Query
                   }
                 }
             }
-            eData.put("traits_json",traits_json);
+
     }
 
     /*tRaits for datequery
@@ -402,17 +403,46 @@ For Numeric Range Query
       JSONObject jsonObj = array.getJSONObject(i);
       jsonObj.each{ k,v ->
               String key="trait_"+k;
-                  traits.put(key,v);
+                  traits.put(key,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
                   }
               }
             }
 
     }
 
+    String traitSeasonDateQuery=
+    """
+    select g.item from (
+     select x1.object_id, json_agg(x1.item) as item from (
+  	(
+  	select
+  	 x.object_id,json_object_agg(x.tid,x.dates) as item
+  	 from (select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t
+  	 where f.trait_instance_id = t.id and (t.data_types='DATE')  and (t.units='MONTH') and f.object_type='species.Species') x group by x.object_id
+  	)
+  ) x1 group by x1.object_id
+  ) g where g.object_id"""+id;
+    def traitSeasonDate=sql.rows(traitSeasonDateQuery);
 
+    traitSeasonDate.each { rows ->
+      rows.each{ row ->
+        JSONArray array = new JSONArray(row.getValue().toString());
+    for(int i=0; i<array.length(); i++){
+        JSONObject jsonObj = array.getJSONObject(i);
+        jsonObj.each{ k,v ->
+                String key="trait_"+k;
+                  Map<String,Object> dates=new HashMap<String,Object>();
+                    dates.put("gte",v[0]);
+                    dates.put("lte",v[1]);
+                    traits_season.put(key,dates);
+                    }
+                }
+              }
 
-
+      }
 eData.put("traits",traits);
+eData.put("traits_json",traits_json);
+eData.put("traits_season",traits_season);
 dataToElastic.add(eData);
 }
 return dataToElastic;
