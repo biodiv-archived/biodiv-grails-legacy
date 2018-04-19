@@ -65,7 +65,7 @@ class AbstractMetadataService extends AbstractObjectService {
 
     private static final String GBIF_SITE = 'http://api.gbif.org'
 	private static final String GBIF_DWCA_VALIDATOR = 'http://tools.gbif.org/dwca-validator/validatews.do'
- 
+
     def create(klass, params) {
         def instance = klass.newInstance();
         instance = update(instance, params, klass)
@@ -103,15 +103,15 @@ class AbstractMetadataService extends AbstractObjectService {
         def dateAccuracy =  Metadata.DateAccuracy.getEnum(params.dateAccuracy)
         if(dateAccuracy) {
             switch(dateAccuracy) {
-                case DateAccuracy.UNKNOWN : 
+                case DateAccuracy.UNKNOWN :
                 instance.fromDate = new Date(0);
                 //TODO:add flag
                 break;
-                case DateAccuracy.APPROXIMATE : 
+                case DateAccuracy.APPROXIMATE :
                 //TODO:add flag
                 break;
             }
-            instance.dateAccuracy = dateAccuracy?:(params.toDate?Metadata.DateAccuracy.APPROXIMATE:Metadata.DateAccuracy.ACCURATE); 
+            instance.dateAccuracy = dateAccuracy?:(params.toDate?Metadata.DateAccuracy.APPROXIMATE:Metadata.DateAccuracy.ACCURATE);
         }
 
         if( params.fromDate != ""){
@@ -122,7 +122,7 @@ class AbstractMetadataService extends AbstractObjectService {
             }
             log.debug "Parsing date ${params.fromDate}"
             log.debug "got ${instance.fromDate}"
-  
+
             if(params.toDate && (params.toDate instanceof Date)) {
                 if(params.toDate == new Date(0)) {
                     instance.toDate = instance.fromDate;
@@ -135,7 +135,7 @@ class AbstractMetadataService extends AbstractObjectService {
                 instance.toDate = instance.fromDate;
             }
        }
-       
+
 
         String licenseStr = params.license_0?:params.license
         if(licenseStr) {
@@ -146,7 +146,7 @@ class AbstractMetadataService extends AbstractObjectService {
             instance.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
         }
         instance.language = params.locale_language;
-        
+
         instance.externalId = params.externalId;
         instance.externalUrl = params.externalUrl;
         instance.viaId = params.viaId;
@@ -165,7 +165,7 @@ class AbstractMetadataService extends AbstractObjectService {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         //        if(params.latitude && params.longitude) {
         //            instance.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-        //        } else 
+        //        } else
         if(params.topology) {
             instance.topology = params.topology;
         } else if(params.areas) {
@@ -220,7 +220,7 @@ class AbstractMetadataService extends AbstractObjectService {
     def setAssociations(instance, params, sendMail) {
         log.debug "setAssociations tags"
         def tags = (params.tags != null) ? ((params.tags instanceof List) ? params.tags : Arrays.asList(params.tags)) : new ArrayList();
-        if(tags) { 
+        if(tags) {
             instance.setTags(tags)
         }
         if(instance.metaClass.hasProperty(instance, "userGroups")) {
@@ -237,7 +237,7 @@ class AbstractMetadataService extends AbstractObjectService {
         /*if(instance.metaClass.hasProperty(instance, "dateAccuracy")) {
             switch(instance.dateAccuracy) {
                 case DateAccuracy.UNKNOWN:
-                case DateAccuracy.APPROXIMATE : 
+                case DateAccuracy.APPROXIMATE :
                     flagIt(instance, FlagType.DATE_INAPPROPRIATE, "Date is "+dateAccuracy.value());
                     break;
            }
@@ -246,21 +246,21 @@ class AbstractMetadataService extends AbstractObjectService {
 
     }
 
-    def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
+    def setUserGroups(instance, List userGroupIds, boolean sendMail = true, doFlush = true) {
 		if(!instance) return;
         userGroupIds = userGroupIds?.collect {(it instanceof Long) ? it : Long.parseLong(it)}
 		def instanceInUserGroups = instance.userGroups.collect { it.id }
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
 			log.debug 'removing instance from usergroups'
-			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
+			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail, doFlush);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
             println "Adding resources to ${userGroupIds}"
-			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail);
+			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail, doFlush);
 			instanceInUserGroups.removeAll(toRemainInUserGroups)
             println "Removing from ${instanceInUserGroups}"
-			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
+			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail, doFlush);
 		}
 	}
 
@@ -292,7 +292,7 @@ class AbstractMetadataService extends AbstractObjectService {
             userGroupsWithFilterRule.each { uGroup ->
                 if(instance.isUserGroupValidForPosting(uGroup))
                     validUserGroups << uGroup.id;
-                else 
+                else
                     userGroupIds.remove(uGroup.id);
             }
             if(userGroupIds) {
@@ -301,7 +301,7 @@ class AbstractMetadataService extends AbstractObjectService {
         }
         return validUserGroups;
         */
-        
+
     }
 
     Date parseDate(date){
@@ -309,7 +309,7 @@ class AbstractMetadataService extends AbstractObjectService {
     }
 
     boolean validateDwCA(String zipFile) {
-        
+
         def http = new HTTPBuilder()
         http.request( GBIF_DWCA_VALIDATOR, GET, JSON ) { req ->
             uri.query = [ archiveUrl:zipFile]
@@ -342,7 +342,7 @@ class AbstractMetadataService extends AbstractObjectService {
                 instance.save(flush:true)
                 log.info "Adding flagged activity"
                 def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
-                def act = activityFeedService.addActivityFeed(instance, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
+                def act = activityFeedService.addActivityFeed(instance, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes);
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 e.printStackTrace();
