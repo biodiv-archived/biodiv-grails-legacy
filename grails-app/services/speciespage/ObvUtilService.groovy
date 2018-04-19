@@ -808,8 +808,10 @@ class ObvUtilService {
 
 				params.obvId = observationInstance.id
 				params.author = observationInstance.author
-				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                postProcessObervation(params, observationInstance, newObv, uploadLog);
+				// flush will happen at the end of batch, so need not flush at each observation
+				boolean doFlush = false
+				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED, null, null, doFlush);
+                postProcessObervation(params, observationInstance, newObv, uploadLog, doFlush);
 				result.add(observationInstance.id)
 
             } else {
@@ -827,10 +829,10 @@ class ObvUtilService {
         return success;
 	}
 
-    private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null) {
+    private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null, boolean doFlush=true) {
         params.identifiedBy = params.identifiedBy;
-        addReco(params, observationInstance, newObv)
-        if(uploadLog)
+        addReco(params, observationInstance, newObv, doFlush)
+        if(uploadLog) 
             uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id;
 
 		println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
@@ -845,11 +847,11 @@ class ObvUtilService {
 
         utilsService.benchmark('setGroups') {
             if(params.groupsWithSharingNotAllowed) {
-                observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false, false);
+                observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false, doFlush);
             } else {
                 def userGroups = observationService.getValidUserGroups(observationInstance, params.userGroupsList);
                 if(userGroups)
-                    observationService.setUserGroups(observationInstance, userGroups, false, false);
+                    observationService.setUserGroups(observationInstance, userGroups, false, doFlush);
             }
         }
 
@@ -894,7 +896,7 @@ class ObvUtilService {
         }
     }
 
-	private addReco(params, Observation observationInstance, boolean newObv=false){
+	private addReco(params, Observation observationInstance, boolean newObv=false, boolean doFlush=true){
 		def recoResultMap;
         params.flushImmediately = false;
         recoResultMap = observationService.getRecommendation(params);
@@ -942,7 +944,7 @@ class ObvUtilService {
     			    observationInstance.calculateMaxVotedSpeciesName();
                 }
             }
-			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
+			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, null, null, doFlush);
 
         } else {
             recommendationVoteInstance?.errors?.allErrors?.each { log.error it }
