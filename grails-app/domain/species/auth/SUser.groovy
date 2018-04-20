@@ -27,8 +27,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-@Cache(region="user", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-@JsonIgnoreProperties(['authorities'])
+//@Cache(region="user", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
+//@JsonIgnoreProperties(['authorities'])
 class SUser  implements Serializable {
 
 	public enum SexType implements org.springframework.context.MessageSourceResolvable{
@@ -150,17 +150,11 @@ class SUser  implements Serializable {
     OccupationType occupationType;
     InstitutionType institutionType;
 
-    @JsonIgnore
 	transient springSecurityService
-    @JsonIgnore
 	def aclUtilService
-    @JsonIgnore
 	def grailsApplication;
-    @JsonIgnore
 	def commentService;
-    @JsonIgnore
 	def activityFeedService;
-    @JsonIgnore
     def utilsService;
 
 	String username
@@ -228,7 +222,7 @@ class SUser  implements Serializable {
 		password column: '`password`'
 		aboutMe type:"text";
 		autoTimestamp false;
-        cache usage: 'read-only', include: 'non-lazy'
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 
     @JsonIgnore

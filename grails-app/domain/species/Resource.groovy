@@ -100,7 +100,7 @@ class Resource extends Sourcedata implements Rateable, Serializable {
 		description type:'text';
 		annotations type:'text';
 		sort "id"
-        cache include: 'non-lazy'
+        cache  usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
     static constraints = {

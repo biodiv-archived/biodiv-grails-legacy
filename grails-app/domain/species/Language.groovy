@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-@Cache(region="language", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-
+//@Cache(region="language", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 class Language  implements Serializable {
 	public static final String DEFAULT_LANGUAGE = "English";
 	private static final Random NUMBER_GENERATOR = new Random();
@@ -30,10 +29,10 @@ class Language  implements Serializable {
 		isDirty(blank:false, nullable:false);
     }
 	
-	static mapping = {
+	static mapping = { 
 		version false;
 		sort 'name';
-        cache usage: 'read-only', include: 'non-lazy'
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
 	public static Language getLanguage(String languageName){

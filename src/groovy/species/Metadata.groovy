@@ -26,12 +26,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 @JsonIgnoreProperties([])
 abstract class Metadata {
 	
@@ -217,7 +211,7 @@ abstract class Metadata {
     static mapping = {
         columns {
 //            topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
-//            topology (type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Geometry)
+            topology (type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Geometry)
         }
         cache include: 'non-lazy'
     }

@@ -50,18 +50,14 @@ public class CustomGeometryDeserializer<T extends Geometry> extends JsonDeserial
         jsonParser = JsonParserSequence.createFlattened(tb.asParser(jsonParser), jsonParser);
         jsonParser.nextToken();
 */
-ObjectMapper mapper = new ObjectMapper();
-JsonNode actualObj = mapper.readTree("{\"type\":\"Point\",\"coordinates\":[79.98046875000001,19.11921945341411]}");
-System.out.println(actualObj);
         ObjectCodec oc = jsonParser.getCodec();
-        System.out.println(oc);
-        System.out.println(jsonParser);
-//        JsonNode root = oc.readTree(jsonParser);
-//        System.out.println(root);
+        JsonNode root = oc.readTree(jsonParser);
+        System.out.println(root);
         System.out.println(geometryParser);
-System.out.println(geometryParser.geometryFromJson(actualObj));
+System.out.println(geometryParser.geometryFromJson(root));
+System.out.println(geometryParser.geometryFromJson(root).getClass());
 
-        return geometryParser.geometryFromJson(actualObj);
+        return geometryParser.geometryFromJson(root);
     }
 
 
@@ -72,8 +68,8 @@ System.out.println(geometryParser.geometryFromJson(actualObj));
         System.out.println("CustomGeometryDeSerializer deserializeWithType");
         System.out.println(typeDeserializer);
         // effectively assuming no type information at all
-        return deserialize(parser, context);
-        //return typeDeserializer.deserializeTypedFromAny(parser, context);
+        //return deserialize(parser, context);
+        return typeDeserializer.deserializeTypedFromAny(parser, context);
 
     }
 

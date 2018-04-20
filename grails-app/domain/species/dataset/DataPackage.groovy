@@ -139,6 +139,7 @@ class DataPackage {
 	
 	static mapping = {
         description type:'text'		
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 
     Map<SupportingModules, List<CustomField>> supportingModules() {

@@ -89,6 +89,7 @@ class CustomField {
 		version : false
 		notes type:'text'
 		options type:'text'
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
 	def List fetchOptions(){

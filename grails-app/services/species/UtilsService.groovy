@@ -52,6 +52,11 @@ import java.text.SimpleDateFormat;
 
 import java.text.Format;
 
+import org.hibernate.cache.redis.util.RedisCacheUtil;
+import org.hibernate.cache.redis.client.RedisClientFactory;
+import org.hibernate.cache.CacheException;
+import org.hibernate.cache.redis.client.RedisClient;
+     
 class UtilsService {
 
     static transactional = false
@@ -98,6 +103,12 @@ class UtilsService {
 
     private Map bannerMessageMap;
     private Map filterMap;
+
+    private RedisClient redisClient;
+
+    UtilsService() { 
+       redisClient = RedisClientFactory.createRedisClient(RedisCacheUtil.getRedissonConfigPath());
+    }
 
     public void cleanUpGorm() {
         cleanUpGorm(true)
@@ -1191,20 +1202,32 @@ class UtilsService {
 		return "custom_fields_group_" + ug.id
 	}
 
-    def getFromCache(String cacheName, String cacheKey) {
-        def cache = grailsCacheManager.getCache(cacheName);
-        if(!cache) return null;
-        log.debug "Returning from cache ${cache.name}" 
-        return cache.get(cacheKey)?.get();
+    def getFromCache(final String cacheName, final String cacheKey) {
+/*        def cache = grailsCacheManager.getCache(cacheName);
+        println "CACHE CACHE CACHE CACHE ${cacheName}================================================"
+        if(!cacheName || !cacheKey) return null;
+        //return cache.get(cacheKey)?.get();
+*/
+        log.debug "Get from cache ${cacheName} ${cacheKey}" 
+        return redisClient.get(cacheName, cacheKey);
     }
 
-    def putInCache(String cacheName, String cacheKey, value) {
-        def cache = grailsCacheManager.getCache(cacheName);
+    def putInCache(final String cacheName, final String cacheKey, value) {
+/*        def cache = grailsCacheManager.getCache(cacheName);
+        println "CACHE CACHE CACHE CACHE ${cacheName}================================================"
+        println cache
+ 
         if(!cache) return null;
-        log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
         cache.put(cacheKey,value);
+*/
+        log.debug "Putting result in cache ${cacheName} at key ${cacheKey} ${value?.class}"
+        redisClient.set(cacheName, cacheKey, value);
     }  
-    
+   
+    void shutdownRedisClient() {
+        redisClient.shutdown();
+    }
+
     Map getBannerMessages() {  
         return bannerMessageMap;
     }

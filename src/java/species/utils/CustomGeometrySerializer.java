@@ -12,10 +12,29 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static com.bedatadriven.jackson.datatype.jts.GeoJson.*;
+//import static com.bedatadriven.jackson.datatype.jts.GeoJson.*;
 
 public class CustomGeometrySerializer extends GeometrySerializer {
 
+    public static final String BASE_PACKAGE = "com.vividsolutions.jts.geom";
+
+    public static final String POINT = "Point";
+    public static final String LINE_STRING = "LineString";
+    public static final String POLYGON = "Polygon";
+
+    public static final String MULTI_POINT = "MultiPoint";
+    public static final String MULTI_LINE_STRING = "MultiLineString";
+    public static final String MULTI_POLYGON = "MultiPolygon";
+
+    public static final String GEOMETRY_COLLECTION = "GeometryCollection";
+
+    public static final String TYPE = "type";
+    public static final String CLASS = "@class";
+    public static final String JSON_CLASS = "com.fasterxml.jackson.databind.JsonNode";
+
+    public static final String GEOMETRIES = "geometries";
+
+    public static final String COORDINATES = "coordinates";
 	@Override
 	public void serialize(Geometry value, JsonGenerator jgen,
 						  SerializerProvider provider) throws IOException {
@@ -31,7 +50,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
         typeSer.writeTypeSuffixForScalar(value, jgen);
     }
 
-/*	public void writeGeometry(JsonGenerator jgen, Geometry value)
+	public void writeGeometry(JsonGenerator jgen, Geometry value)
 			throws IOException {
 		if (value instanceof Polygon) {
 			writePolygon(jgen, (Polygon) value);
@@ -71,6 +90,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
 	private void writeGeometryCollection(JsonGenerator jgen, GeometryCollection value) throws
 			IOException {
 		jgen.writeStartObject();
+		jgen.writeStringField(CLASS, JSON_CLASS);
 		jgen.writeStringField(TYPE, GEOMETRY_COLLECTION);
 		jgen.writeArrayFieldStart(GEOMETRIES);
 
@@ -85,6 +105,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
 	private void writeMultiPoint(JsonGenerator jgen, MultiPoint value)
 			throws IOException {
 		jgen.writeStartObject();
+		jgen.writeStringField(CLASS, JSON_CLASS);
 		jgen.writeStringField(TYPE, MULTI_POINT);
 		jgen.writeArrayFieldStart(COORDINATES);
 
@@ -99,6 +120,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
 	private void writeMultiLineString(JsonGenerator jgen, MultiLineString value)
 			throws IOException {
 		jgen.writeStartObject();
+		jgen.writeStringField(CLASS, JSON_CLASS);
 		jgen.writeStringField(TYPE, MULTI_LINE_STRING);
 		jgen.writeArrayFieldStart(COORDINATES);
 
@@ -118,6 +140,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
 	private void writeMultiPolygon(JsonGenerator jgen, MultiPolygon value)
 			throws IOException {
 		jgen.writeStartObject();
+		jgen.writeStringField(CLASS, JSON_CLASS);
 		jgen.writeStringField(TYPE, MULTI_POLYGON);
 		jgen.writeArrayFieldStart(COORDINATES);
 
@@ -132,6 +155,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
 	private void writePolygon(JsonGenerator jgen, Polygon value)
 			throws IOException {
 		jgen.writeStartObject();
+		jgen.writeStringField(CLASS, JSON_CLASS);
 		jgen.writeStringField(TYPE, POLYGON);
 		jgen.writeFieldName(COORDINATES);
 		writePolygonCoordinates(jgen, value);
@@ -163,6 +187,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
 	private void writeLineString(JsonGenerator jgen, LineString lineString)
 			throws IOException {
 		jgen.writeStartObject();
+		jgen.writeStringField(CLASS, JSON_CLASS);
 		jgen.writeStringField(TYPE, LINE_STRING);
 		jgen.writeFieldName(COORDINATES);
 		writeLineStringCoords(jgen, lineString);
@@ -172,6 +197,7 @@ public class CustomGeometrySerializer extends GeometrySerializer {
 	private void writePoint(JsonGenerator jgen, Point p)
 			throws IOException {
 		jgen.writeStartObject();
+		jgen.writeStringField(CLASS, JSON_CLASS);
 		jgen.writeStringField(TYPE, POINT);
 		jgen.writeFieldName(COORDINATES);
 		writePointCoords(jgen, p);
@@ -191,5 +217,5 @@ public class CustomGeometrySerializer extends GeometrySerializer {
                 }
 		jgen.writeEndArray();
 	}
-*/
+
 }

@@ -108,7 +108,9 @@ grails.project.dependency.resolution = {
             excludes "bcprov-jdk14"
         }
 
-	    compile "org.hibernate:hibernate-spatial:4.3"
+	    compile ("org.hibernate:hibernate-spatial:4.3") {
+            excludes "postgresql", "postgis-jdbc"
+        }
         /*
         compile ("org.hibernatespatial:hibernate-spatial-postgis:1.1") {
             excludes 'hibernate-core', 'javassist'
@@ -129,7 +131,9 @@ grails.project.dependency.resolution = {
             excludes "hibernate-core", "hibernate-entitymanager", "logback-classic"
         }
 
+        compile group: 'net.postgis', name: 'postgis-jdbc', version: '2.2.1'
   	    compile "com.bedatadriven:jackson-datatype-jts:2.4"
+
     }
 
     plugins { 
@@ -138,15 +142,15 @@ grails.project.dependency.resolution = {
         compile ":scaffolding:2.1.2"
         compile group: 'org.grails.plugins', name: 'platform-core', version: '1.0.0'
         //TODO enable this plugin
-        compile (':cache:1.1.8') {
+        /*compile (':cache:1.1.8') {
                 excludes "servlet-api" 
-        }
+        }*/
 //        compile "org.grails.plugins:cache-ehcache:1.0.5"
 //        runtime ":database-migration:1.4.0"
 
         //runtime (':hibernate:3.6.10.16') {
         runtime (":hibernate4:4.3.5.5" ){// or ":hibernate:3.6.10.17" 
-            //excludes 'ehcache-core'
+            //excludes 'ehcache-core','hibernate-ehcache'
         }
 
 //        runtime ':hibernate-spatial:0.0.4'

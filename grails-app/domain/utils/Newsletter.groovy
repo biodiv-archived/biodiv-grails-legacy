@@ -36,7 +36,7 @@ class Newsletter {
 	static mappings = {
 		sort displayOrder:"desc"
 
-        cache include: 'non-lazy'
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	} 
 	
 	def boolean fetchIsHomePage(){

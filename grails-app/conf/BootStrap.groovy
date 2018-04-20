@@ -234,6 +234,7 @@ class BootStrap {
 	def destroy = {
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		//namesIndexerService.store(indexStoreDir);
+        utilsService.shutdownRedisClient();
 	}
 	
 }

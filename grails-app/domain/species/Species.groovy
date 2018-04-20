@@ -586,10 +586,17 @@ class Species implements Rateable, Serializable {
 
     static long countSpecies() {
         def c = Species.createCriteria();
+println "countSpecies%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
         def count = c.count {
             gt ('percentOfInfo',  new Float(0.0));
             cache true;
         }
+println "countSpecies%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
         return count;
     }
 

@@ -40,23 +40,14 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @JsonIgnoreProperties(['userGroups', 'resource', 'recommendationVote', 'annotations'])
 class Observation extends DataObject  implements Serializable {
 
-    @JsonIgnore
 	def dataSource
-    @JsonIgnore
 	def commentService;
-    @JsonIgnore
 	def springSecurityService;
-    @JsonIgnore
     def resourceService;
-    @JsonIgnore
 	def observationsSearchService;
-    @JsonIgnore
     def observationService;
-    @JsonIgnore
     def userGroupService;
-    @JsonIgnore
     def traitService;
-    @JsonIgnore
     def customFieldService;
 
 	public enum OccurrenceStatus {
@@ -249,7 +240,7 @@ class Observation extends DataObject  implements Serializable {
 		autoTimestamp false
 		tablePerHierarchy false
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "observation_id_seq"]
-        cache include: 'non-lazy'
+        //cache include: 'non-lazy'
 	 }
 
 	/**
@@ -816,12 +807,17 @@ class Observation extends DataObject  implements Serializable {
 
     static long countObservations() {
         def c = Observation.createCriteria();
+println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
         def observationCount = c.count {
             eq ('isDeleted', false);
             //eq ('isShowable', true);
             eq ('isChecklist', false);
             cache true;
         }
+        println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         return observationCount;
     }
 
@@ -907,6 +903,26 @@ class Observation extends DataObject  implements Serializable {
                 validUserGroups << uGroup;
         }
         return validUserGroups;
+    }
+
+    public void setBasisOfRecord(basisOfRecord) {
+        println "basisOfRecord##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.basisOfRecord = basisOfRecord;
+    }
+
+    public void setProtocol(protocol) {
+        println "protocol##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.protocol = protocol;
     }
 
 }

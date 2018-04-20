@@ -7,8 +7,7 @@ import species.utils.ImageUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-@Cache(region="habitat", usage = CacheConcurrencyStrategy.READ_ONLY, include = "non-lazy")
-
+//@Cache(region="habitat", usage = CacheConcurrencyStrategy.READ_ONLY, include = "non-lazy")
 class Habitat  implements Serializable {
 	
 	def grailsApplication;

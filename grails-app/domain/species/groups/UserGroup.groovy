@@ -103,7 +103,7 @@ class UserGroup implements Taggable, Serializable {
 		description type:'text';
 		//aboutUs type:'text';
 		sort name:"asc"
-        cache true
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 		filterRule type:'text';
 	}
 
@@ -528,9 +528,17 @@ class UserGroup implements Taggable, Serializable {
 
     static long countUserGroups() {
         def c = UserGroup.createCriteria();
+println "countUserGroups%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
         def count = c.count {
             cache true;
         }
+println "countUserGroups%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
         return count;
     }
 }

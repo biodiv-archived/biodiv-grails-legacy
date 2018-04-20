@@ -25,9 +25,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-@Cache(region="document", include = "non-lazy")
-@JsonIgnoreProperties([])
-
+//@Cache(region="document", include = "non-lazy")
+//@JsonIgnoreProperties([])
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -302,9 +301,17 @@ class Document extends DataObject implements Comparable {
 
     static long countDocuments() {
         def c = Document.createCriteria();
+println "countDocuments%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
         def count = c.count {
             cache true;
         }
+println "countDocuments%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
         return count;
     }
 

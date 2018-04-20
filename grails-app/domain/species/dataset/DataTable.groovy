@@ -28,7 +28,12 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 import content.eml.Document;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+@JsonIgnoreProperties([])
 class DataTable extends CollMetadata {
 	
 	
@@ -69,6 +74,7 @@ class DataTable extends CollMetadata {
 	static mapping = {
 		tablePerHierarchy false;
 		id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "datatable_id_seq"]
+        //cache include: 'non-lazy'
 	}
     
 	def fetchColumnNames(){

@@ -31,7 +31,6 @@ import species.formatReader.SpreadsheetReader;
 
 
 import org.apache.commons.logging.LogFactory;
-import grails.plugin.cache.Cacheable;
 import org.apache.log4j.Level;
 
 class AbstractObjectService {
@@ -186,7 +185,7 @@ class AbstractObjectService {
 
         def featured = []
         def count = 0;
-        def queryParams = [cache:true];
+        def queryParams = [cache:true]; //[cache:true];
         def countQuery,query;
         if(type) {
             queryParams["type"] = type

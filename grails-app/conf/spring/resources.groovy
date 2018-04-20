@@ -366,7 +366,7 @@ beans = {
         authenticationFailureHandler = ref('restAuthenticationFailureHandler')
         restAuthenticationProvider = ref('restAuthenticationProvider')
     }*/
-    webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
+//    webCacheKeyGenerator(species.utils.CustomCacheKeyGenerator)
     entityInterceptor(species.MyEntityInterceptor);
 
     jwtTokenAuthProvider(JwtTokenAuthProvider) {

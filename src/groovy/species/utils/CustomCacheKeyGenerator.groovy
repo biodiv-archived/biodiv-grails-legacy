@@ -1,11 +1,11 @@
 package species.utils
 
-import grails.plugin.cache.web.filter.DefaultWebKeyGenerator;
+//import grails.plugin.cache.web.filter.DefaultWebKeyGenerator;
 import javax.servlet.http.HttpServletRequest;
 import org.codehaus.groovy.grails.web.util.WebUtils;
 import org.springframework.util.StringUtils;
-class CustomCacheKeyGenerator extends DefaultWebKeyGenerator {
-
+class CustomCacheKeyGenerator {//extends DefaultWebKeyGenerator {
+/*
     @Override
     public String generate(HttpServletRequest request) {
 
@@ -36,4 +36,4 @@ class CustomCacheKeyGenerator extends DefaultWebKeyGenerator {
 
         return key.toString();
     }    
-}
+*/}

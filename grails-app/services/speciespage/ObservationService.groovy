@@ -89,7 +89,6 @@ import static org.springframework.http.HttpStatus.*;
 import species.ScientificName.TaxonomyRank;
 
 import species.NamesMetadata.NameStatus;
-import grails.plugin.cache.Cacheable;
 
 import species.trait.Fact;
 import species.trait.Trait;
