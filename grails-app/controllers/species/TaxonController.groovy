@@ -194,9 +194,6 @@ private List buildlistResult(rs,classSystem) {
         def result = utilsService.getFromCache(cacheName, cacheKey);//resultStr ? JSON.parse(resultStr) : null;
         if(!result) {
             result = _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
-            println "===="
-            println result;
-            println "===="
             utilsService.putInCache(cacheName, cacheKey, result);
         }
         render result as JSON
