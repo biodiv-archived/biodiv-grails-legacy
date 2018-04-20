@@ -35,11 +35,10 @@ import species.dataset.Dataset1;
 import species.dataset.DataTable;
 
 
-class UserGroup implements Taggable, Serializable {
-	
+class UserGroup implements Taggable {
 	def dataSource;
 	def activityFeedService
-	
+
 	String name;
 	String description;
 	//String aboutUs;
@@ -70,7 +69,7 @@ class UserGroup implements Taggable, Serializable {
 	// Language
     Language language;
 
-	
+
 	boolean sendDigestMail=false;
 	//when sending digest mail to count no. of days for calulating top contributors
 	Date statStartDate = new Date();
@@ -86,7 +85,7 @@ class UserGroup implements Taggable, Serializable {
 		allowObvCrossPosting nullable:false
 		allowNonMembersToComment nullable:false
 		allowUsersToJoin nullable:false
-            
+
         sw_latitude nullable:false
         sw_longitude nullable:false
         ne_latitude nullable:false
@@ -106,6 +105,8 @@ class UserGroup implements Taggable, Serializable {
         cache usage: 'nonstrict-read-write', include: 'non-lazy'
 		filterRule type:'text';
 	}
+
+	static userGroupFilterRules = [:];
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -136,7 +137,7 @@ class UserGroup implements Taggable, Serializable {
 			return false;
 
 		UserGroup other = (UserGroup) obj;
-		
+
 		//reading complete object again
 		try {
 			other = UserGroup.get(other.id)
@@ -149,7 +150,7 @@ class UserGroup implements Taggable, Serializable {
 				//log.debug other.name
 			}
 		}
-		
+
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -213,7 +214,7 @@ class UserGroup implements Taggable, Serializable {
 			return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
 		}
 	}
-	
+
 	def getExperts(int max, long offset) {
 		UserGroupMemberRole.withTransaction {
 			def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
@@ -250,7 +251,7 @@ class UserGroup implements Taggable, Serializable {
 		if(founder) {
             boolean success = true;
 			if(isMember(founder)){
-				success = deleteMember(founder)	
+				success = deleteMember(founder)
 			}
             if(success) {
 			    def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
@@ -265,7 +266,7 @@ class UserGroup implements Taggable, Serializable {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		return getUserList(max, offset, sortBy, role.id)
 	}
-	
+
 
 	void setMembers(List<SUser> members) {
 		if(members) {
@@ -284,7 +285,7 @@ class UserGroup implements Taggable, Serializable {
 		}
 	}
 
-	
+
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
@@ -292,12 +293,12 @@ class UserGroup implements Taggable, Serializable {
 		}
 		return false;
 	}
-	
+
 	boolean addExpert(SUser member) {
 		if(member) {
             boolean success = true;
 			if(isMember(member)){
-				success = deleteMember(member)	
+				success = deleteMember(member)
 			}
             if(success) {
 			    def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
@@ -394,7 +395,7 @@ class UserGroup implements Taggable, Serializable {
 			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg left outer join activity_feed as af on(umg.s_user_id = af.author_id) where umg.user_group_id = $groupId and af.is_showable = true ";
         	query += (roleId) ? " and umg.role_id $roleId" : ""
 			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
-			
+
 			//log.debug "Getting users list : $query"
 			def sql =  Sql.newInstance(dataSource);
 			sql.rows(query).each{
@@ -402,7 +403,7 @@ class UserGroup implements Taggable, Serializable {
 			};
 			return res;
 		}
-		
+
 		String sortOrder = sortBy.trim().equalsIgnoreCase("name") ? "asc" : "desc"
 		String query = "from UserGroupMemberRole as umr where umr.userGroup = :userGroup"
 		query += (roleId) ? " and umg.role.id $roleId" : ""
@@ -414,15 +415,15 @@ class UserGroup implements Taggable, Serializable {
 	def getPages(){
 		return userGroupService.getNewsLetters(this, null, null, null, null);
 	}
-	
+
 	def getThemes(){
 		return userGroupService.getGroupThemes()
 	}
-	
+
 	def fetchHomePageTitle(){
 		return userGroupService.fetchHomePageTitle(this)
 	}
-	
+
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
@@ -438,11 +439,11 @@ class UserGroup implements Taggable, Serializable {
     def noOfDocuments() {
         return userGroupService.getCountByGroup(Document.simpleName, this.id?this:null);
     }
-	
+
 	def noOfDiscussions() {
 		return userGroupService.getCountByGroup(Discussion.simpleName, this.id?this:null);
 	}
-    
+
     static UserGroup findByWebaddress(webaddress){
     	if(webaddress){
             return UserGroup.createCriteria().get {
@@ -452,7 +453,7 @@ class UserGroup implements Taggable, Serializable {
     	}
     }
 
-    static List<UserGroup> list() { 
+    static List<UserGroup> list() {
         return UserGroup.createCriteria().list {
             order('name', 'asc')
             cache true
@@ -466,13 +467,17 @@ class UserGroup implements Taggable, Serializable {
         fRJson.add(['fieldName':fieldName, 'ruleName':ruleName, 'ruleValues':ruleValuesJSONArray]);
         this.filterRule = fRJson.toString();
     }
-    
+
     void setFilterRules(JSONObject filterRules) {
         this.filterRule = filterRules.toString();
     }
 
     List<FilterRule> getFilterRules() {
+	if (userGroupFilterRules.containsKey(this.id)) {
+          return userGroupFilterRules.get(this.id);
+	}
         List<FilterRule> filterRules = [];
+
         if(this.filterRule) {
             JSON.parse(this.filterRule).each {
                 def rule = it;
@@ -492,6 +497,8 @@ class UserGroup implements Taggable, Serializable {
                 filterRules << new FilterRule(rule.fieldName, rule.ruleName, rule.ruleValues);
             }
         }
+	userGroupFilterRules[id] = filterRules;
+	log.debug "added user group filter to userGroupFilterRules: ${userGroupFilterRules}"
         return filterRules;
     }
 
@@ -523,7 +530,7 @@ class UserGroup implements Taggable, Serializable {
             this.ruleName = ruleName;
             this.ruleValues = ruleValues;
         }
-        
+
     }
 
     static long countUserGroups() {

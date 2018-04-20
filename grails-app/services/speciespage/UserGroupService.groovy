@@ -245,7 +245,7 @@ class UserGroupService {
 
 	//@Transactional
 	def getUserGroups(SUser userInstance) {
-		
+
 		return userInstance.getUserGroups()
 	}
 
@@ -1235,12 +1235,12 @@ class UserGroupService {
 	////////////////////////////////////// Bulk posting ////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
 
-    def addResourceOnGroups(instance, List userGroupIds, boolean sendMail=true) {
-        return updateResourceOnGroups(instance, userGroupIds, 'post', sendMail);
+    def addResourceOnGroups(instance, List userGroupIds, boolean sendMail=true, doFlush=true) {
+        return updateResourceOnGroups(instance, userGroupIds, 'post', sendMail, doFlush);
     }
 
-    def removeResourceOnGroups(instance, List userGroupIds, boolean sendMail=true) {
-        return updateResourceOnGroups(instance, userGroupIds, 'remove', sendMail);
+    def removeResourceOnGroups(instance, List userGroupIds, boolean sendMail=true, doFlush=true) {
+        return updateResourceOnGroups(instance, userGroupIds, 'remove', sendMail, doFlush);
     }
 
     def addResourceOnGroup(instance, UserGroup userGroup, boolean sendMail=true) {
@@ -1251,8 +1251,8 @@ class UserGroupService {
         return updateResourceOnGroup(instance, userGroup, 'remove', sendMail);
     }
 
-    def updateResourceOnGroups(instance, List userGroupIds, String submitType, boolean sendMail=true) {
-        return updateResourceOnGroup([userGroups:userGroupIds.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType, author:instance.getAuthor().id+''], sendMail)
+    def updateResourceOnGroups(instance, List userGroupIds, String submitType, boolean sendMail=true, doFlush=true) {
+        return updateResourceOnGroup([userGroups:userGroupIds.join(", "), objectIds:instance.id+'', objectType:instance.class.getCanonicalName(), pullType:'single', submitType:submitType, author:instance.getAuthor().id+''], sendMail, doFlush)
     }
 
     def updateResourceOnGroup(instance, UserGroup userGroup, String submitType, boolean sendMail=true) {
@@ -1260,7 +1260,7 @@ class UserGroupService {
     }
 
 
-	def updateResourceOnGroup(params, boolean sendMail=true){
+	def updateResourceOnGroup(params, boolean sendMail=true, doFlush=true){
         log.debug "Updating resource on group ${params}"
 		def r = [:]
 		try{
@@ -1324,7 +1324,7 @@ class UserGroupService {
 					break
 			}
 
-			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, functionString, sendMail)
+			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, functionString, sendMail, doFlush)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
 			if(objectIds && objectIds != "") {
@@ -1334,9 +1334,9 @@ class UserGroupService {
                     if(obj.instanceOf(Dataset1) && obj.dataTables){
                         dataTables.addAll(obj.dataTables);
                         log.debug "${submitType}ing datatables ${dataTables} into usergroups ${obj.userGroups}"
-                        functionString = (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'            
+                        functionString = (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'
                         def uGs = (submitType == 'post')? obj.userGroups : allGroups
-                        println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, dataTables, 'dataTables', functionString, sendMail);
+                        println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, dataTables, 'dataTables', functionString, sendMail, doFlush);
                     }
 
                     if(obj.instanceOf(DataTable)){
@@ -1356,9 +1356,9 @@ class UserGroupService {
                                     obvs = []
                                     obvs.addAll(dataObjects);
                                     log.debug "${submitType}ing datatable ${dataTable} ${obvs.size()} ${dataTable.dataTableType} into usergroups ${dataTable.userGroups}"
-                                    functionString = (submitType == 'post')? 'addTo'+dataTable.dataTableType : 'removeFrom'+dataTable.dataTableType            
+                                    functionString = (submitType == 'post')? 'addTo'+dataTable.dataTableType : 'removeFrom'+dataTable.dataTableType
                                     def uGs = (submitType == 'post')? dataTable.userGroups : allGroups
-                                    println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, dataTable.dataTableType.value().toLowerCase(), functionString, sendMail);
+                                    println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, dataTable.dataTableType.value().toLowerCase(), functionString, sendMail, doFlush);
                                     offset += max;
                                 }
                             }
@@ -1367,7 +1367,7 @@ class UserGroupService {
 				}
 			}
 
-	
+
 		}catch (Exception e) {
 			e.printStackTrace()
 			r['success'] = false
@@ -1409,7 +1409,7 @@ class UserGroupService {
 		public static final int POST_BATCH_SIZE = 100
 		private static final log = LogFactory.getLog(this);
 
-		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction, boolean sendMail=true){
+		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction, boolean sendMail=true, doFlush=true){
 			ResourceFetcher rf;
             boolean isBulk = false;
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
@@ -1440,9 +1440,11 @@ class UserGroupService {
                             afDescriptionList <<  getStatusMsg(af, obvs[0].class.canonicalName, obvs.size() - obvs.size(), params.submitType, ug)
                         }
                     }
-                    obvs.clear();
-                    println "Flushing and clearing session"
-                    session.flush();
+                    obvs.clear(); 
+                    	if (doFlush){
+                    	println "Flushing and clearing session"
+                    	session.flush();
+                    	}
                     //session.clear();
 
                     // we need to disconnect and get a new DB connection here
@@ -1486,7 +1488,7 @@ class UserGroupService {
                     boolean saveUg = false;
 					resList.each { obv ->
 						obv = obv.merge()
-                        println "testing group validity for ${obv}"
+			println "testing group validity for ${obv}"
                         boolean hasValidUserGroup = obv.metaClass.respondsTo(obv, "isUserGroupValidForPosting");
 
                         if(hasValidUserGroup) {
@@ -1544,7 +1546,7 @@ class UserGroupService {
 			}
 
 			def newObvs = []
-			obvs.each { obv -> 
+			obvs.each { obv ->
 				if(( obv.metaClass.hasProperty(obv, 'author') && (obv.author == currUser)) || !Featured.isFeaturedAnyWhere(obv)){
 					newObvs << obv
 					log.debug "User is author or obv is not featured in any group " + currUser

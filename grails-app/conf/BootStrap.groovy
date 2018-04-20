@@ -59,6 +59,7 @@ class BootStrap {
         initCaches();
         initBannerMessageMap();
         initFiltersMap();
+		initUserGroupFilterRules();
         //speciesTraitsService.init();
         log.debug "BouncyCastleProviderSingleton.getInstance"
         Provider bc = BouncyCastleProviderSingleton.getInstance();
@@ -221,6 +222,14 @@ class BootStrap {
 
 	def initBannerMessageMap() {
 		utilsService.loadBannerMessageMap();
+	}
+
+	def initUserGroupFilterRules() {
+		List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
+		userGroupsWithFilterRule.each {uG ->
+			UserGroup.userGroupFilterRules[uG.id] = uG.getFilterRules();
+		}
+		println "Usergroup filter rules initialized ${UserGroup.userGroupFilterRules}"
 	}
 
 	def initFiltersMap(){
