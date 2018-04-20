@@ -474,10 +474,10 @@ class UserGroup implements Taggable {
     }
 
     List<FilterRule> getFilterRules() {
-        List<FilterRule> filterRules = [];
 	if (userGroupFilterRules.containsKey(this.id)) {
           return userGroupFilterRules.get(this.id);
 	}
+        List<FilterRule> filterRules = [];
 
         if(this.filterRule) {
             JSON.parse(this.filterRule).each {
