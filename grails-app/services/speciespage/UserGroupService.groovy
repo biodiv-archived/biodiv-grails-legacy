@@ -1430,7 +1430,7 @@ class UserGroupService {
                         List postedObvs = postInBatch(ug, obvs_1, params.submitType, updateFunction, groupRes)
                         if(postedObvs){
                             log.debug "Transcation complete with resource pull now adding feed and sending mail..."
-                            def af = activityFeedService.addFeedOnGroupResoucePull(postedObvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false, sendMail)
+                            def af = activityFeedService.addFeedOnGroupResoucePull(postedObvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false, sendMail, doFlush)
                             afDescriptionList <<  getStatusMsg(af, obvs[0].class.canonicalName, obvs.size() - obvs.size(), params.submitType, ug)
                         }
                     }

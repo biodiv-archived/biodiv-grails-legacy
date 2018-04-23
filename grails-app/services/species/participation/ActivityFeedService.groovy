@@ -799,7 +799,7 @@ def updateDescriptionJSON(ActivityFeed feedInstance) {
 		addFeedOnGroupResoucePull([resource], ug, author, isPost, true, false, sendMail)
 	}
 
-	def addFeedOnGroupResoucePull(List resources, UserGroup ug, SUser author, boolean isPost, boolean isShowable=true, boolean isBulkPull=false, boolean sendMail=true){
+	def addFeedOnGroupResoucePull(List resources, UserGroup ug, SUser author, boolean isPost, boolean isShowable=true, boolean isBulkPull=false, boolean sendMail=true, boolean flushImmidiatly=true){
 		log.debug "Before Adding feed for resources " + resources.size()
 		if(resources.isEmpty()){
 			return
@@ -814,7 +814,7 @@ def updateDescriptionJSON(ActivityFeed feedInstance) {
 			ActivityFeed.withNewTransaction { status ->
 				resList.each { r->
 					def description = getDescriptionForResourcePull(r, isPost)
-					af = addActivityFeed(r, ug, author, activityType, description, isShowable, !isBulkPull)
+					af = addActivityFeed(r, ug, author, activityType, description, isShowable, flushImmidiatly)
 					int oldCount = resCountMap.get(r.class.canonicalName)?:0
 					resCountMap.put(r.class.canonicalName, ++oldCount)
 					if(!isBulkPull && !isChecklistObservation(r) && sendMail){
@@ -826,7 +826,7 @@ def updateDescriptionJSON(ActivityFeed feedInstance) {
 		if(isBulkPull){
 			ActivityFeed.withNewTransaction { status ->
 				def description = getDescriptionForBulkResourcePull(isPost, resCountMap)
-				af = addActivityFeed(ug, ug, author, activityType, description, true)
+				af = addActivityFeed(ug, ug, author, activityType, description, true, flushImmidiatly)
 	            if(sendMail)
 				    utilsService.sendNotificationMail(activityType, ug, null, null, af)
 			}
