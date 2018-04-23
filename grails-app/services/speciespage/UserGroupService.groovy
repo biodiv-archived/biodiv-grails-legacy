@@ -1312,7 +1312,7 @@ class UserGroupService {
 					functionString += (submitType == 'post')? 'addToDiscussions' : 'removeFromDiscussions'
 					break
 				case DataTable.class.getCanonicalName():
-					groupRes += 'dataTables'
+					groupRes += 'data_tables'
 					functionString += (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'
 					break
                 case Dataset1.class.getCanonicalName():
@@ -1323,8 +1323,8 @@ class UserGroupService {
 				default:
 					break
 			}
-
-			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, functionString, sendMail, doFlush)
+            String groupResId = getGroupResId(objectType);
+			r['msgCode']= new ResourceUpdate().updateResourceOnGroup(params, allGroups, obvs, groupRes, groupResId, functionString, sendMail, doFlush)
 			r['success'] = true
 			//r['msgCode']=  (submitType == 'post') ? 'userGroup.default.multiple.posting.success' : 'userGroup.default.multiple.unposting.success'
 			if(objectIds && objectIds != "") {
@@ -1336,7 +1336,7 @@ class UserGroupService {
                         log.debug "${submitType}ing datatables ${dataTables} into usergroups ${obj.userGroups}"
                         functionString = (submitType == 'post')? 'addToDataTables' : 'removeFromDataTables'
                         def uGs = (submitType == 'post')? obj.userGroups : allGroups
-                        println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, dataTables, 'dataTables', functionString, sendMail, doFlush);
+                        println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, dataTables, 'data_tables', "data_table_id", functionString, sendMail, doFlush);
                     }
 
                     if(obj.instanceOf(DataTable)){
@@ -1358,7 +1358,7 @@ class UserGroupService {
                                     log.debug "${submitType}ing datatable ${dataTable} ${obvs.size()} ${dataTable.dataTableType} into usergroups ${dataTable.userGroups}"
                                     functionString = (submitType == 'post')? 'addTo'+dataTable.dataTableType : 'removeFrom'+dataTable.dataTableType
                                     def uGs = (submitType == 'post')? dataTable.userGroups : allGroups
-                                    println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, dataTable.dataTableType.value().toLowerCase(), functionString, sendMail, doFlush);
+                                    println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, dataTable.dataTableType.value().toLowerCase(), getGroupResId(DataTable.class.getCanonicalName()), functionString, sendMail, doFlush);
                                     offset += max;
                                 }
                             }
@@ -1375,6 +1375,34 @@ class UserGroupService {
 		}
 		return r
 	}
+
+    private String getGroupResId(String objectType) {
+        String groupResId = '';
+        switch (objectType) {
+				case [Observation.class.getCanonicalName(), Checklists.class.getCanonicalName()]:
+					groupResId += 'observation_id'
+					break
+				case Species.class.getCanonicalName():
+					groupResId += 'species_id'
+					break
+				case Document.class.getCanonicalName():
+					groupResId += 'document_id'
+					break
+				case Discussion.class.getCanonicalName():
+					groupResId += 'discussion_id'
+					break
+				case DataTable.class.getCanonicalName():
+					groupResId += 'data_table_id'
+					break
+                case Dataset1.class.getCanonicalName():
+					groupResId += 'dataset1_id'
+					break
+
+				default:
+					break
+			}
+        return groupResId;
+    }
 
 	def boolean getResourcePullPermission(params, isBulkPull=true){
 		if(!springSecurityService.isLoggedIn()){
@@ -1409,7 +1437,7 @@ class UserGroupService {
 		public static final int POST_BATCH_SIZE = 100
 		private static final log = LogFactory.getLog(this);
 
-		def String updateResourceOnGroup(params, groups, allObvs, groupRes, updateFunction, boolean sendMail=true, doFlush=true){
+		def String updateResourceOnGroup(params, groups, allObvs, groupRes, groupResId, updateFunction, boolean sendMail=true, doFlush=true){
 			ResourceFetcher rf;
             boolean isBulk = false;
 			if(params.pullType == 'bulk' && params.selectionType == 'selectAll'){
@@ -1433,7 +1461,7 @@ class UserGroupService {
                     obvs = isBulk ? rf.next() : obvs
                     groups.each { UserGroup ug ->
                         List obvs_1 = new ArrayList(obvs);
-                        List postedObvs = postInBatch(ug, obvs_1, params.submitType, updateFunction, groupRes)
+                        List postedObvs = postInBatch(ug, obvs_1, params.submitType, updateFunction, groupRes, groupResId)
                         if(postedObvs){
                             log.debug "Transcation complete with resource pull now adding feed and sending mail..."
                             def af = activityFeedService.addFeedOnGroupResoucePull(postedObvs, ug, currUser, params.submitType == 'post' ? true: false, false, params.pullType == 'bulk'?true:false, sendMail)
@@ -1463,16 +1491,44 @@ class UserGroupService {
 		}
 
 
-		private List postInBatch(UserGroup ug, List obvs, String submitType, String updateFunction, String groupRes){
+		private List postInBatch(UserGroup ug, List obvs, String submitType, String updateFunction, String groupRes, String groupResId){
 
+            def sql =  Sql.newInstance(dataSource);
             List postedObvs = [];
 			UserGroup.withTransaction(){  status ->
-				if(submitType == 'post'){
-					obvs.removeAll(Eval.x(ug, 'x.' + groupRes))
-				}else{
-					obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
+                String query = "select "+groupResId+" from user_group_"+groupRes+" where user_group_id="+ug.id+" and "+groupResId+" in ("+obvs.collect{it.id}.join(',')+")";
+                println query;
+                List ids = sql.rows(query);
+println ids;
+		            List newObvs = [];
+					obvs.each { obv ->
+                        boolean isFound = false;
+                        ids.each {id->
+                            println id
+                            println id[groupResId]
+                            if(obv.id == id[groupResId]) {
+                                isFound = true;
+                            }
+                        }
+                        if(submitType == 'post') {
+                            if(!isFound) newObvs << obv
+                        } else {
+                            if(isFound) newObvs <<obv
+                        }
+
+                        //removeAll(Eval.x(ug, 'x.' + groupRes))
+                    }
+                    
+                    obvs = newObvs;
+                    println "new obvs after remove/retain ${obvs}"
+				//} else {
+				//	obvs.retainAll(Eval.x(ug, 'x.' + groupRes))
+				//	obvs = getFeatureSafeList(ug, obvs)
+				//}
+
+                if(submitType != 'post') {
 					obvs = getFeatureSafeList(ug, obvs)
-				}
+                }
 			}
 			if(obvs.isEmpty()){
 				log.debug "Nothing to update because of permissoin or not part of group"
@@ -1505,8 +1561,15 @@ class UserGroupService {
                                 }
                             }
                         }
-						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
-                        println "valid : "+ug.observations.size();
+                        println "doing Eval add/remove obv from ug";
+//						Eval.xy(ug, obv,  'x.' + updateFunction + '(y)')
+//                        println "valid : "+ug.observations.size();
+
+                        if(submitType == 'post') {
+                            sql.execute("insert into user_group_observations ("+groupResId+", user_group_id) values(?,?)", [obv.id, ug.id]);
+                        } else {
+                            sql.execute("delete from user_group_observations where "+groupResId+"=? and user_group_id = ?", [obv.id, ug.id]);
+                        }
                         saveUg = true;
                         postedObvs << obv;
 					}

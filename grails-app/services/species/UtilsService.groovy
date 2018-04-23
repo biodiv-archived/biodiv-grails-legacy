@@ -1220,8 +1220,10 @@ class UtilsService {
         if(!cache) return null;
         cache.put(cacheKey,value);
 */
-        log.debug "Putting result in cache ${cacheName} at key ${cacheKey} ${value?.class}"
-        redisClient.set(cacheName, cacheKey, value);
+        if(cacheKey && value) {
+            log.debug "Putting result in cache ${cacheName} at key ${cacheKey} ${value?.class}"
+            redisClient.set(cacheName, cacheKey, value);
+        }
     }  
    
     void shutdownRedisClient() {
