@@ -292,8 +292,11 @@ println params.fromDate
         println "==================================+++++"
         println "==================================+++++"
         List<FilterRule> filterRule = userGroup.getFilterRules();
+        println filterRule
         boolean isValid = true;
-        filterRule.each { fRule ->
+        filterRule.each {  fRule ->
+            println "==="
+            println fRule
             switch(fRule.fieldName) {
                 case 'topology' : 
                 if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
@@ -307,6 +310,7 @@ println params.fromDate
                 break;
             }
         }
+        println isValid
         return isValid;
     }
 

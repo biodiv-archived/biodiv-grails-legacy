@@ -1448,13 +1448,13 @@ class UserGroupService {
                     //session.clear();
 
                     // we need to disconnect and get a new DB connection here
-                    def connection = session.disconnect();
+                    /*def connection = session.disconnect();
                     if(connection) {
                         connection.close();
                     }
 
                     session.reconnect(dataSource.connection);
-
+                    */
                     isNotOver = isBulk ? rf.hasNext() : false;
                 }
                 println "isNotOver"

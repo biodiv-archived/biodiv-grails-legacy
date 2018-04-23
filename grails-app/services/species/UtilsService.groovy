@@ -1300,17 +1300,23 @@ class UtilsService {
     }
 
     def evictInCache(String cacheName, String cacheKey) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        /*org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Evict result in cache ${cache.name} at key ${cacheKey}"
         return cache.evict(cacheKey);
+        */
+        log.debug "Evict result in cache ${cacheName} at key ${cacheKey}"
+        redisClient.del(cacheName, cacheKey)
     }
 
     def clearCache(String cacheName) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+/*        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Clearing Cache ${cache.name}"
         return cache.clear();
+*/
+        log.debug "Clearing Cache ${cache.name}"
+        redisClient.flushDb();
     }
 
     def CSVWriter getCSVWriter(def directory, def fileName) {
