@@ -124,7 +124,10 @@ abstract class AbstractObjectController {
         String cacheKey = "${params.controller}-${params.id}"
         String cacheName = 'resources';
 
-        result = utilsService.getFromCache(cacheName, cacheKey);
+//        result = utilsService.getFromCache(cacheName, cacheKey);
+        String resultStr = utilsService.getFromCache(cacheName, cacheKey);
+        result = resultStr ? JSON.parse(resultStr) : null;
+
         if(!result) {
             result = [:];
             if(params.id){            
@@ -146,7 +149,7 @@ abstract class AbstractObjectController {
             }
 
             if(result)
-                utilsService.putInCache(cacheName, cacheKey, result);
+                utilsService.putInCache(cacheName, cacheKey,  (result as JSON).toString());
         }
 
 
