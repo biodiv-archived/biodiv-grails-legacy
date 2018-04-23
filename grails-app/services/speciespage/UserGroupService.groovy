@@ -1566,9 +1566,9 @@ println ids;
 //                        println "valid : "+ug.observations.size();
 
                         if(submitType == 'post') {
-                            sql.execute("insert into user_group_observations ("+groupResId+", user_group_id) values(?,?)", [obv.id, ug.id]);
+                            sql.execute("insert into user_group_"+groupRes+" ("+groupResId+", user_group_id) values(?,?)", [obv.id, ug.id]);
                         } else {
-                            sql.execute("delete from user_group_observations where "+groupResId+"=? and user_group_id = ?", [obv.id, ug.id]);
+                            sql.execute("delete from user_group_"+groupRes+" where "+groupResId+"=? and user_group_id = ?", [obv.id, ug.id]);
                         }
                         saveUg = true;
                         postedObvs << obv;
