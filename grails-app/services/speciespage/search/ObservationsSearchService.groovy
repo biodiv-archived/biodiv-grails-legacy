@@ -42,7 +42,7 @@ class ObservationsSearchService extends AbstractSearchService {
         log.info "Initializing publishing to observations search index"
 
         //TODO: change limit
-        int limit = BATCH_SIZE//Observation.count()+1,
+        int limit = BATCH_SIZE //Observation.count()+1,
         int offset = 0;
         int noIndexed = 0;
 
@@ -170,8 +170,6 @@ class ObservationsSearchService extends AbstractSearchService {
                 END AS name,
             t.position,
             t.rank,
-            tres.path,
-            tres.classification_id AS classificationid,
             resp.file_name AS thumbnail,
             array_remove(array_agg(DISTINCT ug.id), NULL::bigint) AS usergroupid,
             array_remove(array_agg(DISTINCT ug.name), NULL::character varying) AS usergroupname,
@@ -192,15 +190,23 @@ class ObservationsSearchService extends AbstractSearchService {
            LEFT JOIN taxonomy_definition t ON r.taxon_concept_id = t.id
            LEFT JOIN user_group_observations ugo ON obs.id = ugo.observation_id
            LEFT JOIN user_group ug ON ug.id = ugo.user_group_id
-           LEFT JOIN taxonomy_registry tres ON tres.taxon_definition_id = t.id
            LEFT JOIN featured f ON f.object_id = obs.id
-           WHERE (tres.classification_id = 265799 OR tres.classification_id IS NULL) and obs.is_deleted=false and obs.id in  ( """+sids+""" )
-          GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, t.canonical_form,t.normalized_form , r.name,r.taxon_concept_id, r.accepted_name_id, tres.path,
-          tres.classification_id, t.status, t.position, t.rank, resp.file_name  """;
+           WHERE obs.is_deleted=false and obs.id in  ( """+sids+""" )
+          GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, t.canonical_form,t.normalized_form , r.name,r.taxon_concept_id,
+          r.accepted_name_id,t.status, t.position, t.rank, resp.file_name  """;
 
           println "Running sql for getting observation json";
 
           println query;
+
+          String customFieldTableQuery="""select table_name from information_schema.tables where table_name like 'custom_fields_group%' """;
+          def customRows=sql.rows(customFieldTableQuery);
+          List<String> customFieldUserGroupArray=new ArrayList<String>();
+          customRows.each{ customRow ->
+              customRow.each { k,v ->
+              customFieldUserGroupArray.add(v.split("_")[3].toString());
+              }
+          }
 
         def obvRows = sql.rows(query);
         List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
@@ -274,6 +280,44 @@ def id=obvRow.get("id");
 Map<String, Object> traits=new HashMap<String,Object>();
 Map<String, Object> traits_json=new HashMap<String,Object>();
 Map<String, Object> traits_season=new HashMap<String,Object>();
+Map<String, Object> custom_fields=new HashMap<String,Object>();
+
+// def userGroupId=eData.get("usergroupid")
+// for(int i=0;i<userGroupId.length;i++){
+//   if(userGroupId[i].toString() in customFieldUserGroupArray){
+//
+//       String custFieldQuery="""select * from custom_fields_group_"""+userGroupId+""" where observation_id="""+id;
+//       def customFieldValues = sql.rows(custFieldQuery);
+//       customFieldValues.each{ row ->
+//           row.each { k,v ->
+//           custom_fields.put(k,v);
+//
+//       }
+//
+//   }
+// }
+// }
+
+
+/*
+Query for path and classificationid
+
+*/
+String queryForPathAndClassification="""select tres.path,tres.classification_id as classificationid
+                                        from observation obv
+                                         left join recommendation r on obv.max_voted_reco_id=r.id
+                                         left join taxonomy_definition t on r.taxon_concept_id=t.id
+                                         left join taxonomy_registry tres on tres.taxon_definition_id=t.id
+                                          where (tres.classification_id=265799 or tres.classification_id=null)
+                                          and obv.id="""+id;
+
+def queryForPathAndClassificationResult=sql.rows(queryForPathAndClassification);
+queryForPathAndClassificationResult.each { row ->
+    row.each { k,v ->
+      eData.put(k,v.toString());
+}
+}
+
 
 String traitKeyValueQuery =
  """
@@ -430,6 +474,12 @@ For Numeric Range Query
               }
 
       }
+
+/*
+Queries for Getting custom fields for particular observation id
+
+*/
+
 eData.put("traits",traits);
 eData.put("traits_json",traits_json);
 eData.put("traits_season",traits_season);
