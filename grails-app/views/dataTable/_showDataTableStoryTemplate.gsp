@@ -29,7 +29,7 @@ String instanceType = dataTableInstance.dataTableType;
                 <div id="dataTable_${dataTableInstance.id}_table">
                     <g:if test="${dataTableInstance.uploadLog}">
                         <g:if test="${dataTableInstance.uploadLog.status == UploadLog.Status.UPLOADED}">
-                            <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+                            <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance, dataObjectsCount:instanceCount]"/>
                         </g:if> 
                         <g:else>
                         <div class="alert alert-info">
