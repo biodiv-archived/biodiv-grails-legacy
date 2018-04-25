@@ -10,7 +10,7 @@
 
             <% 
             def dataObjects = dataTableInstance.getDataObjects(params)
-            def dataObjectsCount = dataTableInstance.getDataObjectsCount();
+            //def dataObjectsCount = dataTableInstance.getDataObjectsCount();
 
             def columnNames = dataTableInstance.fetchColumnNames();
             if(dataTableInstance.dataTableType == DataTableType.FACTS) {
@@ -60,7 +60,7 @@
             </g:each>	
         </tbody>
     </table>
-    <g:if test="${params.action == 'list' && params.controller=='dataTable'}">
+    <g:if test="${(params.action == 'list' && params.controller=='dataTable') || (params.action == 'show' && params.controller=='dataset')}">
         <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
         <div class="centered">
         <div class="btn " style="width:50%;margin-top:50px;">

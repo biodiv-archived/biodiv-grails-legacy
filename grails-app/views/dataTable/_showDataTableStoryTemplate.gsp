@@ -39,7 +39,7 @@ String instanceType = dataTableInstance.dataTableType;
                         </g:else>
                     </g:if>
                     <g:else>
-                        <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance]"/>
+                        <g:render template="/dataTable/showDataTableDataTemplate" model="[dataTableInstance:dataTableInstance, dataObjectsCount:instanceCount]"/>
                     </g:else>
                 </div>
             </div>
