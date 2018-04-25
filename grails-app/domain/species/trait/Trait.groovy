@@ -277,11 +277,19 @@ class Trait {
             println "Found ibp parent classification to be ${ibpParentTaxon}";
             println "trait taxon ${traitInstance.taxon}";
             ibpParentTaxon.each { t ->
+                println t.id
                 traitInstance.taxon.each { taxon ->
-                    if(traitInstance.taxon.id == t.id)
+                    println taxon.id
+                    if(taxon.id == t.id) {
                        isValid = true;
+                       println "isValid ${isValid}"
+                       return;
+                    }
                 }
+                if(isValid) return;
+                       println "2isValid ${isValid}"
             }
+                       println "3isValid ${isValid}"
         }
         return isValid;
     }

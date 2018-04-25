@@ -118,7 +118,7 @@ class FactController extends AbstractObjectController {
                                 activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
                             }
 
-                            List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
+                            List<Fact> facts = Fact.findAllByTraitInstanceAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
                             Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
                             queryParams.trait[traitInstance.id] = '';
                             facts.each { fact ->
@@ -155,7 +155,7 @@ class FactController extends AbstractObjectController {
                             println "======================"
                             println queryParams
 
-                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':traitInstance, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':traitInstance, 'traitInstance':traitInstance, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
                         } else {
 
                         }

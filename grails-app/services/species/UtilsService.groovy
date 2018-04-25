@@ -1314,10 +1314,10 @@ class UtilsService {
     def clearCache(String cacheName) {
 /*        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
-        log.debug "Clearing Cache ${cache.name}"
+        log.debug "Clearing Cache ${cacheName}"
         return cache.clear();
 */
-        log.debug "Clearing Cache ${cache.name}"
+        log.debug "Clearing Cache ${cacheName}"
         redisClient.flushDb();
     }
 
