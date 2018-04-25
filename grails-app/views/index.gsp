@@ -32,7 +32,7 @@
             <div class="navblock" style="margin-top:20px;">
                 <div id="species_entry" class="entry" onclick="location.href='${uGroup.createLink(controller:'species', action:'list', absolute:true)}'";><span class="content">${g.message(code:'default.species.label')}</span></div>
                 <div id="observations" class="entry" onclick="location.href='${uGroup.createLink(controller:'observation', action:'list', absolute:true)}'"><span class="content">${g.message(code:'species.observation')}</span></div>
-                <div id="explore" class="entry"  onclick="location.href='${uGroup.createLink(controller:'map', action:'show', absolute:true)}'"><span class="content">${g.message(code:'button.maps')}</span></div>
+				<div id="explore" class="entry"  onclick="location.href='/map'"><span class="content">${g.message(code:'button.maps')}</span></div>
 
                 <div id="documents" class="entry" onclick="location.href='${uGroup.createLink(controller:'document', action:'list', absolute:true)}'"><span class="content">${g.message(code:'button.documents')}</span></div>
                 <div id="groups_entry" class="entry"  onclick="location.href='${uGroup.createLink(controller:'group', action:'list', absolute:true)}'";><span class="content">${g.message(code:'default.groups.label')}</span></div>
@@ -42,7 +42,7 @@
 
             <div id="stats" class="navblock" style="margin-top:-20px">
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countByPercentOfInfoGreaterThan(0)}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.species')}">${Species.countSpecies()}</div>
                 </div>
                 <div class="entry">
                     <div class="stats_number" title="${g.message(code:'title.number.observations')}">${Observation.countObservations()}</div>
@@ -52,14 +52,14 @@
                     <div class="stats_number" title="${g.message(code:'title.number.maps')}">206</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.documents')}">${Document.countDocuments()}</div>
                 </div>
  
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.groups')}">${UserGroup.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.groups')}">${UserGroup.countUserGroups()}</div>
                 </div>
                 <div class="entry">
-                    <div class="stats_number" title="${g.message(code:'title.number.discussions')}">${Discussion.count()}</div>
+                    <div class="stats_number" title="${g.message(code:'title.number.discussions')}">${Discussion.countDiscussions()}</div>
                 </div>
 
             </div>
@@ -67,7 +67,7 @@
             <div class="navblock" style="margin-top:20px;">
                 <b><big>&nbsp;<a name="latestObservations"><g:message code="index.button.latest.observations" /></a></big></b>
                 <div class="sidebar_section" style="margin: 5px; overflow: hidden; background-color: white;">
-                    <div class="jcarousel-skin-ie7" data-contextfreeurl="/observation/show&quot;" data-url="/observation/related" id="carousel_latestUpdatedObservations" style="clear: both; width: 880px; margin-top: 23px;">
+                    <div class="jcarousel-skin-ie7" data-contextfreeurl="/observation/show&quot;" data-url="/biodiv-api/naksha/search/observation/observation?sort=lastrevised&max=11" id="carousel_latestUpdatedObservations" style="clear: both; width: 880px; margin-top: 23px;">
                         <ul style="list-style: none; width: 880px; margin-left: 0px;">
                         </ul>
                         <div class="observation_links" style="margin-top: 5px; margin-bottom: 3px;">
@@ -109,7 +109,7 @@
         </div>
         <asset:script>
         $(document).ready(function() {
-            relatedStory([], "latestUpdatedObservations", "latestUpdatedObservations", "", "");
+            relatedStory_latestObvs([], "latestUpdatedObservations", "latestUpdatedObservations", "", "");
         });
         </asset:script>
     </body>

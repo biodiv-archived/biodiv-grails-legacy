@@ -12,7 +12,7 @@ import content.eml.Document;
 import species.participation.UsersResource;
 import grails.converters.JSON
 
-class Resource extends Sourcedata implements Rateable {
+class Resource extends Sourcedata implements Rateable, Serializable {
 	def utilsService
 	
 	public enum ResourceType {
@@ -100,6 +100,7 @@ class Resource extends Sourcedata implements Rateable {
 		description type:'text';
 		annotations type:'text';
 		sort "id"
+        cache  usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
     static constraints = {
@@ -251,5 +252,25 @@ class Resource extends Sourcedata implements Rateable {
         }
         return m
             
+    }
+
+    public void setType(type) {
+        println "resourceType##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.type = type;
+    }
+
+    public void setContext(context) {
+        println "context##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.context = context;
     }
 }

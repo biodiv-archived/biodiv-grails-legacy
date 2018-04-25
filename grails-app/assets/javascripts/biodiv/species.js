@@ -109,21 +109,21 @@ function showOccurence(speciesName) {
         var layersOptions = [
         {
             title :window.i8ln.species.specie.oc ,
-            layers : 'ibp:occurrence',
+            layers : 'biodiv:occurrence',
             styles : '',
             cql_filter : "species_name='" + speciesName + "'",
             opacity : 0.7
         },
         {
             title :window.i8ln.species.specie.obs ,
-            layers : 'ibp:observation_locations',
+            layers : 'biodiv:observation_locations',
             styles : '',
             cql_filter : "species_name='" + speciesName + "'",
             opacity : 0.7
         },
         {
             title :window.i8ln.species.specie.ckl,
-            layers : 'ibp:checklist_species_locations',
+            layers : 'biodiv:checklist_species_locations',
             styles : '',
             cql_filter : "species_name='" + speciesName + "'",
             opacity : 0.7

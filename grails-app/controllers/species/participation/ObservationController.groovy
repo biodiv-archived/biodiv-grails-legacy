@@ -116,10 +116,6 @@ class ObservationController extends AbstractObjectController {
     }
 
     def list() {
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++++++++++"
         def model;
         params.isMediaFilter = (params.isMediaFilter) ?: 'true'
         model = runLastListQuery(params);
@@ -675,7 +671,6 @@ class ObservationController extends AbstractObjectController {
                         def type
                         def pi
 						if(resourcetype == resourceTypeImage){
-                                println "==== "+file.getAbsolutePath()+" ==== "+obvDir.toString();
 								pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
                                 //ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
                                 def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
@@ -705,10 +700,6 @@ class ObservationController extends AbstractObjectController {
 				if(params.videoUrl) {
 					//TODO:validate url;
 					def videoUrl = params.videoUrl;
-                    println '--------------------------------';
-                    println '--------------------------------';
-                    println '--------------------------------';
-                    println videoUrl;
 					if(videoUrl && Utils.isURL(videoUrl)) {
 						String videoId = Utils.getYouTubeVideoId(videoUrl);
 						if(videoId) {
@@ -824,7 +815,9 @@ class ObservationController extends AbstractObjectController {
                     observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
                     if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
                         mailType = utilsService.OBSERVATION_ADDED;
+                        log.debug "send mail start"
                         utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+                        log.debug "send mail finished"
                     }
 
                     if(!params["createNew"]){
@@ -849,6 +842,7 @@ class ObservationController extends AbstractObjectController {
                         } else {
                             //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+
                             def model = utilsService.getSuccessModel(msg, null, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml,statusComplete : true]);
                             //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             withFormat {

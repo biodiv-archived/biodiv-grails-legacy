@@ -121,7 +121,7 @@ abstract class ScientificName extends NamesMetadata {
 		}
 
     static int getTaxonRank(String rankStr) {
-        MessageSource messageSource = grails.util.Holders.application.mainContext.getBean('messageSource')
+        MessageSource messageSource = grails.util.Holders.grailsApplication.mainContext.getBean('messageSource')
         def request = null;
         try {
             request = RequestContextHolder.currentRequestAttributes().request

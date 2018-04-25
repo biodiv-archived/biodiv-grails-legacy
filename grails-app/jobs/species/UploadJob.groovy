@@ -73,8 +73,8 @@ class UploadJob {
                     result = factService.upload(dl.filePath, dl.fetchMapFromText(), dl);
                     break;
                     case SPECIES_BULK_UPLOAD:
-                    int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-                    dataSource.setUnreturnedConnectionTimeout(100000);
+                    //int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+                    //dataSource.setUnreturnedConnectionTimeout(100000);
                     try{
                         println "starting task $dl and sleeping"
                         TaxonomyDefinition.UPDATE_SQL_LIST.clear();
@@ -92,8 +92,8 @@ class UploadJob {
                         TaxonomyDefinition.UPDATE_SQL_LIST.clear();
                         NamelistService.clearSessionNewNames();
                     }
-                    log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
-                    dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+                    //log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+                    //dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
                     break;
                     default:
                     log.debug "Invalid source Type $dl.uploadType"

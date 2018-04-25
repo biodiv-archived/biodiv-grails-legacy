@@ -4,7 +4,7 @@ import species.groups.SpeciesGroup
 import species.Habitat
 import speciespage.ObservationService
 
-import org.hibernatespatial.GeometryUserType
+//import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
 import species.participation.Observation
 import com.vividsolutions.jts.geom.MultiPolygon;

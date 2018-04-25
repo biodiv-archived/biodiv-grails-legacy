@@ -17,6 +17,7 @@ class Classification {
 	static mapping = {
 		version : false;
 		sort name:"asc"
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
 	public static Classification fetchIBPClassification(){

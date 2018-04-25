@@ -38,7 +38,6 @@ import species.participation.ResourceRedirect
 
 
 import static org.springframework.http.HttpStatus.*;
-import grails.plugin.cache.Cacheable;
 
 abstract class AbstractObjectController {
     
@@ -52,11 +51,12 @@ abstract class AbstractObjectController {
             String cacheKey = "${params.webaddress?:'IBP'}-${params.controller}-${params.action}-${params.filterProperty}-${params.filterPropertyValue}-${params.max?:1}-${params.offset?:0}"
             String cacheName = 'featured';
 
-            result = utilsService.getFromCache(cacheName, cacheKey);
+            String resultStr = utilsService.getFromCache(cacheName, cacheKey);
+            result = resultStr ? JSON.parse(resultStr) : null;
             if(!result) {
                 def relatedObv = observationService.getRelatedObservations(params).relatedObv;
                 result = formatRelatedResults(relatedObv, params);
-                utilsService.putInCache(cacheName, cacheKey, result);
+                utilsService.putInCache(cacheName, cacheKey, (result as JSON).toString());
             }
         } else {
             def relatedObv = observationService.getRelatedObservations(params).relatedObv;
@@ -124,7 +124,10 @@ abstract class AbstractObjectController {
         String cacheKey = "${params.controller}-${params.id}"
         String cacheName = 'resources';
 
-        result = utilsService.getFromCache(cacheName, cacheKey);
+//        result = utilsService.getFromCache(cacheName, cacheKey);
+        String resultStr = utilsService.getFromCache(cacheName, cacheKey);
+        result = resultStr ? JSON.parse(resultStr) : null;
+
         if(!result) {
             result = [:];
             if(params.id){            
@@ -146,7 +149,7 @@ abstract class AbstractObjectController {
             }
 
             if(result)
-                utilsService.putInCache(cacheName, cacheKey, result);
+                utilsService.putInCache(cacheName, cacheKey,  (result as JSON).toString());
         }
 
 

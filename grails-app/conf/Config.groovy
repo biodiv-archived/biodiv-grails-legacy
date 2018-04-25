@@ -86,21 +86,23 @@ def log4jConsoleLogLevel = Priority.DEBUG
 
 
 grails.gorm.default.mapping = {
-cache true
+cache false
 /*id generator:'increment'*/
 /* Added by the Hibernate Spatial Plugin. */
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.GeometryCollection)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LineString)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Point)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygon)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiLineString)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPoint)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPolygon)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LinearRing)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Puntal)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Lineal)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygonal)
+
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Geometry)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.GeometryCollection)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.LineString)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Point)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Polygon)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.MultiLineString)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.MultiPoint)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.MultiPolygon)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.LinearRing)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Puntal)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Lineal)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Polygonal)
+
 'user-type'( type:org.hibernate.type.YesNoType, class:Boolean )
 }
 
@@ -630,9 +632,9 @@ environments {
             info    'org.hibernate.jdbc.ConnectionManager'
             */
             info   'com.grailsrocks.emailconfirmation'
-            info   'com.odobo.grails.plugin.springsecurity.rest'
-            info   'com.odobo.grails.plugin.springsecurity.openid'
-            info   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
+            debug   'com.odobo.grails.plugin.springsecurity.rest'
+            debug   'com.odobo.grails.plugin.springsecurity.openid'
+            debug   'org.codehaus.groovy.grails.plugin.springsecurity.oauth'
             info   'uk.co.desirableobjects.oauth.scribe'
             debug   'org.codehaus.groovy.grails.plugin.uk.co.desirableobjects.oauth.scribe'
 			debug   'grails.app.services.speciespage.SpeciesUploadService'
@@ -652,6 +654,7 @@ environments {
             debug 'org.apache.http.wire'
             //debug  'org.codehaus.groovy.grails.orm.hibernate.cfg'
             trace 'grails.plugin.springsecurity.SpringSecurityUtils'
+            debug 'com.zaxxer.hikari.pool.HikariPool'
         }
         logHibernateStats = 'ALWAYS' // From ALWAYS, ALLOWED, NEVER
     }
@@ -668,7 +671,7 @@ environments {
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
-                filesutraURL = "http://fileops.pamba.strandls.com"
+                filesutraURL = "https://fileops.pamba.strandls.com"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
@@ -807,55 +810,57 @@ environments {
     }
     kk {
         servername = 'indiabiodiversity.org'
-        grails.serverURL = "http://${servername}"
+        grails.serverURL = "https://${servername}"
 
         speciesPortal {
             app.rootDir = "/apps/biodiv"
             data.rootDir = "${app.rootDir}/data"
             names.parser.serverURL = "127.0.0.1"
-            search.biodivApiUrl="http://localhost:8081"
-            search.nakshaURL = "http://localhost:8081"
+
+            search.biodivApiURL="http://localhost:8080"
+            search.nakshaURL = "http://localhost:8080"
+
             resources {
                 rootDir = "${app.rootDir}/img"
-                serverURL = "http://${servername}/${appName}/img"
-                filesutraURL = "http://fileops.indiabiodiversity.org"
+                serverURL = "https://${servername}/${appName}/img"
+                filesutraURL = "https://fileops.indiabiodiversity.org"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
                 rootDir = "${app.rootDir}/observations"
-                serverURL = "http://${servername}/${appName}/observations"
+                serverURL = "https://${servername}/${appName}/observations"
                 //filePicker.key = 'Az2MIh1LOQC2OMDowCnioz'
             }
             userGroups {
                 rootDir = "${app.rootDir}/userGroups"
-                serverURL = "http://${servername}/${appName}/userGroups"
+                serverURL = "https://${servername}/${appName}/userGroups"
             }
             datasource {
                 rootDir = "${app.rootDir}/datasources"
-                serverURL = "http://${servername}/${appName}/datasources"
+                serverURL = "https://${servername}/${appName}/datasources"
             }
             users {
                 rootDir = "${app.rootDir}/users"
-                serverURL = "http://${servername}/${appName}/users"
+                serverURL = "https://${servername}/${appName}/users"
             }
 
             content{
                 rootDir = "${app.rootDir}/content"
-                serverURL = "http://${servername}/${appName}/content"
+                serverURL = "https://${servername}/${appName}/content"
             }
             maps {
-                serverURL = "http://${servername}/${appName}/maps"
+                serverURL = "https://${servername}/${appName}/maps"
             }
             usersResource {
                 rootDir = "${app.rootDir}/usersRes"
-                serverURL = "http://${servername}/${appName}/usersRes"
+                serverURL = "https://${servername}/${appName}/usersRes"
             }
 			namelist {
 				rootDir = "${app.rootDir}/col-xmls/TaxonomyDefinition"
 			}
 	        traits{
                 rootDir = "${app.rootDir}/traits"
-                serverURL = "http://${servername}/${appName}/traits"
+                serverURL = "https://${servername}/${appName}/traits"
 
                 databaseDir = "${app.rootDir}/traits"
                 traitValueFile="${app.rootDir}/icons.csv"
@@ -932,6 +937,7 @@ environments {
             info   'grails.app.services.speciespage.ObservationService'
             info   'grails.app.services.speciespage'
             info   'grails.app.services.species'
+            debug 'com.zaxxer.hikari'
         }
 
         //grails.resources.mappers.hashandcache.excludes = ['**']
@@ -1606,8 +1612,10 @@ grails.plugins.dynamicController.mixins = [
 //'securityContextPersistenceFilter',
 //'rememberMeAuthenticationFilter',
 grails.plugin.springsecurity.filterChain.filterNames = [
-    'logoutFilter',
+
+    'restLogoutFilter', 'logoutFilter',
       'authenticationProcessingFilter', 'facebookAuthCookieTransparentFilter',
+      'restAuthenticationFilter', 'restTokenValidationFilter',
          'anonymousAuthenticationFilter',
             'exceptionTranslationFilter', 'filterInvocationInterceptor'
             ]
@@ -1764,8 +1772,42 @@ grails {
     }
 }
 */
+redissonConfig="${speciesPortal.app.rootDir}/redisson.yaml"
+redis {
+    // Connection details (default: localhost:6379)
+    host = localhost
+    port = 6379
+
+    // Connection timeout
+    timeout = 2000
+
+    // Password to access Redis (optional)
+    password = secret
+
+    // database for hibernate cache (default 0)
+    database=1
+
+    redis.expiryInSeconds.default=120
+    redis.expiryInSeconds.hibernate.common=0
+    redis.expiryInSeconds.hibernate.account=1200
+/*
+    expiryInSeconds {
+        // hiberante 2nd cache default expiry (seconds)
+        default = 120
+
+        // expiry of hibernate.common region (seconds) // hibernate is prefix, region name is test.Author
+        expiryInSeconds.biodiv-hibernate.test.Author = 0
+
+        // expiry of hibernate.account region (seconds) // hibernate is prefix, region name is test.Book
+        expiryInSeconds.biodiv-hibernate.test.Book = 1200
+    }
+*/
+}
+
 grails.assets.bundle=true
 grails.assets.minifyJs=false
-cble.logging = trueors.url.pattern = '/api/*'
-cors.headers = ['Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, TRACE, OPTIONS']
-//cors.enable.logging = true
+cors.enabled = true;
+cors.enable.logging = false
+//cors.url.pattern = '/api/*'
+cors.allow.origin.regex = '.*\\.indiabiodiversity\\.org'
+cors.headers = ['Access-Control-Allow-Origin':'*', 'Access-Control-Allow-Headers': 'origin, authorization, accept, content-type, x-requested-with, X-Auth-Token, X-AppKey' ]

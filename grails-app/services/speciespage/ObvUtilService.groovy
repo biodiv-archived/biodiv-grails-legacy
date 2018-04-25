@@ -20,7 +20,7 @@ import species.Language;
 
 import species.auth.SUser
 import species.groups.SpeciesGroup;
-import species.groups.UserGroup 
+import species.groups.UserGroup
 import species.participation.*
 import species.participation.RecommendationVote.ConfidenceType
 import species.Habitat
@@ -39,7 +39,7 @@ import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
-import species.sourcehandler.exporter.DwCObservationExporter; 
+import species.sourcehandler.exporter.DwCObservationExporter;
 import species.sourcehandler.exporter.DwCSpeciesExporter
 import org.codehaus.groovy.grails.web.json.JSONObject;
 import grails.converters.JSON;
@@ -110,13 +110,13 @@ class ObvUtilService {
 	static final String PUBLISHING_COUNTRY   = "publishingCountry"
 	static final String ACCESS_RIGHTS = "accessRights"
 	static final String INFORMATION_WITHHELD   = "informationWitheld"
- 
+
 	//task related
 	static final String  SUCCESS = "Success";
 	static final String  FAILED = "Failed";
 	static final String  SCHEDULED = "Scheduled";
 	static final String  EXECUTING = "Executing";
-	
+
 	private static final int BATCH_SIZE = 50
 
     def utilsService
@@ -137,11 +137,11 @@ class ObvUtilService {
 	///////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Export ////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
-	
+
 	private final static int EXPORT_BATCH_SIZE = 5000;
 	private final static int MAX_BATCHES = 1;
-	
-	
+
+
 	def requestExport(params){
         log.debug "creating download request"
         DownloadLog dl;
@@ -155,7 +155,7 @@ class ObvUtilService {
         }
 
 		x = Math.min(x, MAX_BATCHES)
-			
+
         for( int i=0; i<x; i++) {
             int offset = (i * EXPORT_BATCH_SIZE);
             dl = DownloadLog.createLog(springSecurityService.currentUser, params.filterUrl, params.downloadType, params.notes, params.source, params, offset);
@@ -167,20 +167,20 @@ class ObvUtilService {
                 r['msg']= messageSource.getMessage('observation.download.requsted',null,'Processing... You will be notified by email when it is completed. Login and check your user profile for download link.', LCH.getLocale())
             } else {
                 r['success'] = false;
-                r['msg'] = 'Error in creating download log.' 
+                r['msg'] = 'Error in creating download log.'
                 def errors = [];
                 dl.errors.allErrors.each {
                     def formattedMessage = messageSource.getMessage(it, LCH.getLocale());
                     errors << ['field': it.field, 'message': formattedMessage]
                 }
-                r['errors'] = errors 
+                r['errors'] = errors
                 println dl.errors.allErrors
             }
             res << r;
         }
         return res;
 	}
-	
+
 	def export(params, dl){
         if(params.downloadFrom && params.downloadFrom == 'uniqueSpecies') {
             def max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -197,7 +197,7 @@ class ObvUtilService {
                 }
             }
             distinctRecoListResult.distinctRecoListResult = completeResult;
-            return exportUniqueSpeciesList(distinctRecoListResult); 
+            return exportUniqueSpeciesList(distinctRecoListResult);
         }else {
 //            def observationInstanceList = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, params.webaddress, dl.offset).getAllResult()
             return exportObservation(dl, params.webaddress);
@@ -206,25 +206,25 @@ class ObvUtilService {
 
         }
     }
-	
+
     private File exportUniqueSpeciesList(Map distinctRecoListResult) {
         if(!distinctRecoListResult) {
             return null;
-        } 
+        }
         if(distinctRecoListResult.totalCount == 0) {
             return null;
         }
         File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
 		if(!downloadDir.exists()){
 			downloadDir.mkdirs()
-		} 
+		}
 		return exportDistinctRecoAsCSV(downloadDir, distinctRecoListResult);
     }
-	
+
     private File exportDistinctRecoAsCSV(downloadDir, Map distinctRecoListResult){
         File csvFile = new File(downloadDir, "UniqueSpecies_" + new Date().getTime() + ".csv")
         CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
-        
+
         def header = ['Species Name', 'Count', 'URL'];
         writer.writeNext(header.toArray(new String[0]))
         def distinctRecoList = distinctRecoListResult.distinctRecoList;
@@ -243,16 +243,16 @@ class ObvUtilService {
 
         return csvFile
     }
-	
+
     private def exportObservation(DownloadLog dl, String userGroupWebaddress){
     	if(!dl)
 			return null
-		
+
 		File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
 		if(!downloadDir.exists()){
 			downloadDir.mkdirs()
 		}
-		log.debug "export type " + dl.type 
+		log.debug "export type " + dl.type
 		if(dl.type == DownloadLog.DownloadType.CSV) {
 			return exportAsCSV(downloadDir, dl, userGroupWebaddress)
 		} else if(dl.type == DownloadLog.DownloadType.KML) {
@@ -265,23 +265,23 @@ class ObvUtilService {
 /*    private def exportObservation(List obvList, exportType, reqUser, dl_id, params_filterUrl ){
 		if(! obvList)
 			return null
-		
+
 		//removing checklist
-		def obvWithoutChecklist = []	
+		def obvWithoutChecklist = []
 		obvList.each { obv ->
 			if(!obv.isChecklist)
 				obvWithoutChecklist << obv
 		}
 		obvList = obvWithoutChecklist
-		
+
 		if(obvList.isEmpty())
 			return null
-		
+
 		File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
 		if(!downloadDir.exists()){
 			downloadDir.mkdirs()
 		}
-		log.debug "export type " + exportType 
+		log.debug "export type " + exportType
 		if(exportType == DownloadLog.DownloadType.CSV){
 			return exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl)
 		}else if(exportType == DownloadLog.DownloadType.KML) {
@@ -295,9 +295,9 @@ class ObvUtilService {
 		String folderName = "obv_"+ + new Date().getTime()
 		String parent_dir = downloadDir.getAbsolutePath() + File.separator + folderName+File.separator + folderName
 		File csvFile = new File(parent_dir, "obv_" + new Date().getTime() + ".csv")
-		
+
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
-		
+
 		boolean headerAdded = false
         ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, userGroupWebaddress, dl.offsetParam.intValue());
         int total = 0;
@@ -327,14 +327,14 @@ class ObvUtilService {
 		return archive(downloadDir.getAbsolutePath(), folderName, csvFile, f )
 		//return csvFile
 	}
-/*	
+/*
 	private File exportAsCSV(downloadDir, obvList, reqUser, dl_id , params_filterUrl){
 		String folderName = "obv_"+ + new Date().getTime()
 		String parent_dir=downloadDir.getAbsolutePath() +File.separator+folderName+File.separator+ folderName
 		File csvFile = new File(parent_dir, "obv_" + new Date().getTime() + ".csv")
-		
+
 		CSVWriter writer = getCSVWriter(csvFile.getParent(), csvFile.getName())
-		
+
 		boolean headerAdded = false
 		obvList.each { obv ->
 			log.debug "Writting " + obv
@@ -381,17 +381,17 @@ class ObvUtilService {
 
 /*        ResourceFetcher rf = new ResourceFetcher(Observation.class.canonicalName, dl.filterUrl, null, 0);
         while(rf.hasNext()) {
-            def obvList = rf.next(); 
+            def obvList = rf.next();
             obvList.each {
                 def it_observation = it
-                def next = it_observation as JSON ; 
+                def next = it_observation as JSON ;
                 def it_final = JSON.parse(""+next)
                 list_final.add(it_final)
             }
         }
 */
         DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), dl, userGroupWebaddress);
-        //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
+        //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl)
     }
 
     def CSVWriter getCSVWriter(def directory, def fileName) {
@@ -405,15 +405,15 @@ class ObvUtilService {
 
         obvList.each {
             def it_observation =it
-            def next = it_observation as JSON ; 
+            def next = it_observation as JSON ;
             def it_final=JSON.parse(""+next)
             list_final.add(it_final)
         }
 
         DwCObservationExporter.getInstance().exportObservationData(downloadDir.getAbsolutePath(), list_final, reqUser, dl_id, params_filterUrl );
-        //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl) 
+        //DwCSpeciesExporter.getInstance().exportSpecieData(downloadDir, list_final, reqUser , dl_id , params_filterUrl)
     }
-*/	
+*/
     def exportAsKML(File downloadDir, DownloadLog dl, String userGroupWebaddress){
         def config = grails.util.Holders.config
         String iconBasePath = config.speciesPortal.observations.serverURL
@@ -584,9 +584,9 @@ class ObvUtilService {
     }
 
 	////////////////////////////////// End export//////////////////////////////
-	
-	
-	
+
+
+
 	def batchUpload(request, params){
 		processBatch(params)
 	}
@@ -597,14 +597,14 @@ class ObvUtilService {
 			log.error "Image dir not found. Aborting upload"
 			return
 		}
-		
+
 		File spreadSheet = new File(params.batchFileName)
 		if(!spreadSheet.exists()){
 			log.error "Main batch file not found. Aborting upload"
 			return
 		}
-		
-		List resultObv = [] 
+
+		List resultObv = []
 		int i = 0;
 		SpreadsheetReader.readSpreadSheet(spreadSheet.getAbsolutePath()).get(0).each{ m ->
 			if(m[IMAGE_FILE_NAMES].trim() != ""){
@@ -621,7 +621,7 @@ class ObvUtilService {
 		//last batch
 		publishAndGormcleanup(resultObv)
 	}
-	
+
 	private publishAndGormcleanup(List resultObv){
 		utilsService.cleanUpGorm(true)
 		def obvs = resultObv.collect { Observation.read(it) }
@@ -632,7 +632,7 @@ class ObvUtilService {
 		}
 		resultObv.clear();
 	}
-	
+
 	boolean uploadObservation(imageDir, Map m, List resultObv, File uploadLog=null, ProtocolType protocolType = ProtocolType.MULTI_OBSERVATION) {
         Map obvParams = [:];
         boolean result;
@@ -667,15 +667,15 @@ class ObvUtilService {
         }
         return result;
 	}
-	
+
 	private void populateParams(Map obvParams, Map m, ProtocolType protocolType){
-		
+
 		//mandatory
         obvParams['id'] = m['id']?:null;
         SpeciesGroup sG = m[SPECIES_GROUP] ? SpeciesGroup.findByName(m[SPECIES_GROUP].trim()) : null
 		obvParams['group_id'] = m[SPECIES_GROUP]?(sG ? sG.id : defaultSpeciesGroup.id):defaultSpeciesGroup.id
         Habitat h = m[HABITAT] ? Habitat.findByName(m[HABITAT].trim()) : null;
-        obvParams['habitat_id'] = m[HABITAT] ? ( h ? h.id :  defaultHabitat.id ): defaultHabitat.id 
+        obvParams['habitat_id'] = m[HABITAT] ? ( h ? h.id :  defaultHabitat.id ): defaultHabitat.id
 		obvParams['longitude'] = m[LONGITUDE]
 		obvParams['latitude'] = m[LATITUDE]
 		obvParams['location_accuracy'] = 'Approximate'
@@ -685,18 +685,18 @@ class ObvUtilService {
 		obvParams['topology'] = m[TOPOLOGY];
 		//reco related
 		obvParams['recoName'] = m[SN]
-		obvParams['commonName'] = m[CN] 
+		obvParams['commonName'] = m[CN]
 		obvParams['languageName'] = m[LANGUAGE]
 		obvParams['recoComment'] = m[COMMENT]
 		obvParams['identifiedBy'] = m[IDENTIFIED_BY]
 		obvParams['dateIdentified'] = m[DATE_IDENTIFIED]
-		
+
 		//tags, grouplist, notes
 		obvParams['notes'] = m[NOTES]
 
 		obvParams['tags'] = (m[TAGS] ? m[TAGS].trim().split(",").collect { it.trim() } : null)
 		obvParams['userGroupsList'] = getUserGroupIds(m[USER_GROUPS])
-		
+
 		obvParams['fromDate'] = m[OBSERVED_ON]
 		obvParams['toDate'] = m[TO_DATE]
 		obvParams['dateAccuracy'] = m[DATE_ACCURACY]?:(m[AbstractObservationImporter.ANNOTATION_HEADER]?m[AbstractObservationImporter.ANNOTATION_HEADER][DATE_ACCURACY]:null)
@@ -705,12 +705,12 @@ class ObvUtilService {
             log.debug "Finding user by email"
 		    obvParams['author'] = SUser.findByEmail(m[AUTHOR_EMAIL].trim())
         } else {
-            obvParams['author'] = springSecurityService.currentUser ?: SUser.read(1L); 
+            obvParams['author'] = springSecurityService.currentUser ?: SUser.read(1L);
         }
-        
+
         if(m[ORIGINAL_AUTHOR_NAME])
 		    obvParams['originalAuthor'] = m[ORIGINAL_AUTHOR_NAME]
-		
+
 		obvParams['externalId'] = m[EXTERNAL_ID]
 		obvParams['externalUrl'] = m[OBSERVATION_URL]
 		obvParams['viaId'] = m[COLLECTION_ID]
@@ -726,16 +726,16 @@ class ObvUtilService {
         obvParams['resourceListType'] = "ofObv"
 
 		obvParams['agreeTerms'] = "on"
-        
+
         obvParams['locale_language'] = utilsService.getCurrentLanguage();
-		
+
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         println "populating topology"
         println "${obvParams.topology}"
         if(!obvParams.topology && obvParams.latitude && obvParams.longitude) {
             println "constructing areas from lat lng ${obvParams.latitude}"
             obvParams.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(obvParams.longitude?.toFloat(), obvParams.latitude?.toFloat())));
-        } 
+        }
 
         if(m[DwCObservationImporter.ANNOTATION_HEADER])
             obvParams['checklistAnnotations'] = m[DwCObservationImporter.ANNOTATION_HEADER] as JSON;
@@ -756,36 +756,36 @@ class ObvUtilService {
             obvParams.putAll(m['mediaInfo']);
         }
  	}
-	
+
 	private getUserGroupIds(String names){
 		if(!names || names.trim() == "")
 			return null
-		
-		List gIds = [] 
-		names = names.split(",").each { name -> 
+
+		List gIds = []
+		names = names.split(",").each { name ->
 			def ug = UserGroup.findByName(name.trim())
 			if(ug){
 				gIds.add(ug.id)
 			}
 		}
-		
+
 		if(gIds.isEmpty()){
 			return null
 		}
-		
+
 		return gIds.join(",")
 	}
-	
+
 	private boolean saveObv(Map params, List result, File uploadLog=null, boolean newObv=false, ProtocolType protocolType=ProtocolType.MULTI_OBSERVATION) {
         boolean success = false;
-	
-	
+
+
         if(!isValidObservation(params, uploadLog, protocolType)) {
 			log.error "Aborting saving this observation as it is not valid for above reasons. Obv : $params"
             if(uploadLog) uploadLog << "\nAborting saving this observation as it is not valid for above reasons. Obv: $params"
 
 			return false
-		}	
+		}
 
 		def observationInstance;
 		try {
@@ -808,31 +808,33 @@ class ObvUtilService {
 
 				params.obvId = observationInstance.id
 				params.author = observationInstance.author
-				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED);
-                postProcessObervation(params, observationInstance, newObv, uploadLog);
+				// flush will happen at the end of batch, so need not flush at each observation
+				boolean doFlush = false
+				activityFeedService.addActivityFeed(observationInstance, null, observationInstance.author, activityFeedService.OBSERVATION_CREATED, null, null, doFlush);
+                postProcessObervation(params, observationInstance, newObv, uploadLog, doFlush);
 				result.add(observationInstance.id)
-				
+
             } else {
                 if(uploadLog) uploadLog <<  "\nError in observation creation : "+observationInstance
-                observationInstance.errors.allErrors.each { 
-                    if(uploadLog) uploadLog << "\n"+it; 
+                observationInstance.errors.allErrors.each {
+                    if(uploadLog) uploadLog << "\n"+it;
                     log.error it;
                 }
             }
 		} catch(e) {
 				log.error "error in creating observation"
-                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}" 
+                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}"
 				e.printStackTrace();
 		}
         return success;
 	}
 
-    private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null) {
+    private postProcessObervation(params, observationInstance, boolean newObv=false, File uploadLog=null, boolean doFlush=true) {
         params.identifiedBy = params.identifiedBy;
-        addReco(params, observationInstance, newObv)
+        addReco(params, observationInstance, newObv, doFlush)
         if(uploadLog) 
             uploadLog <<  "\n======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id;
-        
+
 		println "======NAME PRESENT IN TAXONCONCEPT : ${observationInstance.externalId} :  "+observationInstance.maxVotedReco?.taxonConcept?.id
         if(observationInstance.dataTable && observationInstance.maxVotedReco?.taxonConcept && observationInstance.maxVotedReco?.taxonConcept.group ) {
             observationService.updateSpeciesGrp(['group_id': observationInstance.maxVotedReco.taxonConcept.group.id], observationInstance, false);
@@ -845,14 +847,14 @@ class ObvUtilService {
 
         utilsService.benchmark('setGroups') {
             if(params.groupsWithSharingNotAllowed) {
-                observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false);
+                observationService.setUserGroups(observationInstance, [params.groupsWithSharingNotAllowed], false, doFlush);
             } else {
                 def userGroups = observationService.getValidUserGroups(observationInstance, params.userGroupsList);
                 if(userGroups)
-                    observationService.setUserGroups(observationInstance, userGroups, false);
+                    observationService.setUserGroups(observationInstance, userGroups, false, doFlush);
             }
         }
-		
+
         //customFieldService.updateCustomFields(params, observationInstance.id)
         if(params.traits) {
             utilsService.benchmark('setTraits') {
@@ -867,12 +869,12 @@ class ObvUtilService {
 
         /*switch(observationInstance.dateAccuracy) {
             case DateAccuracy.UNKNOWN:
-            case DateAccuracy.APPROXIMATE : 
+            case DateAccuracy.APPROXIMATE :
                 observationService.flagIt(observationInstance, FlagType.DATE_INAPPROPRIATE, "Date is "+observationInstance.dateAccuracy.value());
             break;
         }*/
 
-        if(observationInstance.dataTable) {
+        /*if(observationInstance.dataTable) {
             log.debug "Posting observation to all user groups that data table is part of"
             HashSet uGs = new HashSet();
             uGs.addAll(observationInstance.dataTable.userGroups);
@@ -881,20 +883,20 @@ class ObvUtilService {
             }
             log.debug uGs
             userGroupService.addResourceOnGroups(observationInstance, uGs.collect{it.id}, false);
-        }
+        }*/
 
         if(!observationInstance.save()){
             if(uploadLog) uploadLog <<  "\nError in updating few properties of observation : "+observationInstance
-                observationInstance.errors.allErrors.each { 
-                    if(uploadLog) uploadLog << "\n"+it; 
-                    log.error it 
+                observationInstance.errors.allErrors.each {
+                    if(uploadLog) uploadLog << "\n"+it;
+                    log.error it
                 }
         } else {
             println "Successfully saved observation"
         }
     }
 
-	private addReco(params, Observation observationInstance, boolean newObv=false){
+	private addReco(params, Observation observationInstance, boolean newObv=false, boolean doFlush=true){
 		def recoResultMap;
         params.flushImmediately = false;
         recoResultMap = observationService.getRecommendation(params);
@@ -904,7 +906,7 @@ class ObvUtilService {
 		def commonNameReco =  recoResultMap.commonNameReco;
         println "commonNameReco : ${commonNameReco}"
 		ConfidenceType confidence = observationService.getConfidenceType(params.confidence?:ConfidenceType.CERTAIN.name());
-		
+
 		def recommendationVoteInstance
         Date dateIdentified = params.dateIdentified ? utilsService.parseDate(params.dateIdentified) : observationInstance.createdOn;
 		if(reco) {
@@ -914,7 +916,7 @@ class ObvUtilService {
             }
 		    if(!recommendationVoteInstance) {
                 println "creating new vote"
-			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName); 
+			    recommendationVoteInstance = new RecommendationVote(observation:observationInstance, recommendation:reco, commonNameReco:commonNameReco, author:params.author, originalAuthor:params.identifiedBy?:params.originalAuthor, confidence:confidence, votedOn:dateIdentified, givenSciName:params.recoName, givenCommonName:params.commonName);
             } else {
                 println "Changing existing names"
                 recommendationVoteInstance.recommendation = reco;
@@ -942,19 +944,19 @@ class ObvUtilService {
     			    observationInstance.calculateMaxVotedSpeciesName();
                 }
             }
-			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED);
-           
+			def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, null, null, doFlush);
+
         } else {
             recommendationVoteInstance?.errors?.allErrors?.each { log.error it }
         }
         }
 
-			
+
 	}
 
 	private Map uploadImageFiles(imageDir, imagePaths, license, author) {
 		Map resourcesInfo = [:];
-        if(imageDir && imageDir.exists()) { 
+        if(imageDir && imageDir.exists()) {
 		String rootDir = grailsApplication.config.speciesPortal.observations.rootDir
 		File obvDir
 		int index = 1
@@ -963,7 +965,7 @@ class ObvUtilService {
             if(f.exists()){
 				log.debug "uploading file $f"
 				if(f.length()  > grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE) {
-					log.debug  "File size cannot exceed 100MB" 
+					log.debug  "File size cannot exceed 100MB"
 				} else if(f.length() == 0) {
 					log.debug 'File cannot be empty'
 				} else {
@@ -995,7 +997,7 @@ class ObvUtilService {
         }
 		return resourcesInfo
 	}
-	
+
     private boolean isValidObservation(Map params, File uploadLog, ProtocolType protocolType) {
         def media = params['file_1']
         def snCol = params['recoName']
@@ -1066,18 +1068,18 @@ class ObvUtilService {
             obvParams[IDENTIFIED_BY] = recoVote.originalAuthor
             obvParams[DATE_IDENTIFIED] = (new SimpleDateFormat("dd/MM/yyyy")).format(recoVote.votedOn)
         }
-		
+
 		//tags, grouplist, notes
 		obvParams[NOTES] = obv.notes
 
 //		obvParams['tags'] = (m[TAGS] ? m[TAGS].trim().split(",").collect { it.trim() } : null)
 		obvParams['userGroupsList'] = obv.userGroups.collect {it.name}.join(',');
-		
+
 		obvParams[OBSERVED_ON] =  (new SimpleDateFormat("dd/MM/yyyy")).format(obv.fromDate)
 		obvParams[TO_DATE] =  (new SimpleDateFormat("dd/MM/yyyy")).format(obv.toDate)
 		obvParams[DATE_ACCURACY] = obv.dateAccuracy.value();
 		obvParams[AUTHOR_EMAIL] = obv.author.email;
-		
+
 		obvParams[EXTERNAL_ID] = obv.externalId
 		obvParams[OBSERVATION_URL] = obv.externalUrl
 		obvParams[COLLECTION_ID] = obv.viaId
@@ -1088,16 +1090,16 @@ class ObvUtilService {
     	obvParams['geoPrivacy'] = obv.geoPrivacy;
 
 		obvParams['agreeTerms'] = "on"
-        
+
 //        obvParams['locale_language'] = utilsService.getCurrentLanguage();
-		
+
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);//grailsApplication.config.speciesPortal.maps.SRID);
         println "populating topology"
         println "${obvParams.topology}"
         if(obvParams.topology) {
             println "constructing areas from lat lng ${obvParams.latitude}"
             obvParams.areas = Utils.GeometryAsWKT(obv.topology);
-        } 
+        }
         obvParams[AbstractObservationImporter.ANNOTATION_HEADER] = obv.fetchChecklistAnnotation();
         Map traits = obv.getTraitFacts().traitFactMap;
         Map obvTraits = [:];
@@ -1131,18 +1133,18 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
     *   Upload observations from file
     */
     Map upload(String file, Map params, UploadLog dl) {
-        dl.writeLog("============================================\n", Level.INFO);            
+        dl.writeLog("============================================\n", Level.INFO);
         File observationsFile = new File(params.file);
         File multimediaFile = null;
         File mappingFile = new File(params.mappingFile);
         File multimediaMappingFile = null;
-        File imagesDir = params.imagesDir ? new File(params.imagesDir):null; 
+        File imagesDir = params.imagesDir ? new File(params.imagesDir):null;
         File uploadLog =  new File(dl.logFilePath);
 
         DataTable dataTable = DataTable.get(params.dataTable)
         if(params.isMarkingDirty) {
             //make inplace changes for existing observations
-            dl.writeLog("Marking has changed. So doing a inplace edit for existing observations\n", Level.INFO);            
+            dl.writeLog("Marking has changed. So doing a inplace edit for existing observations\n", Level.INFO);
             println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -1154,7 +1156,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
 
         } else {
             //do a fresh upload from file
-            dl.writeLog("Doing a fresh upload from file\n", Level.INFO);            
+            dl.writeLog("Doing a fresh upload from file\n", Level.INFO);
             FileObservationImporter importer = FileObservationImporter.getInstance();
             importer.separator = ',';
             Map o = importer.importData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
@@ -1170,11 +1172,13 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
         Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
 
         List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
+				println "obvParamsList ${obvParamsList}"
         int noOfUploadedObv=0, noOfFailedObv=0;
         boolean flushSingle = false;
         Date startTime = new Date();
         int i=0;
         while(obvParamsList) {
+				println "obvParamsList ${obvParamsList}"
             List resultObv = [];
             int tmpNoOfUploadedObv = 0, tmpNoOfFailedObv= 0;
             try {
@@ -1196,7 +1200,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
                         }
                     } catch(Exception e) {
                         tmpNoOfFailedObv++;
-                        if(flushSingle) { 
+                        if(flushSingle) {
                             utilsService.cleanUpGorm(true)
                             uploadLog << "\n"+e.getMessage()
                         }
@@ -1219,7 +1223,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
                 flushSingle = false;
             } catch (Exception e) {
                 log.error "error in creating observation."
-                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}." 
+                if(uploadLog) uploadLog << "\nerror in creating observation ${e.getMessage()}."
                     e.printStackTrace();
                 flushSingle = true;
             }
@@ -1244,7 +1248,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
     Map uploadDwCDataset(Map params) {
         def resultModel = [:]
         String file = params.path?:params.uFile?.path;
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        def config = grails.util.Holders.config
         file = config.speciesPortal.content.rootDir + file;
 
         File f = new File(file);
@@ -1271,16 +1275,16 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
             }
         }
 
-        
+
         File uploadLog = new File(destDir, 'upload.log');
         if(uploadLog.exists()) uploadLog.delete();
 
         Date startTime = new Date();
         if(directory) {
-            params['author'] = springSecurityService.currentUser; 
+            params['author'] = springSecurityService.currentUser;
             params['type'] = DatasetType.OBSERVATIONS;
             params['datasource'] = Datasource.read(params.long('datasource'));
- 
+
             if(metadataFile) {
                 uploadLog << "\nUploading dataset in DwCA format present at : ${f.getAbsolutePath()}";
                 uploadLog << "\nDataset upload start time : ${startTime}"
@@ -1304,8 +1308,8 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
             if(f1.save()) {
                 params['uFile'] = f1
             }
-            //params['uFile'] = params.uFile; 
-    //        params['originalAuthor'] = createContact() 
+            //params['uFile'] = params.uFile;
+    //        params['originalAuthor'] = createContact()
             Dataset dataset;
             def feedType;
             if(params.id) {
@@ -1327,25 +1331,25 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
                         if(isDwC) {
                             importDWCObservations(dataset, directory, uploadLog);
                         } else {
-                            def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()    
+                            def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
                             def rs = [:]
                             if(ServletFileUpload.isMultipartContent(request)) {
                                 MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
                                 Utils.populateHttpServletRequestParams(request, rs);
-                            } 
- 
+                            }
+
                             def multimediaF = params.multimediaFile?:params.multimediaFileUpload;
                             def mF = params.mappingFile?:params.mappingFileUpload;
                             def mMF = params.multimediaMappingFile?:params.multimediaMappingFileUpload;
                             File multimediaFile, mappingFile, multimediaMappingFile;
-                            
+
                             if(multimediaF instanceof String) {
                                 multimediaFile = new File(config.speciesPortal.content.rootDir, multimediaF );
                             } else {
                                 multimediaFile = new File(directory, 'multimediaFile.tsv');
                                 multimediaF.transferTo(multimediaFile);
                             }
-                            
+
                             if(mF instanceof String) {
                                 mappingFile = new File(config.speciesPortal.content.rootDir, mF );
                             } else {
@@ -1381,9 +1385,9 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
         uploadLog << "Starting import of GBIF Observations data";
         def conn = new Sql(dataSource)
 
-        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-        dataSource.setUnreturnedConnectionTimeout(0);
-	
+//        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//        dataSource.setUnreturnedConnectionTimeout(0);
+
 
         def tmpBaseDataTable = "gbifdata";
         def tmpNewBaseDataTable = "gbifdata_new";
@@ -1391,9 +1395,9 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
         def tmpBaseDataTable_parsedNamess = tmpBaseDataTable+"_parsed_names";
         def tmpBaseDataTable_namesList = tmpBaseDataTable+"_namesList";
 
-        String occurencesFileName = (new File(directory, 'occurrence.txt')).getAbsolutePath(); 
-        String multimediaFileName = (new File(directory, 'multimedia.txt')).getAbsolutePath(); 
-        String namesFileName = (new File(directory, 'gbif_names_all_with_idswithoutspchar.csv')).getAbsolutePath(); 
+        String occurencesFileName = (new File(directory, 'occurrence.txt')).getAbsolutePath();
+        String multimediaFileName = (new File(directory, 'multimedia.txt')).getAbsolutePath();
+        String namesFileName = (new File(directory, 'gbif_names_all_with_idswithoutspchar.csv')).getAbsolutePath();
         Date startTime = new Date();
          try {
             uploadLog << "\nCreating base table for ${occurencesFileName}";
@@ -1423,7 +1427,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
             alter table '''+tmpNewBaseDataTable+''' add column key text;
             update '''+tmpNewBaseDataTable+''' set key=concat(scientificname,species,genus,family,order1,class,phylum,kingdom,taxonrank);
             ''');
-            
+
             uploadLog << "\nCreating distinct sciName table for parsing";
             conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);
             conn.executeUpdate("CREATE TABLE "+tmpBaseDataTable_parsedNamess+"(id serial primary key, sciName text, clean_sciName text, canonicalForm text, species text, genus text, family text, order1 text, class text, phylum text, kingdom text, commonName text, taxonrank text, taxonId bigint, acceptedId bigint, recommendation_id bigint)");
@@ -1463,9 +1467,9 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         NamesParser namesParser = new NamesParser();
         SUser currentUser = springSecurityService.currentUser;
         List resultObv = [];
-        int limit = 5000, offset 
+        int limit = 5000, offset
         def noOfSciNames, noOfCommonNames;
-        
+
         Date s = new Date();
         Date t_date = new Date();
 /*        while(true) {
@@ -1619,7 +1623,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
             update '''+tmpBaseDataTable_multimedia+''' set annotations = g.data from (select id as xid, row_to_json((select d from (select 'http://www.gbif.org/occurrence/'||gbifId as gbifId, type, identifier, format, license, references1 as references, rightsHolder, title, publisher, source, description, created, creator, contributor, audience) d))::text as data from gbifdata_multimedia) as  g where g.xid=id;
 
             update '''+tmpBaseDataTable_multimedia+''' set to_update = 't', set resource_id = r.id from resource r where r.gbifid = gbifID;
-            
+
             delete from resource_contributor where resource_contributors_id in (select resource_id from '''+tmpBaseDataTable_multimedia+''' where to_update = 't');
             delete from observation_resource where resource_id in (select resource_id from '''+tmpBaseDataTable_multimedia+''' where to_update = 't');
 
@@ -1650,7 +1654,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
            update observation set no_of_identifications = g.count from (select * from tmp) g where g.observation_id=id;
 
            drop table tmp;
-                    
+
             create table tmp as select resource_id, observation_id, rating_ref, (case when avg is null then 0 else avg end) as avg, (case when count is null then 0 else count end) as count from observation_resource o left outer join (select rating_link.rating_ref, avg(rating.stars), count(rating.stars) from rating_link , rating  where rating_link.type='resource' and rating_link.rating_id = rating.id  group by rating_link.rating_ref) c on o.resource_id =  c.rating_ref order by observation_id asc, avg desc, resource_id asc;
 
             update observation set repr_image_id = g.resource_id from (select b.observation_id,b.resource_id from (select observation_id, max(avg) as max_avg from tmp group by observation_id) a inner join tmp b on a.observation_id=b.observation_id where b.avg=a.max_avg) g where g.observation_id=id;
@@ -1666,7 +1670,7 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
         conn.close();
         }
         uploadLog << "\nTime taken for resources ${((new Date()).getTime() - s.getTime())/1000} sec"
-         
+
 
 
         /*uploadLog << "\n Publishing search index"
@@ -1683,12 +1687,12 @@ update '''+tmpBaseDataTable_namesList+''' set key=concat(sciname,species,genus,f
 
         try {
             //conn = new Sql(dataSource);
-            //conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);	
-            //conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);	
+            //conn.executeUpdate("DROP TABLE IF EXISTS " + tmpTableName);
+            //conn.executeUpdate("DROP TABLE IF EXISTS " + tmpBaseDataTable_parsedNamess);
         } finally {
             //conn.close();
-            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
-            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+//            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
         }
 
         uploadLog << "\n\n----------------------------------------------------------------------";

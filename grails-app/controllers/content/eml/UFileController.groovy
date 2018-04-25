@@ -43,8 +43,8 @@ import content.eml.UFile;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.License
 import species.License.LicenseType
-
-
+import grails.util.Holders;
+	
 class UFileController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -53,7 +53,7 @@ class UFileController {
     def springSecurityService;
     def grailsApplication
     def speciesUploadService;
-    def config = grails.util.Holders.config
+    def config = Holders.config
     def messageSource
     def speciesService;
 	String contentRootDir = config.speciesPortal.content.rootDir
@@ -251,7 +251,7 @@ class UFileController {
             return
         }
 
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        //def config = Hodlers.config
         def file = new File(config.speciesPortal.content.rootDir+ufile.path)
         if (file.exists()) {
             log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"

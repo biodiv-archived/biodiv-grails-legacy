@@ -30,17 +30,17 @@ class NamesLoaderService {
     int syncNamesAndRecos(boolean cleanAndUpdate, boolean addToTree = false) {
         log.info "Synching names and recommendations"
         int noOfNames = 0;
-        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//        int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
         try {
-            dataSource.setUnreturnedConnectionTimeout(500);
+//            dataSource.setUnreturnedConnectionTimeout(500);
 			noOfNames += syncRecosFromTaxonConcepts(3, 3, cleanAndUpdate, addToTree);
             noOfNames += syncSynonyms(addToTree);
             noOfNames += syncCommonNames(addToTree);
         } catch(Exception e) {
             log.error e.printStackTrace();
         } finally {
-            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
-            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//            log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+//            dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
         }
         log.info "No of names synched : "+noOfNames
         return noOfNames;

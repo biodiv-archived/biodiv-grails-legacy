@@ -2,7 +2,12 @@ package species.auth
 
 import org.apache.commons.lang.builder.HashCodeBuilder
 import org.apache.commons.logging.LogFactory;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+@Cache(region="user_role", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
+@JsonIgnoreProperties(['aclUtilService'])
 class SUserRole implements Serializable {
 
 	SUser sUser

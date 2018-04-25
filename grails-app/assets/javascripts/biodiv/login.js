@@ -21,7 +21,12 @@ function handleError(xhr, textStatus, errorThrown, successHandler, errorHandler,
     if (xhr.status == 401) {
         var brToken = $.cookie("BRToken");
         var now = new Date().getTime();
-        var timeLeftForRToken = (new Date(localStorage.get('last_login_date'))).getTime() + (30*24*60*60*1000) - now;//issued at+30 days - now
+	var lld = $.cookie("lld");
+        var timeLeftForRToken;
+	if(lld > 0) 
+	    timeLeftForRToken = lld + (30*24*60*60*1000) - now;//issued at+30 days - now
+	else
+	    timeLeftForRToken=0;
         //if only 5 days are left to validate refresh token we will
         //propmt the user to login again to progress his login window
         if(brToken == null || timeleft <= (5*24*60*60*1000)) {
@@ -133,11 +138,12 @@ function clearAllCookies() {
 
     $.cookie('BAToken',null, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain});
     $.cookie('BRToken',null, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain});
+    $.cookie('lld',null, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain});
 
-    localStorage.removeItem("id");
-    localStorage.removeItem("pic");
-    localStorage.removeItem("name");
-    localStorage.removeItem("last_login_date");
+    //localStorage.removeItem("id");
+    //localStorage.removeItem("pic");
+    //localStorage.removeItem("name");
+    //localStorage.removeItem("last_login_date");
 }
 
 function callAuthSuccessUrl(url, p) {
@@ -200,10 +206,11 @@ function setLoginInfo(data, isAjax) {
 console.log(expires_in);
     $.cookie("BAToken", data.access_token, {path : window.params.login.api.cookie.path, domain: window.params.login.api.cookie.domain, expires : expires_in});
     $.cookie("BRToken", data.refresh_token, {path : window.params.login.api.cookie.path, domain:window.params.login.api.cookie.domain, expires : rToken_expires_in});//setting for 60 days
-    localStorage.setItem("id", parseInt(decoded.id));
-    localStorage.setItem("pic", data.pic);
-    localStorage.setItem("name", decoded.username);
-    localStorage.setItem("last_login_date", new Date(decoded.iat*1000));
+    $.cookie("lld", (new Date(decoded.iat*1000)).getTime(), {path : window.params.login.api.cookie.path, domain:window.params.login.api.cookie.domain, expires : rToken_expires_in});//setting for 60 days
+//    localStorage.setItem("id", parseInt(decoded.id));
+//    localStorage.setItem("pic", decoded.pic);
+//    localStorage.setItem("name", decoded.username);
+//    localStorage.setItem("last_login_date", new Date(decoded.iat*1000));
 
     if(typeof isAjax === 'undefined')
        isAjax = $("#ajaxLogin").is(':visible'); 
@@ -217,11 +224,11 @@ console.log(expires_in);
 var loginPopupWindow;
 $(document).ready(function() {
    $('.fbJustConnect').click(function() {
-        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id="+window.params.login.api.facebook.apiKey+"&redirect_uri="+window.params.login.api.facebook.redirect_uri+"&scope=email%2Cuser_location%2Cuser_website&state=biodiv-api-state");
+        loginPopupWindow = window.open("https://www.facebook.com/dialog/oauth?response_type=code&client_id="+window.params.login.api.facebook.apiKey+"&redirect_uri="+window.params.login.api.facebook.redirect_uri+"&scope=email%2Cuser_location&state=biodiv-api-state");
         /*$.ajax({
             async: true,
             crossDomain: true,
-            url: "https://www.facebook.com/dialog/oauth?response_type=code&client_id=115305755799166&redirect_uri=http%3A%2F%2Fapi.local.ibp.org%2Flogin%2Fcallback%3Fclient_name%3DfacebookClient&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_website%2Cuser_work_history&state=biodiv-api-state",
+            url: "https://www.facebook.com/dialog/oauth?response_type=code&client_id=115305755799166&redirect_uri=http%3A%2F%2Fapi.local.ibp.org%2Flogin%2Fcallback%3Fclient_name%3DfacebookClient&scope=user_likes%2Cuser_about_me%2Cuser_birthday%2Cuser_education_history%2Cemail%2Cuser_hometown%2Cuser_relationship_details%2Cuser_location%2Cuser_religion_politics%2Cuser_relationships%2Cuser_work_history&state=biodiv-api-state",
             method: "GET",
             headers: {
                 "cache-control": "no-cache",
@@ -252,7 +259,7 @@ $(document).ready(function() {
         /*
          var clickedObject = this;
          var scope = { scope: "" };
-        scope.scope = "email,user_about_me,user_location,user_hometown,user_website";
+        scope.scope = "email,user_about_me,user_location,user_hometown";
 
         window.fbEnsure(function() {
             FB.login(function(response) {

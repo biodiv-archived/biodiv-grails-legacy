@@ -10,13 +10,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Properties;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.util.ReflectHelper;
 import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
-import org.postgresql.util.PGobject;
-
-
+import org.hibernate.engine.spi.SessionImplementor;
 
 public class JSONType implements UserType {
 
@@ -33,7 +29,7 @@ public class JSONType implements UserType {
   private static final String JSON_TYPE = "json";
 
   @Override
-  public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws HibernateException, SQLException{
+  public Object nullSafeGet(ResultSet rs, String[] names,  SessionImplementor session, Object owner) throws HibernateException, SQLException{
 
       // System.out.println("*****************y***********************************************");
       // System.out.println("*************************************************getting activityfeed json");
@@ -45,7 +41,7 @@ public class JSONType implements UserType {
   }
 
   @Override
-  public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException, SQLException {
+  public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session) throws HibernateException, SQLException {
 
 
       // System.out.println("***********x*****************************************************");

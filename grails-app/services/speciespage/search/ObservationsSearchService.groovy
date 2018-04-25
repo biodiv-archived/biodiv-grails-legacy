@@ -6,8 +6,9 @@ import java.util.Map
 import grails.converters.JSON;
 
 import java.text.SimpleDateFormat;
-
+import org.codehaus.groovy.grails.web.json.JSONArray;
 import groovy.sql.Sql;
+import groovy.json.JsonSlurper
 import species.CommonNames
 import species.Habitat;
 import species.NamesParser
@@ -15,11 +16,15 @@ import species.Synonyms
 import species.TaxonomyDefinition
 import species.auth.SUser;
 import species.groups.SpeciesGroup;
+
 import species.participation.Observation;
 import species.participation.Checklists;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
+
+import org.codehaus.groovy.grails.web.json.JSONObject;
+
 import com.vividsolutions.jts.geom.Point
 import com.vividsolutions.jts.io.WKTWriter;
 import species.UtilsService
@@ -37,7 +42,7 @@ class ObservationsSearchService extends AbstractSearchService {
         log.info "Initializing publishing to observations search index"
 
         //TODO: change limit
-        int limit = BATCH_SIZE//Observation.count()+1,
+        int limit = BATCH_SIZE //Observation.count()+1,
         int offset = 0;
         int noIndexed = 0;
 
@@ -47,7 +52,7 @@ class ObservationsSearchService extends AbstractSearchService {
         if(limit > INDEX_DOCS) limit = INDEX_DOCS
         while(noIndexed < INDEX_DOCS) {
             Observation.withNewTransaction([readOnly:true]) { status ->
-                observations = Observation.findAllByIsShowableAndIsDeleted(true, false, [max:limit, offset:offset, sort:'id',readOnly:true]);
+                observations = Observation.findAllByIsDeleted(false, [max:limit, offset:offset, sort:'id',readOnly:true]);
                 noIndexed += observations.size()
                 if(!observations) return;
                 publishSearchIndex(observations, true);
@@ -72,14 +77,16 @@ class ObservationsSearchService extends AbstractSearchService {
         List docs = new ArrayList();
         Map names = [:];
         Map docsMap = [:]
+        List<Long> ids=new ArrayList<Long>();
 
         obvs.each { obv ->
             log.debug "Reading Observation : "+obv.id;
-            List edoc=getJson(obv);
-
-
+            ids.push(obv.id);
         }
+        List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
+         dataToElastic=getJson(ids);
 
+         postToElastic(dataToElastic);
 //        return commitDocs(docs, commit);
     }
 
@@ -87,9 +94,9 @@ class ObservationsSearchService extends AbstractSearchService {
         super.delete("observation",id.toString());
     }
 
-    List getJson(Observation obv) {
+    def getJson(List<Long> ids) {
         def sql =  Sql.newInstance(dataSource);
-
+          def sids=ids.join(",")
         String query = """
         SELECT obs.id,
             obs.version,
@@ -148,7 +155,6 @@ class ObservationsSearchService extends AbstractSearchService {
             obs.via_code AS viacode,
             obs.via_id AS viaid,
             obs.protocol,
-            obs.traits,
             obs.basis_of_record AS basisofrecord,
             obs.no_of_images AS noofimages,
             obs.no_of_videos AS noofvideos,
@@ -164,8 +170,6 @@ class ObservationsSearchService extends AbstractSearchService {
                 END AS name,
             t.position,
             t.rank,
-            tres.path,
-            tres.classification_id AS classificationid,
             resp.file_name AS thumbnail,
             array_remove(array_agg(DISTINCT ug.id), NULL::bigint) AS usergroupid,
             array_remove(array_agg(DISTINCT ug.name), NULL::character varying) AS usergroupname,
@@ -186,53 +190,109 @@ class ObservationsSearchService extends AbstractSearchService {
            LEFT JOIN taxonomy_definition t ON r.taxon_concept_id = t.id
            LEFT JOIN user_group_observations ugo ON obs.id = ugo.observation_id
            LEFT JOIN user_group ug ON ug.id = ugo.user_group_id
-           LEFT JOIN taxonomy_registry tres ON tres.taxon_definition_id = t.id
            LEFT JOIN featured f ON f.object_id = obs.id
-           WHERE (tres.classification_id = 265799 OR tres.classification_id IS NULL) and obs.is_deleted=false and obs.id="""+obv.id+"""
-          GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, t.canonical_form,t.normalized_form , r.name,r.taxon_concept_id, r.accepted_name_id, tres.path,
-          tres.classification_id, t.status, t.position, t.rank, resp.file_name  """;
+           WHERE obs.is_deleted=false and obs.id in  ( """+sids+""" )
+          GROUP BY obs.id, su.name, su.icon, su.profile_pic, sg.name, h.name, ll.name, l.name, t.canonical_form,t.normalized_form , r.name,r.taxon_concept_id,
+          r.accepted_name_id,t.status, t.position, t.rank, resp.file_name  """;
 
           println "Running sql for getting observation json";
 
+          println query;
+
+          String customFieldTableQuery="""select table_name from information_schema.tables where table_name like 'custom_fields_group%' """;
+          def customRows=sql.rows(customFieldTableQuery);
+          List<String> customFieldUserGroupArray=new ArrayList<String>();
+          customRows.each{ customRow ->
+              customRow.each { k,v ->
+              customFieldUserGroupArray.add(v.split("_")[3].toString());
+              }
+          }
+
+
+          /*
+          Query for path and classificationid
+          */
+          String queryForPathAndClassification="""select obv.id,tres.path,tres.classification_id as classificationid
+                                                  from observation obv
+                                                   left join recommendation r on obv.max_voted_reco_id=r.id
+                                                   left join taxonomy_definition t on r.taxon_concept_id=t.id
+                                                   left join taxonomy_registry tres on tres.taxon_definition_id=t.id
+                                                    where (tres.classification_id=265799 or tres.classification_id=null)
+                                                    and obv.id in ( """+sids+""" )""";
+
+                                                    println  queryForPathAndClassification;
+
+          def queryForPathAndClassificationResult=sql.rows(queryForPathAndClassification);
+
+          Map<String,Map<String,String>> pathClassification=new HashMap<String,Map<String,String>>();
+
+
+          queryForPathAndClassificationResult.each { row ->
+              def id;
+              Map<String,String> pathClass=new HashMap<String,String>();
+              row.each { k,v ->
+                if(k!="id"){
+                  pathClass.put(k,v.toString());
+                }
+                else{
+                  id=v.toString();
+                }
+          }
+          pathClassification.put(id.toString(),pathClass);
+          }
+
         def obvRows = sql.rows(query);
+        List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
         obvRows.each { obvRow ->
             Map<String,Object> eData=new HashMap<String,Object>();
+
             obvRow.each { k, v ->
                 if(k=="usergroupid"){
+                    if(v!=null)
                     eData.put(k, v.getArray());
                 }
                 else if(k=="imageresource"){
+                    if(v!=null)
                     eData.put(k, v.getArray());
                   }
                 else if(k=="usergroupname"){
+                  if(v!=null)
                     eData.put(k, v.getArray());
                  }
                  else if(k=="urlresource"){
+                   if(v!=null)
                    eData.put(k,v.getArray());
                  }
                  else if(k=="featurednotes"){
+                   if(v!=null)
                    eData.put(k,v.getArray())
                  }
                  else if(k=="featuredgroups"){
+                   if(v!=null)
                    eData.put(k,v.getArray())
                  }
                 else if(k=="todate"){
-                    print v.class
+                  println v.getClass()
+                  if(v!=null)
                     eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
                 }
                 else if(k=="fromdate"){
-                    print v.class
+                    println v.getClass()
+                    if(v!=null)
                     eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
                 }
                 else if(k=="lastrevised"){
-                    print v.class
+                    println v.getClass()
+                    if(v!=null)
                     eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
                 }
                 else if(k=="createdon"){
-                    print v.class
+                      println v.getClass()
+                      if(v!=null)
                     eData.put(k,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
                 }
                 else{
+                  if(v!=null)
                     eData.put(k, v.toString());
                 }
               }
@@ -241,51 +301,285 @@ def fromdate=obvRow.get("fromdate");
 def geoPrivacyAdjust = Utils.getRandomFloat()
 def longitude = obvRow.get("longitude") + geoPrivacyAdjust
 def latitude = obvRow.get("latitude") + geoPrivacyAdjust
-def location="["+longitude+","+ latitude+"]";
+List<Double> location=new ArrayList<Double>();
+location.add(longitude);
+location.add(latitude);
 eData.put("location",location);
 eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));
 eData.put("checklistannotations",null);
 
-def traits = obvRow.get("traits");
-if(traits) {
-    traits.each {traitDetails ->
-        println traitDetails;
-        traitDetails.getArray().each { t1 ->
-            String traitKey = "trait_"+t1[0];
-            if(!eData[traitKey]) eData[traitKey] = [];
-            t1.eachWithIndex { t2, index ->
-                println t2;
-                if(index > 0) {
-                    eData[traitKey] << t2
+def id=obvRow.get("id");
+
+/**
+Observation classificationid and path related data
+*/
+Map<String, String> pathclassData=new HashMap<String,String>();
+pathclassData=pathClassification.get(id.toString());
+if(pathclassData!=null){
+  eData.put("path",pathclassData.get("path"));
+  eData.put("classificationid",pathclassData.get("classificationid"));
+}
+else{
+  eData.put("path",null);
+  eData.put("classificationid",null);
+}
+
+
+Map<String, Object> traits=new HashMap<String,Object>();
+Map<String, Object> traits_json=new HashMap<String,Object>();
+Map<String, Object> traits_season=new HashMap<String,Object>();
+Map<String, Object> custom_fields=new HashMap<String,Object>();
+
+// def userGroupId=eData.get("usergroupid")
+// for(int i=0;i<userGroupId.length;i++){
+//   if(userGroupId[i].toString() in customFieldUserGroupArray){
+//
+//       String custFieldQuery="""select * from custom_fields_group_"""+userGroupId+""" where observation_id="""+id;
+//       def customFieldValues = sql.rows(custFieldQuery);
+//       customFieldValues.each{ row ->
+//           row.each { k,v ->
+//           custom_fields.put(k,v);
+//
+//       }
+//
+//   }
+// }
+// }
+
+
+
+
+
+String traitKeyValueQuery =
+ """
+ select g.traits from (
+ 	select
+ 	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits
+ 	from (
+ 	select f.object_id, t.id as tid ,json_agg(DISTINCT tv.value) AS tvalues from fact f, trait t, trait_value tv
+        where f.trait_instance_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation'  group by f.object_id,t.id
+ 	) x group by x.object_id
+ 	) g where g.object_id="""+id;
+
+   def traitKeyValue = sql.rows(traitKeyValueQuery);
+
+traitKeyValue.each { rows ->
+  rows.each{ row ->
+    JSONArray array = new JSONArray(row.getValue().toString());
+for(int i=0; i<array.length(); i++){
+    JSONObject jsonObj = array.getJSONObject(i);
+    jsonObj.each{ k,v ->
+            String key="trait_"+k;
+                traits.put(key,v);
+                }
+                                    }
+          }
+
+  }
+/*
+For Numeric Range Query
+*/
+
+  String traitRangeNumericQuery=
+  """
+  select g.traits from (
+	select
+	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']' as traits
+	from (
+	select  f.object_id, t.id as tid,ARRAY[f.value,f.to_value] as tvalues from fact f, trait t
+	where f.trait_instance_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation'
+) x group by x.object_id
+) g where g.object_id="""+id;
+  def traitrangeNumeric=sql.rows(traitRangeNumericQuery);
+
+  traitrangeNumeric.each { rows ->
+    rows.each{ row ->
+      JSONArray array = new JSONArray(row.getValue().toString());
+  for(int i=0; i<array.length(); i++){
+      JSONObject jsonObj = array.getJSONObject(i);
+      jsonObj.each{ k,v ->
+              String key="trait_"+k;
+                  traits.put(key,v);
+                  }
+              }
+            }
+
+    }
+
+  String traitColorQuery=
+  """
+  select g.traits from (
+	select
+	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.tvalues)), ',') || ']'  as traits
+	 from (
+	select f.object_id,t.id as tid,  array_agg(DISTINCT f.value) AS tvalues from fact f, trait t
+	 where  f.trait_instance_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation'  group by f.object_id,t.id
+) x group by x.object_id
+) g where g.object_id="""+id;
+  def traitColor=sql.rows(traitColorQuery);
+  traitColor.each { rows ->
+    rows.each{ row ->
+      JSONArray array = new JSONArray(row.getValue().toString());
+  for(int i=0; i<array.length(); i++){
+      JSONObject jsonObj = array.getJSONObject(i);
+      println jsonObj;
+      jsonObj.each{ k,v ->
+              String key="trait_"+k;
+              List<Map<String,Object>> ColorArray=new ArrayList<Map<String,Object>>();
+                    for(int j=0;j<v.length();j++){
+                      String newrgb=v[j].trim().substring(4,v[j].length()-1);
+			                String[] items =newrgb.split(",");
+                      List<Integer> rgbList=new ArrayList<Integer>();
+                			for(String x:items){
+                				rgbList.add(Integer.parseInt(x));
+                			}
+                      Map hsbvals=[:];
+                			 hsbvals=rgbToHSV(rgbList.get(0), rgbList.get(1), rgbList.get(2));
+                			Map<String,Object> hslMap=new HashMap<String,Object>();
+                			hslMap.put("h", hsbvals.get("hue"));
+                			hslMap.put("s", hsbvals.get("saturation"));
+                			hslMap.put("l", hsbvals.get("value"));
+                      ColorArray.add(hslMap);
+                    }
+                    traits_json.put(key,ColorArray);
+                  }
                 }
             }
-        }
+
     }
-}
-eData.remove('traits');
 
-postToElastic(eData);
-}
+    /*tRaits for datequery
+    */
+
+  String traitDateQuery=
+  """
+  select g.traits from (
+	select
+	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits
+	 from (
+	select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t
+	 where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units!='MONTH') and f.object_type='species.participation.Observation'
+	) x group by x.object_id
+	) g where g.object_id="""+id;
+  def traitDate=sql.rows(traitDateQuery);
+
+  traitDate.each { rows ->
+    rows.each{ row ->
+      JSONArray array = new JSONArray(row.getValue().toString());
+  for(int i=0; i<array.length(); i++){
+      JSONObject jsonObj = array.getJSONObject(i);
+      jsonObj.each{ k,v ->
+              String key="trait_"+k;
+                  traits.put(key,new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(v));
+                  }
+              }
+            }
+
+    }
+
+    String traitSeasonDateQuery=
+    """
+    select g.traits from (
+  	select
+  	 x.object_id,  '[' || string_agg(format('{%s:%s}', to_json(x.tid), to_json(x.dates)), ',') || ']' as traits
+  	 from (
+  	select f.object_id,t.id as tid, ARRAY[f.from_date,f.to_date] as dates from fact f, trait t
+  	 where f.trait_instance_id = t.id and (t.data_types='DATE') and (t.units='MONTH')  and f.object_type='species.participation.Observation'
+  	) x group by x.object_id
+  	) g where g.object_id="""+id;
+    def traitSeasonDate=sql.rows(traitSeasonDateQuery);
+
+    traitSeasonDate.each { rows ->
+      rows.each{ row ->
+        JSONArray array = new JSONArray(row.getValue().toString());
+    for(int i=0; i<array.length(); i++){
+        JSONObject jsonObj = array.getJSONObject(i);
+        jsonObj.each{ k,v ->
+                String key="trait_"+k;
+                  Map<String,Object> dates=new HashMap<String,Object>();
+                    dates.put("gte",v[0]);
+                    dates.put("lte",v[1]);
+                    traits_season.put(key,dates);
+                    }
+                }
+              }
+
+      }
+
+/*
+Queries for Getting custom fields for particular observation id
+
+*/
+
+eData.put("traits",traits);
+eData.put("traits_json",traits_json);
+eData.put("traits_season",traits_season);
+dataToElastic.add(eData);
 }
 
-    void postToElastic(Map doc) {
+return dataToElastic;
+}
+
+def rgbToHSV(red, green, blue) {
+    float r = red / 255f
+    float g = green / 255f
+    float b = blue / 255f
+    float max = [r, g, b].max()
+    float min = [r, g, b].min()
+    float delta = max - min
+    def hue = 0
+    def saturation = 0
+    if (max == min) {
+        hue = 0
+    } else if (max == r) {
+        def h1 = (g - b) / delta / 6
+        def h2 = h1.asType(int)
+        if (h1 < 0) {
+            hue = (360 * (1 + h1 - h2)).round()
+        } else {
+            hue = (360 * (h1 - h2)).round()
+        }
+        log.trace("rgbToHSV: red max=${max} min=${min} delta=${delta} h1=${h1} h2=${h2} hue=${hue}")
+    } else if (max == g) {
+        hue = 60 * ((b - r) / delta + 2)
+        log.trace("rgbToHSV: green hue=${hue}")
+    } else {
+        hue = 60 * ((r - g) / (max - min) + 4)
+        log.trace("rgbToHSV: blue hue=${hue}")
+    }
+
+    if (max == 0) {
+        saturation = 0
+    } else {
+        saturation = delta / max * 100
+    }
+
+    def value = max * 100
+
+    return [
+        "red": red.asType(int),
+        "green": green.asType(int),
+        "blue": blue.asType(int),
+        "hue": hue.asType(int),
+        "saturation": saturation.asType(int),
+        "value": value.asType(int),
+    ]
+}
+
+    void postToElastic(List<Map<String,Object>> doc) {
       if(!doc) return;
-      println doc
+
         def searchConfig = grailsApplication.config.speciesPortal
       def URL=searchConfig.search.nakshaURL;
 
         def http = new HTTPBuilder(URL)
         http.request(Method.POST, groovyx.net.http.ContentType.JSON) {
-            uri.path = "/biodiv-api/naksha/observation/observation/${doc.id}";
+            uri.path = "/naksha/services/bulk-upload/observation/observation";
             body = doc
-
             response.success = { resp, reader ->
-                log.debug "Successfully posted observation ${doc.id} to elastic"
+                log.debug "Successfully posted observation  to elastic"
             }
-            response.'404' = {
-              println 'Not found';
-              log.debug "Error in posting observation to elastic : Not found";
-            }
+            response.failure = { resp ->  log.error 'Request failed : '+resp }
         }
     }
 

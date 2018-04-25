@@ -23,7 +23,6 @@
         <g:render template="/common/titleTemplate" model="['title':title, 'description':description, 'canonicalUrl':canonicalUrl, 'imagePath':imagePath]"/>
 
 
-        <gvisualization:apiImport />
         <g:set var="entityName"
             value="${message(code: 'SUser.label', default: 'SUser')}" />
 

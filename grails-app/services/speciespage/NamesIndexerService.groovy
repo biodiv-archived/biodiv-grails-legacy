@@ -51,8 +51,8 @@ class NamesIndexerService {
 	void rebuild() {
 		log.info "Publishing names to autocomplete index";
 		
-		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(500);
+//		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(500);
 		
 		Lookup lookup1 = new TSTLookup();
 
@@ -104,7 +104,7 @@ class NamesIndexerService {
 		}catch(e){
 			e.printStackTrace()
 		}finally{
-			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		}
 	}
 
@@ -411,8 +411,8 @@ class NamesIndexerService {
 	void rebuildTest() {
 		log.info "Publishing names to autocomplete index";
 		
-		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-		dataSource.setUnreturnedConnectionTimeout(500);
+//		int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//		dataSource.setUnreturnedConnectionTimeout(500);
 		
 		Lookup lookup1 = new TSTLookup();
 
@@ -517,7 +517,7 @@ class NamesIndexerService {
 		}catch(e){
 			e.printStackTrace()
 		}finally{
-			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//			dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 		}
 	}
 }

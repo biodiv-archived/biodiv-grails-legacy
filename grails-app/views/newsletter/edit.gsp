@@ -46,9 +46,7 @@
 						<tr class="prop">
 							<td valign="top"
 								class="value ${hasErrors(bean: newsletterInstance, field: 'newsitem', 'errors')}">
-								<ckeditor:editor name="newsitem" height="400px" userSpace="${params.webaddress }">
-									${newsletterInstance?.newsitem}
-								</ckeditor:editor>
+								<textarea id="newsitem" name="newsitem" >${newsletterInstance?.newsitem}</textarea>
 							</td>
 						</tr>
 						<g:render template="language_wrapTemplate" model="['newsletterInstance':newsletterInstance,userLanguage:userLanguage]" />
@@ -107,7 +105,8 @@
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/ofm/filemanager&viewMode=grid&space=newsletters/${params.webaddress}&type=Image",
                     filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/uploader?type=Image&userSpace=${params.webaddress}",
 
-                        height: '400px'
+                        height: '400px',
+                        allowedContent : true
                 };
 
 		$(document).ready(function(){

@@ -27,7 +27,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
 
                     var contributorId = $('#contributorUserIds').data('contributorid'); 
                     var contributorName = $('#contributorUserIds').data('contributorname'); 
-                    if(contributorId != '' )
+                    if(contributorId != ''  && dataTable_contributor_autofillUsersComp[0])
                         dataTable_contributor_autofillUsersComp[0].addUserId({'item':{'userId':contributorId, 'value':contributorName}});
 
                     $('.addDataTable #speciesGroupFilter button').click(function(e){

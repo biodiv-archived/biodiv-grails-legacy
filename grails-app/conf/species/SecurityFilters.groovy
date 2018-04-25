@@ -65,7 +65,8 @@ class SecurityFilters {
                 if(request.forwardURI.startsWith("/${appName}/api/")) {
                     if (!actionName) actionName = 'index'
                         println "MATCHED--------${params.controller}------${params.action}---${controllerName}--${actionName}------------)"
-                        for( cc in Holders.findApplication().controllerClasses) {
+                        params.format='json';
+                        for( cc in grailsApplication.controllerClasses) {
                             for (m in cc.clazz.methods) {
                                 def ann = m.getAnnotation(grails.plugin.springsecurity.annotation.Secured)
                                 if (ann) {

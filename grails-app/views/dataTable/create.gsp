@@ -132,7 +132,8 @@
                     filebrowserImageBrowseUrl: "/${grailsApplication.metadata['app.name']}/ck/ofm?fileConnector=/${grailsApplication.metadata['app.name']}/ck/ofm/filemanager&viewMode=grid&space=newsletters/${params.webaddress}&type=Image",
                     filebrowserImageUploadUrl: "/${grailsApplication.metadata['app.name']}/ck/uploader?type=Image&userSpace=${params.webaddress}",
 
-                        height: '400px'
+                        height: '400px',
+                        allowedContent : true
                 };
 
 

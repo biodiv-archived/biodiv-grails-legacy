@@ -10,6 +10,13 @@ import species.trait.Trait.DataTypes;
 
 import grails.converters.JSON
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="fact", include = "non-lazy")
+//@JsonIgnoreProperties([])
 class Fact {
 
     Trait traitInstance;
@@ -48,6 +55,7 @@ class Fact {
         description type:"text"
         attribution type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "fact_id_seq"] 
+        cache include: 'non-lazy'
     }
 
     String getActivityDescription() {

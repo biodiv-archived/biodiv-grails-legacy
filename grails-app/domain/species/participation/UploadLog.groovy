@@ -9,7 +9,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log;
 import org.apache.log4j.Level;
-
+import grails.util.Holders;
 class UploadLog {
     private static Log log = LogFactory.getLog(this);
 
@@ -124,7 +124,7 @@ paramsMapAsText type:'text';
             println "===================="
             println filePath
 
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir;
             File ipFile = new File(filePath);
             String tmpFileName = ipFile.getName()+".log";

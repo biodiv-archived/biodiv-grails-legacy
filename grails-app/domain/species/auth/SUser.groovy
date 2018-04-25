@@ -21,12 +21,20 @@ import species.SpeciesPermission;
 import species.Language;
 import species.auth.OAuthID;
 import org.springframework.context.MessageSourceResolvable;
-class SUser {
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="user", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
+//@JsonIgnoreProperties(['authorities'])
+class SUser  implements Serializable {
 
 	public enum SexType implements org.springframework.context.MessageSourceResolvable{
         Male("Male"),
         Female("Female"),
-        
+
 
         private String value;
 
@@ -51,12 +59,12 @@ class SUser {
         String[] getCodes() {
 
             ["${getClass().name}.${name()}"] as String[]
-        }   
+        }
         String getDefaultMessage() { value() }
 
 
     }
-   
+
     public enum OccupationType implements org.springframework.context.MessageSourceResolvable{
         Agriculture("Agriculture"),
 		Business("Business"),
@@ -65,7 +73,7 @@ class SUser {
 		Research("Research"),
 		Student("Student"),
 		Other("Other"),
-        
+
 
         private String value;
 
@@ -95,7 +103,7 @@ class SUser {
         String[] getCodes() {
 
             ["${getClass().name}.${name()}"] as String[]
-        }   
+        }
         String getDefaultMessage() { value() }
 
 
@@ -132,11 +140,11 @@ class SUser {
         String[] getCodes() {
 
             ["${getClass().name}.${name()}"] as String[]
-        }   
+        }
         String getDefaultMessage() { value() }
 
 
-    } 
+    }
 
     SexType sexType;
     OccupationType occupationType;
@@ -203,20 +211,26 @@ class SUser {
 
 	static mapping = {
 		/*
-		 * Just keep in mind that the UUIDHexGenerator is not generating globally unique identifiers, 
-		 * as Java can only acquire the IP address of the machine it’s running on 
-		 * and not the MAC address of the network interface. 
-		 * Also you have to be careful not to run into any conditions where the external system 
+		 * Just keep in mind that the UUIDHexGenerator is not generating globally unique identifiers,
+		 * as Java can only acquire the IP address of the machine it’s running on
+		 * and not the MAC address of the network interface.
+		 * Also you have to be careful not to run into any conditions where the external system
 		 * could create the same IDs that you generate internally.
 		 */
-		id generator:"species.utils.PrefillableUUIDHexGenerator", params:[sequence_name: "suser_id_seq"] 
+		id generator:"species.utils.PrefillableUUIDHexGenerator", params:[sequence_name: "suser_id_seq"]
 
 		password column: '`password`'
 		aboutMe type:"text";
 		autoTimestamp false;
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 
+    @JsonIgnore
 	Set<Role> getAuthorities() {
+        return fetchAuthorities();
+    }
+
+	Set<Role> fetchAuthorities() {
 		SUserRole.findAllBySUser(this).collect { it.role } as Set
 	}
 
@@ -318,7 +332,8 @@ class SUser {
 		uGroups.each {
             try{
                 log.debug "Checking if user has write permission on ${it}"
-                if(aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)|| utilsService.isAdmin()) {
+
+                if(utilsService.isAdmin() || aclUtilService.hasPermission(springSecurityService.getAuthentication(), it, BasePermission.WRITE)) {
                     userGroups.add(it)
                 }
             } catch(e) {
@@ -333,7 +348,7 @@ class SUser {
 	boolean isUserGroupMember(UserGroup userGroup) {
 		return UserGroupMemberRole.countBySUserAndUserGroup(this, userGroup) ?: 0
 	}
-	
+
 	boolean fetchIsFounderOrExpert(){
 		return UserGroupMemberRole.createCriteria().count {
 			and{
@@ -401,4 +416,61 @@ class SUser {
 		return true;
 	}
 
+    public void setSexType(String sexType) {
+        SexType.toList().each {
+            if(it.value().equalsIgnoreCase(sexType))
+                this.sexType = it;
+        }
+    }
+
+    public void setOccupationType(String occupationType) {
+        OccupationType.toList().each {
+            if(it.value().equalsIgnoreCase(occupationType))
+                this.occupationType = it;
+        }
+    }
+
+    public void setInstitutionType(String institutionType) {
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        InstitutionType.toList().each {
+            if(it.value().equalsIgnoreCase(institutionType))
+                this.institutionType = it;
+        }
+    }
+
+    public void setSexType(sexType) {
+        println "sexType##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.sexType = sexType;
+    }
+
+    public void setOccupationType(occupationType) {
+        println "occupationType##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.occupationType = occupationType;
+    }
+
+    public void setInstitutionType( institutionType) {
+        println "institutionType##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        this.institutionType = institutionType;
+    }
 }
