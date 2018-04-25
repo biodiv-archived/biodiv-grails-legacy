@@ -185,7 +185,8 @@
                     enterMode:CKEDITOR.ENTER_BR,
                     autoParagraph:false,
                     fillEmptyBlocks:false,
-                    contentsCss:'/assets/all/ckeditorCss.css'
+                    contentsCss:'/assets/all/ckeditorCss.css',
+                    allowedContent : true
                     //uiColor:'#AADC6F'
                 };
                 var speciesId = ${speciesInstance?.id}
