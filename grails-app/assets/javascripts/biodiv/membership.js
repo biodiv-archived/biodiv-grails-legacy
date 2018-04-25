@@ -388,6 +388,7 @@ function rating() {
 
 function last_actions() {
     console.log('last actions');
+    $('body[style]').attr('style', '');
     $(".ellipsis.multiline").trunk8({
         lines:4,
         tooltip:false,
