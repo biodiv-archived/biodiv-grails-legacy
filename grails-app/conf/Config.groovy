@@ -86,21 +86,23 @@ def log4jConsoleLogLevel = Priority.DEBUG
 
 
 grails.gorm.default.mapping = {
-cache true
+cache false
 /*id generator:'increment'*/
 /* Added by the Hibernate Spatial Plugin. */
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.GeometryCollection)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LineString)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Point)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygon)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiLineString)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPoint)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.MultiPolygon)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.LinearRing)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Puntal)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Lineal)
-'user-type'(type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Polygonal)
+
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Geometry)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.GeometryCollection)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.LineString)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Point)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Polygon)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.MultiLineString)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.MultiPoint)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.MultiPolygon)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.LinearRing)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Puntal)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Lineal)
+'user-type'(type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Polygonal)
+
 'user-type'( type:org.hibernate.type.YesNoType, class:Boolean )
 }
 
@@ -1770,6 +1772,38 @@ grails {
     }
 }
 */
+redissonConfig="${speciesPortal.app.rootDir}/redisson.yaml"
+redis {
+    // Connection details (default: localhost:6379)
+    host = localhost
+    port = 6379
+
+    // Connection timeout
+    timeout = 2000
+
+    // Password to access Redis (optional)
+    password = secret
+
+    // database for hibernate cache (default 0)
+    database=1
+
+    redis.expiryInSeconds.default=120
+    redis.expiryInSeconds.hibernate.common=0
+    redis.expiryInSeconds.hibernate.account=1200
+/*
+    expiryInSeconds {
+        // hiberante 2nd cache default expiry (seconds)
+        default = 120
+
+        // expiry of hibernate.common region (seconds) // hibernate is prefix, region name is test.Author
+        expiryInSeconds.biodiv-hibernate.test.Author = 0
+
+        // expiry of hibernate.account region (seconds) // hibernate is prefix, region name is test.Book
+        expiryInSeconds.biodiv-hibernate.test.Book = 1200
+    }
+*/
+}
+
 grails.assets.bundle=true
 grails.assets.minifyJs=false
 cors.enabled = true;

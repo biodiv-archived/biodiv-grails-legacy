@@ -497,14 +497,16 @@ println queryParts.queryParams
 		switch(tagType){
 			case GrailsNameUtils.getPropertyName(Document.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Document)
+					//tags = TagCloudUtil.tags(Document)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.documents?.collect{it.id}, tagType)
 				}
 				break
 			case GrailsNameUtils.getPropertyName(Project.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Project)
+					//tags = TagCloudUtil.tags(Project)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.projects?.collect{it.id}, tagType)
 				}
@@ -512,7 +514,8 @@ println queryParts.queryParams
 			
 			case GrailsNameUtils.getPropertyName(Discussion.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Discussion)
+					//tags = TagCloudUtil.tags(Discussion)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.discussions?.collect{it.id}, tagType)
 				}
@@ -528,16 +531,24 @@ println queryParts.queryParams
 	private Map getTags(ids, tagType){
 		int tagsLimit = 1000;
 		LinkedHashMap tags = [:]
-		if(!ids){
-			return tags
-		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.tag_ref in " + getSqlInCluase(ids)  + " and  tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query;
+        if(ids == null) {
+            query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+            sql.rows(query).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
+        } else {
+            query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.tag_ref in " + getSqlInCluase(ids)  + " and  tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+            sql.rows(query, ids).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
 
-		sql.rows(query, ids).each{
-			tags[it.getProperty("name")] = it.getProperty("obv_count");
-		};
+        }
+        println "#######################################tags"
+        log.debug query;
+
 		return tags;
 	}
 	

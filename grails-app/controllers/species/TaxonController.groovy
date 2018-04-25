@@ -20,7 +20,6 @@ import species.auth.SUser;
 import species.ScientificName.RelationShip
 import species.NamesMetadata.NamePosition;
 import grails.converters.XML;
-import grails.plugin.cache.Cacheable;
 
 
 import species.utils.ImageType
@@ -189,8 +188,15 @@ private List buildlistResult(rs,classSystem) {
         Long speciesid = params.speciesid ? Long.parseLong(params.speciesid) : null
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
-
-        return _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
+        String cacheKey = "${params.controller}-${params.action}-${classSystem?:''}-${parentId?:''}-${level}-${expandAll}-${expandSpecies}-${expandTaxon}-${speciesid?:''}-${taxonId?:''}-"
+        String cacheName = 'taxon-hierarchy';
+        //String resultStr = utilsService.getFromCache(cacheName, cacheKey);
+        def result = utilsService.getFromCache(cacheName, cacheKey);//resultStr ? JSON.parse(resultStr) : null;
+        if(!result) {
+            result = _listHierarchy(parentId, level, expandAll, expandSpecies, classSystem, speciesid, expandTaxon, taxonId)
+            utilsService.putInCache(cacheName, cacheKey, result);
+        }
+        render result as JSON
     }
 
     private _listHierarchy(String parentId, int level, boolean expandAll, boolean expandSpecies, Long classSystem, Long speciesid, boolean expandTaxon, Long taxonId) {
@@ -231,7 +237,7 @@ private List buildlistResult(rs,classSystem) {
             }*/
         }
         log.debug "Time taken to build hierarchy : ${(System.currentTimeMillis()- startTime)/1000}(sec)"
-        render buildHierarchyResult(rs, classSystem) as JSON
+        return buildHierarchyResult(rs, classSystem) 
     }
 
 

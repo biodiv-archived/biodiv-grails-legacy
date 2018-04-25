@@ -16,11 +16,16 @@ import species.TaxonomyDefinition;
 import species.auth.SUser;
 import speciespage.ObservationService;
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * @author sravanthi
  *
  */
-
+@JsonIgnoreProperties([])
 class GeographicalCoverage {
 	//Geographic Coverage
 	String placeName;
@@ -30,6 +35,8 @@ class GeographicalCoverage {
 	//XXX to be removed after locationScale migration
 	String locationAccuracy;
 //	LocationScale locationScale;
+
+    @JsonIgnore
 	Geometry topology;
 
 	double latitude;
@@ -54,7 +61,7 @@ class GeographicalCoverage {
 
 	static mapping = {
 		columns {
-			topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
+			topology (type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Geometry)
 		}
 	}
 

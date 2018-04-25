@@ -489,21 +489,21 @@ class UserGroupTagLib {
     def showNoOfFoundedUserGroups  = {attrs, body->
         def userInstance = attrs.model?.userInstance;
         def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
-		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role, [cache:true]);
         out <<  "<div class=countvaluecontributed>"+count+"</div>"
     }
 
 	def showNoOfMemberUserGroups  = {attrs, body->
 		def userInstance = attrs.model?.userInstance;
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
-		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role, [cache:true]);
 		out <<  "<div class=countvalue>"+count+"</div>"
 	}
 
     def showNoOfExpertUserGroups  = {attrs, body->
 		def userInstance = attrs.model?.userInstance;
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
-		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role);
+		int count = UserGroupMemberRole.countBySUserAndRole(userInstance, role, [cache:true]);
 		out <<  "<div class=countvalue>"+count+"</div>"
 	}
 

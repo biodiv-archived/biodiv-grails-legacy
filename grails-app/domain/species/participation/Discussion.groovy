@@ -15,7 +15,7 @@ import species.participation.Featured;
 import species.Language;
 import species.Resource;
 
-class Discussion implements Taggable, Rateable {
+class Discussion implements Taggable, Rateable,  Serializable {
 	
 	def springSecurityService;
 	def commentService;
@@ -134,4 +134,19 @@ class Discussion implements Taggable, Rateable {
 		return body
 	}
 	
+    static long countDiscussions() {
+        def c = Discussion.createCriteria();
+println "countDIscussions%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        def count = c.count {
+            cache true;
+        }
+println "countDIscussions%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        return count;
+    }
 }

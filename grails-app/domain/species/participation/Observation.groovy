@@ -31,7 +31,14 @@ import species.trait.Fact;
 import species.groups.UserGroup.FilterRule;
 import species.dataset.DataTable;
 
-class Observation extends DataObject {
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@Cache(region="observation", include = "non-lazy")
+@JsonIgnoreProperties(['userGroups', 'resource', 'recommendationVote', 'annotations'])
+class Observation extends DataObject  implements Serializable {
 
 	def dataSource
 	def commentService;
@@ -194,7 +201,7 @@ class Observation extends DataObject {
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists, Dataset, DataTable]
-    static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
+    //static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
 
  	static constraints = {
 		notes nullable:true
@@ -233,6 +240,7 @@ class Observation extends DataObject {
 		autoTimestamp false
 		tablePerHierarchy false
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "observation_id_seq"]
+        //cache include: 'non-lazy'
 	 }
 
 	/**
@@ -328,6 +336,7 @@ class Observation extends DataObject {
         return observationService.suggestedCommonNames(this, recoId);
     }
 
+    @JsonIgnore
 	static String getFormattedCommonNames(Map langToCommonName, boolean addLanguage){
 		if(langToCommonName.isEmpty()){
 			return ""
@@ -367,10 +376,12 @@ class Observation extends DataObject {
 	 *
 	 * @return
 	 */
+    @JsonIgnore
 	def getRecommendationVotes(int limit, long offset) {
         return observationService.getRecommendationVotes(this, limit, offset);
 	}
 
+    @JsonIgnore
 	def getRecommendationCount(){
 		Sql sql =  Sql.newInstance(dataSource);
 		def result = sql.rows("select count(distinct(recoVote.recommendation_id)) from recommendation_vote as recoVote where recoVote.observation_id = :obvId", [obvId:id])
@@ -422,6 +433,7 @@ class Observation extends DataObject {
 		//activityFeedService.updateIsShowable(this)
     }
 
+    @JsonIgnore
 	def getPageVisitCount(){
 		return visitCount;
 	}
@@ -658,6 +670,7 @@ class Observation extends DataObject {
 		return res
 	}
 
+    @JsonIgnore
 	def getOwner() {
 		return author;
 	}
@@ -783,6 +796,7 @@ class Observation extends DataObject {
 //		activityFeedService.getDomainObject(sourceType, sourceId).title
 //	}
 
+    @JsonIgnore
     def getObservationFeatures() {
         return observationService.getObservationFeatures(this);
     }
@@ -793,11 +807,17 @@ class Observation extends DataObject {
 
     static long countObservations() {
         def c = Observation.createCriteria();
+println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
         def observationCount = c.count {
             eq ('isDeleted', false);
             //eq ('isShowable', true);
             eq ('isChecklist', false);
+            cache true;
         }
+        println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         return observationCount;
     }
 
@@ -844,10 +864,12 @@ class Observation extends DataObject {
 		return (id != sourceId)
 	}
 
+    @JsonIgnore
     Map getTraits() {
         return getTraits(true, null, true);
     }
 
+    @JsonIgnore
     Map getCustomFields() {
     	return customFieldService.fetchAllCustomFields(this);
     }
@@ -872,6 +894,7 @@ class Observation extends DataObject {
         return isValid;
     }
 
+    @JsonIgnore
     List<UserGroup> getValidUserGroups() {
         List<UserGroup> userGroups = UserGroup.list();
         List<UserGroup> validUserGroups = [];
@@ -881,4 +904,25 @@ class Observation extends DataObject {
         }
         return validUserGroups;
     }
+
+    public void setBasisOfRecord(basisOfRecord) {
+        println "basisOfRecord##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.basisOfRecord = basisOfRecord;
+    }
+
+    public void setProtocol(protocol) {
+        println "protocol##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.protocol = protocol;
+    }
+
 }

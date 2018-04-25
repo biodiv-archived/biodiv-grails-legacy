@@ -1,6 +1,12 @@
 package species
 
-class Language {
+import com.fasterxml.jackson.annotation.JsonIgnore
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="language", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
+class Language  implements Serializable {
 	public static final String DEFAULT_LANGUAGE = "English";
 	private static final Random NUMBER_GENERATOR = new Random();
 	
@@ -11,6 +17,7 @@ class Language {
 	//to identify language for curation
 	boolean isDirty = false;
 
+    @JsonIgnore
     static Language defaultLanguage;
     static transients = ['defaultLanguage']
 
@@ -22,10 +29,10 @@ class Language {
 		isDirty(blank:false, nullable:false);
     }
 	
-	static mapping = {
+	static mapping = { 
 		version false;
 		sort 'name';
-        cache usage: 'read-only', include: 'non-lazy'
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
 	public static Language getLanguage(String languageName){
@@ -63,13 +70,13 @@ class Language {
 	}
 	
 	public static filteredList(){
-		return Language.findAllByIsDirtyOrRegionIsNotNull(true).collect{it.name;} ;
+		return Language.findAllByIsDirtyOrRegionIsNotNull(true, [cache:true]).collect{it.name;} ;
 	}
 
     static List<Language> list() { 
         return Language.createCriteria().list {
             order('name', 'asc')
-            cache true
+            //cache true
         }
     }
 

@@ -28,7 +28,12 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 import content.eml.Document;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+@JsonIgnoreProperties([])
 class DataTable extends CollMetadata {
 	
 	
@@ -69,6 +74,7 @@ class DataTable extends CollMetadata {
 	static mapping = {
 		tablePerHierarchy false;
 		id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "datatable_id_seq"]
+        //cache include: 'non-lazy'
 	}
     
 	def fetchColumnNames(){
@@ -193,11 +199,11 @@ println facts
 
    int getDataObjectsCount() {
        switch(dataTableType) {
-           case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false);
-           case DataTableType.DOCUMENTS : return Document.countByDataTableAndIsDeleted(this, false);
+           case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.DOCUMENTS : return Document.countByDataTableAndIsDeleted(this, false, [cache:true]);
        }
        return 0;
    }

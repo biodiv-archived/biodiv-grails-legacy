@@ -19,7 +19,7 @@ import species.License;
 import species.License.LicenseType;
 
 import species.Contributor;
-import org.hibernatespatial.GeometryUserType
+//import org.hibernatespatial.GeometryUserType
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Geometry;
@@ -40,10 +40,18 @@ import species.dataset.DataPackage.SupportingModules;
 
 import species.groups.UserGroup.FilterRule;
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@JsonIgnoreProperties([])
+
 /**
  * @author sravanthi
  *
  */
+
 abstract class CollMetadata implements Taggable, Rateable {
 
 	String title;
@@ -284,8 +292,11 @@ println params.fromDate
         println "==================================+++++"
         println "==================================+++++"
         List<FilterRule> filterRule = userGroup.getFilterRules();
+        println filterRule
         boolean isValid = true;
-        filterRule.each { fRule ->
+        filterRule.each {  fRule ->
+            println "==="
+            println fRule
             switch(fRule.fieldName) {
                 case 'topology' : 
                 if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
@@ -299,6 +310,7 @@ println params.fromDate
                 break;
             }
         }
+        println isValid
         return isValid;
     }
 

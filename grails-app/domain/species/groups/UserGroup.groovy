@@ -36,7 +36,6 @@ import species.dataset.DataTable;
 
 
 class UserGroup implements Taggable {
-
 	def dataSource;
 	def activityFeedService
 
@@ -103,7 +102,7 @@ class UserGroup implements Taggable {
 		description type:'text';
 		//aboutUs type:'text';
 		sort name:"asc"
-        cache true
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 		filterRule type:'text';
 	}
 
@@ -532,5 +531,21 @@ class UserGroup implements Taggable {
             this.ruleValues = ruleValues;
         }
 
+    }
+
+    static long countUserGroups() {
+        def c = UserGroup.createCriteria();
+println "countUserGroups%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        def count = c.count {
+            cache true;
+        }
+println "countUserGroups%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        return count;
     }
 }

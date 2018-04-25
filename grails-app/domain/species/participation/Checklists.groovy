@@ -18,7 +18,13 @@ import species.participation.ActivityFeedService
 
 import org.grails.rateable.*
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+@Cache(region="checklists", include = "non-lazy")
+@JsonIgnoreProperties(['userGroups'])
 class Checklists extends Observation {
 	
 	private static final String KEY_PREFIX = "## "
@@ -26,7 +32,9 @@ class Checklists extends Observation {
 	private static final String META_DATA = "checklist_metadata"
 	private static final String DATA = "checklist_data"
 	
+    @JsonIgnore
 	def activityFeedService;
+    @JsonIgnore
 	def obvUtilService;
 	
 	String title;
@@ -40,6 +48,7 @@ class Checklists extends Observation {
 	String rawChecklist;
 	
 	//to maintain order
+    @JsonIgnore
 	List observations;
 	
 	//dates
@@ -99,6 +108,7 @@ class Checklists extends Observation {
 		refText type:'text';
 		sourceText type:'text';
 		columns type:'text';
+        cache include: 'non-lazy'
 	}
 	
 	

@@ -67,7 +67,7 @@ public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.fa
 
 			token.details = userDetails
 			token.principal = userDetails//facebookAuthDao.getPrincipal(user)
-			token.authorities = userDetails.getAuthorities()
+			token.authorities = userDetails.fetchAuthorities()
 
 			try {
 				preAuthenticationChecks.check(userDetails);

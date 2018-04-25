@@ -3,8 +3,14 @@ package species.dataset
 import content.eml.UFile;
 import species.groups.UserGroup;
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@JsonIgnoreProperties([])
 class Dataset1 extends CollMetadata {
-	
+
     DataPackage dataPackage;
     UFile uFile;	
 	static hasMany = [dataTables: DataTable, userGroups:UserGroup];
@@ -16,6 +22,7 @@ class Dataset1 extends CollMetadata {
 
 	static mapping  = {
 		id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "dataset_id_seq"]
+//        cache include: 'non-lazy'
 	}
 
     int countByDataTable() {
