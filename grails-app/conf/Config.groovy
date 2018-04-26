@@ -1787,19 +1787,31 @@ redis {
     // database for hibernate cache (default 0)
     database=1
 
-    redis.expiryInSeconds.default=120
-    redis.expiryInSeconds.hibernate.common=0
-    redis.expiryInSeconds.hibernate.account=1200
+    maxmemory = 524288000 //500MB
+    //maxmemory-policy = "volatile-lru"
+    redis.expiryInSeconds.default=3000
+    redis.expiryInSeconds.biodivRedis.featured=21600 //6 hrs
+    redis.expiryInSeconds.biodivRedis.taxonHierarchy=21600
+    redis.expiryInSeconds.biodivRedis.resources=21600
+    redis.expiryInSeconds.biodivRedis.species.groups.SpeciesGroup=21600
+    redis.expiryInSeconds.biodivRedis.species.Habitat=21600
+    redis.expiryInSeconds.biodivRedis.species.License=21600
+    redis.expiryInSeconds.biodivRedis.species.Language=21600
+    redis.expiryInSeconds.biodivRedis.species.Classification=21600
+    redis.expiryInSeconds.biodivRedis.species.groups.UserGroup=21600
+    redis.expiryInSeconds.biodivRedis.species.Field=21600
+    redis.expiryInSeconds.biodivRedis.species.trait.TraitValue=21600
+    redis.expiryInSeconds.biodivRedis.species.dataset.DataPackage=21600
+    redis.expiryInSeconds.biodivRedis.species.auth.Role=21600
 /*
     expiryInSeconds {
         // hiberante 2nd cache default expiry (seconds)
         default = 120
 
-        // expiry of hibernate.common region (seconds) // hibernate is prefix, region name is test.Author
-        expiryInSeconds.biodiv-hibernate.test.Author = 0
+        expiryInSeconds.biodivRedis.test.Author = 0
 
         // expiry of hibernate.account region (seconds) // hibernate is prefix, region name is test.Book
-        expiryInSeconds.biodiv-hibernate.test.Book = 1200
+        expiryInSeconds.biodivRedis.test.Book = 1200
     }
 */
 }
