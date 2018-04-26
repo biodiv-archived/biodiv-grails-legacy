@@ -31,7 +31,7 @@ hibernate {
 //    cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
 //    cache.region.factory_class = 'grails.plugin.cache.ehcache.hibernate.BeanEhcacheRegionFactory' // For Hibernate before 4.0
     cache.region.factory_class = 'org.hibernate.cache.redis.hibernate4.GrailsRedisRegionFactory'
-    cache.region_prefix = "biodiv-hibernate"
+    cache.region_prefix = "biodivRedis"
     generate_statistics=true
     cache.use_structured_entries=true
 }

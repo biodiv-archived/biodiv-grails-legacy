@@ -189,7 +189,7 @@ private List buildlistResult(rs,classSystem) {
         def expandTaxon = params.expand_taxon  ? (new Boolean(params.expand_taxon)).booleanValue(): false
         Long taxonId = params.taxonid ? Long.parseLong(params.taxonid) : null
         String cacheKey = "${params.controller}-${params.action}-${classSystem?:''}-${parentId?:''}-${level}-${expandAll}-${expandSpecies}-${expandTaxon}-${speciesid?:''}-${taxonId?:''}-"
-        String cacheName = 'taxon-hierarchy';
+        String cacheName = 'taxonHierarchy';
         //String resultStr = utilsService.getFromCache(cacheName, cacheKey);
         def result = utilsService.getFromCache(cacheName, cacheKey);//resultStr ? JSON.parse(resultStr) : null;
         if(!result) {
