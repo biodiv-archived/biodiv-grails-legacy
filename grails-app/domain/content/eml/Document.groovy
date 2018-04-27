@@ -150,7 +150,7 @@ class Document extends DataObject implements Comparable {
         contributors type:"text"
         title type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "document_id_seq"] 
-        cache include: 'non-lazy'
+        //cache include: 'non-lazy'
     }
 
     List fetchAllFlags(){
