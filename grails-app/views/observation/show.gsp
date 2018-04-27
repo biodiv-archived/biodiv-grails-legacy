@@ -124,12 +124,10 @@ if(r) {
 
                 <obv:showStory
                 model="['observationInstance':observationInstance, 'showDetails':true, 'userGroupWebaddress':userGroup?userGroup.webaddress:userGroupWebaddress,'userLanguage':userLanguage]" />
-                <g:if test="${customFields?.size() > 0}">
                     <div style="margin-top:8px;" class="sidebar_section">
                         <h5><g:message code="heading.customfields" /></h5>
                         <obv:showCustomFields model="['observationInstance':observationInstance]"/>
                     </div>  
-                </g:if>
 
 
                     <div class="recommendations sidebar_section" style="overflow:visible;clear:both;">
