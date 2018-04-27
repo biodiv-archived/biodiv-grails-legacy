@@ -171,4 +171,14 @@ class CustomField {
 			return new java.sql.Timestamp(date.getTime())
 		
 	}
+
+    public void setDataType(dataType) {
+        println "dataType##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.dataType = dataType;
+    }
 }
