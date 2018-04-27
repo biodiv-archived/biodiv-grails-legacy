@@ -162,7 +162,7 @@ class FactController extends AbstractObjectController {
                     } else {
                         // if no traitValue selected 
                         log.debug "No trait value .. so deleting all facts for this trait ${traitInstance}"
-                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
+                        List<Fact> facts = Fact.findAllByTraitInstanceAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
 
                         facts.each { fact ->
                             fact.isDeleted = true;
