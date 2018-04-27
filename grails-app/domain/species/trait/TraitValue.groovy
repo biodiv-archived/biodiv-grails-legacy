@@ -54,7 +54,7 @@ class TraitValue {
     static mapping = {
         description type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_value_id_seq"] 
-        cache include: 'non-lazy'
+        //cache include: 'non-lazy'
     }
 
 	Resource icon(ImageType type) {

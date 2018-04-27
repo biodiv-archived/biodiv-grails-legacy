@@ -55,7 +55,7 @@ class Fact {
         description type:"text"
         attribution type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "fact_id_seq"] 
-        cache include: 'non-lazy'
+        //cache include: 'non-lazy'
     }
 
     String getActivityDescription() {
