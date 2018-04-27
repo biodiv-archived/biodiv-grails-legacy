@@ -388,9 +388,9 @@ class ObservationController extends AbstractObjectController {
                 withFormat {
                     html {
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false];
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false, customFields : customFieldService.fetchAllCustomFields(observationInstance)];
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage,  traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams];
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage,  traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, customFields : customFieldService.fetchAllCustomFields(observationInstance)];
                         }
                     }
                     json  { render model as JSON }

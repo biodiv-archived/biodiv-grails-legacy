@@ -127,7 +127,7 @@ if(r) {
                 <g:if test="${customFields?.size() > 0}">
                     <div style="margin-top:8px;" class="sidebar_section">
                         <h5><g:message code="heading.customfields" /></h5>
-                        <obv:showCustomFields model="['observationInstance':observationInstance]"/>
+                        <obv:showCustomFields model="['observationInstance':observationInstance, customFields:customFields]"/>
                     </div>  
                 </g:if>
 
