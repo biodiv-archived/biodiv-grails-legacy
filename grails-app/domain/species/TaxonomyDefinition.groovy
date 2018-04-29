@@ -607,8 +607,8 @@ class TaxonomyDefinition extends ScientificName {
 					synToAdd.relationship = XMLConverter.getRelationship(null)
 					
 					try{
-						def mergedSyn = synToAdd.merge()
-						synToAdd = mergedSyn ?:synToAdd
+						//def mergedSyn = synToAdd.merge()
+						//synToAdd = mergedSyn ?:synToAdd
 						if(!synToAdd.save(flush:true)){
 							synToAdd.errors.allErrors.each { println  it }
 						}
