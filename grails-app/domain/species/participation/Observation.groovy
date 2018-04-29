@@ -201,7 +201,7 @@ class Observation extends DataObject  implements Serializable {
 
 	static hasMany = [userGroups:UserGroup, resource:Resource, recommendationVote:RecommendationVote, annotations:Annotation];
 	static belongsTo = [SUser, UserGroup, Checklists, Dataset, DataTable]
-    //static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
+    static List eagerFetchProperties = ['author','maxVotedReco', 'reprImage', 'resource', 'maxVotedReco.taxonConcept', 'dataset', 'dataset.datasource'];
 
  	static constraints = {
 		notes nullable:true
