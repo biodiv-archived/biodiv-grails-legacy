@@ -1999,11 +1999,12 @@ private printCacheEntries(cache) {
             }
             if(objectIdL) {
                 model['observationInstance'] = Observation.read(objectIdL);
+                if(model['observationInstance']) {
                 model['customFields'] = model.observationInstance.getCustomFields();
                 if(model['customFields'].size() > 0)
                     m['html'] =  g.render(template:"/observation/showCustomFieldsTemplate", model:model);
                     m['customFields'] = model['customFields'];
-
+                }
             }
         }
         render m as JSON
