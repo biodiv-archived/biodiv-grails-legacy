@@ -6,6 +6,7 @@ import groovy.util.Node;
 import java.util.List
 
 import org.apache.commons.logging.LogFactory
+import org.apache.commons.validator.routines.UrlValidator;
 import grails.util.Holders;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
@@ -1531,6 +1532,14 @@ class XMLConverter extends SourceConverter {
             refs.each {
                 String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
                 String url = it?.url?.text().trim();
+		if(url) {
+                    UrlValidator urlValidator = new UrlValidator();
+                    if(!urlValidator.isValid(url)) {
+                        title = title + url;
+                        url = null;
+                    }
+                }
+
                 if(title || url) {
                     def ref = new Reference(title:title, url:url);
                     references.add(ref);
