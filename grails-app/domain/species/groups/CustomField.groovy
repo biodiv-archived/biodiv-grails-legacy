@@ -8,6 +8,7 @@ import species.dataset.DataPackage
 
 class CustomField {
 	public static final String PREFIX = 'CustomField_'
+	public static final String SQL_PREFIX = 'cf_'
 	
 	def customFieldService
 	def utilsService
@@ -162,7 +163,7 @@ class CustomField {
 	}
 
 	def fetchSqlColName(){
-		return 'cf_' + id 
+		return SQL_PREFIX + id 
 	}
 	
 	private parseDate( val){

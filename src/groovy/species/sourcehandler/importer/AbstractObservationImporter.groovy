@@ -11,6 +11,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
 
     public static String ANNOTATION_HEADER = 'Annotations';
     public static String TRAIT_HEADER = 'traits';
+    public static String CUSTOMFIELD_HEADER = 'customfields';
     public static String MEDIA_ANNOTATION_HEADER = 'media_annotations';
 
     protected CSVReader observationReader
@@ -273,6 +274,15 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 temp.add(column);
                 temp.add("10000");
                 dataToWrite.add(temp.toArray(new String[0]))
+            } else if(mappedColumnName.startsWith("customfield.")) {
+                println "^^^^^^^^^^^^^^CUSTOMFIELD^^^^^^^^^^^^^^^^^^^^"
+                println mappedColumnName 
+                if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
+                def temp = [];
+                temp.add("http://ibp.org/terms/customfield/"+mappedColumnName.replace("customfield.",""));
+                temp.add(column);
+                temp.add("20000");
+                dataToWrite.add(temp.toArray(new String[0]))
             } else if(!mapped){
                 println "^^^^^^^^^^^^^^IBP TERMS^^^^^^^^^^^^^^^^^^^^"
                 println mappedColumnName 
@@ -406,10 +416,13 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                         m[ANNOTATION_HEADER][dwcObvHeader[header.column]] = value;  
                         
                         if(!m[TRAIT_HEADER]) m[TRAIT_HEADER] =  new java.util.LinkedHashMap();
+                        if(!m[CUSTOMFIELD_HEADER]) m[CUSTOMFIELD_HEADER] =  new java.util.LinkedHashMap();
                         if(header.url && header.url.startsWith("http://ibp.org/terms/trait") && row[header.column]) {
                             m[TRAIT_HEADER][header.url.replace("http://ibp.org/terms/trait/","")] = value;  
                         }
-
+                        else if(header.url && header.url.startsWith("http://ibp.org/terms/customfield") && row[header.column]) {
+                            m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")] = value;  
+                        }
                         else if(header.url && header.url.startsWith("http://ibp.org/terms/observation/") && row[header.column]) {
                             m[header.url.replace("http://ibp.org/terms/observation/","")] = value;  
                         }

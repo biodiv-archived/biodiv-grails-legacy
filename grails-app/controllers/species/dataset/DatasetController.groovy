@@ -13,7 +13,8 @@ import species.participation.Observation;
 import species.participation.Checklists;
 import species.dataset.DataPackage.DataTableType;
 import species.dataset.DataTable;
-
+import species.groups.CustomField;
+import species.groups.UserGroup;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class DatasetController extends AbstractObjectController {
@@ -334,7 +335,17 @@ class DatasetController extends AbstractObjectController {
 
         if(dataPackageService.hasPermission(dataTableInstance.dataset.dataPackage, springSecurityService.currentUser)) {
             dataTableInstance.dataTableType = DataTableType.list()[params.int('dataTableTypeId')]; 
-            String tmpl = g.render(template:"/dataTable/add${dataTableInstance.dataTableType.value()}DataTable", model:[dataTableInstance:dataTableInstance]);
+
+
+            def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+            def customFieldList = CustomField.fetchCustomFields(userGroupInstance)
+            println customFieldList
+            println "###############################"
+            println "###############################"
+            println "###############################"
+            println "###############################"
+            println "###############################"
+            String tmpl = g.render(template:"/dataTable/add${dataTableInstance.dataTableType.value()}DataTable", model:['dataTableInstance':dataTableInstance, 'customFieldList':(customFieldList as JSON)]);
             def model = utilsService.getSuccessModel("", dataTableInstance, OK.value(), [tmpl:tmpl]);
             render model as JSON;
 

@@ -72,23 +72,31 @@ class CustomFieldService {
 			return
 		}
 		
-		def  customFieldMap = [:]
-		params.each { String k, v ->
-			if(k.startsWith(CustomField.PREFIX)){
-				String cfName = k.replace(CustomField.PREFIX, "")
-				CustomField cf = CustomField.findByUserGroupAndName(ug, cfName)
-				if(v && !(v instanceof String)){
-					v = v.join(",")
-				}
-				customFieldMap.put(cf.fetchSqlColName(), cf.fetchTypeCastValue(v))
-			}
-		}
-		
-		deleteRow(ug, obvId)
-		customFieldMap.observation_id = obvId
+        def  customFieldMap = [:]
+        params.each { String k, v ->
+            if(k.startsWith(CustomField.PREFIX)){
+                String cfName = k.replace(CustomField.PREFIX, "")
+                CustomField cf = CustomField.findByUserGroupAndName(ug, cfName)
+                if(v && !(v instanceof String)){
+                    v = v.join(",")
+                }
+                customFieldMap.put(cf.fetchSqlColName(), cf.fetchTypeCastValue(v))
+            }
+        }
+        params.each { String k, v ->
+            if(k.startsWith(CustomField.SQL_PREFIX)){
+                String cfId = k.replace(CustomField.SQL_PREFIX, "")
+                CustomField cf = CustomField.read(cfId)
+                if(v && !(v instanceof String)){
+                    v = v.join(",")
+                }
+                customFieldMap.put(cf.fetchSqlColName(), cf.fetchTypeCastValue(v))
+            }
+        }
+        deleteRow(ug, obvId)
+        customFieldMap.observation_id = obvId
+        insertRow(ug, customFieldMap)
 
-		insertRow(ug, customFieldMap)
-		
 	}
 	
 	
@@ -163,11 +171,12 @@ class CustomFieldService {
 		
 		Sql sql = Sql.newInstance(dataSource)
 		boolean isSuccess = queryParams ? sql.execute(queryParams, query):sql.execute(query)
-//		if(isSuccess){
-//			log.error "Query Successful >>>> ${query}  :::: params  ${queryParams}" 
-//		}else{
-//			log.debug " QueryFailed >>>> ${query}  :::: params  ${queryParams}"
-//		}
+		if(isSuccess){
+			log.debug "Query Successful >>>> ${query}  :::: params  ${queryParams}" 
+		}else{
+			log.error " QueryFailed >>>> ${query}  :::: params  ${queryParams}"
+		}
+        println isSuccess
 		return isSuccess
 	}
 	

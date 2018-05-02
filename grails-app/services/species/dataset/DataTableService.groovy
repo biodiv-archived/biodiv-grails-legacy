@@ -370,6 +370,9 @@ println instance.imagesFile?.path;
 
                         case DataTableType.OBSERVATIONS.ordinal() :
                         Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir?.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id, 'isMarkingDirty':dataTable.isMarkingDirty, 'changedCols':dataTable.changedCols];
+                        if(params.webaddress) {
+                            p['webaddress'] = params.webaddress;
+                        }
                         p.putAll(paramsToPropagate);
                         def r = observationService.upload(p);
                         if(r.success) {
