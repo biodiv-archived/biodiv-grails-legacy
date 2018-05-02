@@ -329,6 +329,10 @@ println instance.imagesFile?.path;
                 HashSet uGs = new HashSet();
                 uGs.addAll(dataTable.dataset.userGroups);
                 log.debug uGs
+                if(params.webaddress) {
+		            UserGroup ug = UserGroup.findByWebaddress(params.webaddress)
+                    uGs.add(ug);
+                }
                 userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
             }
 
