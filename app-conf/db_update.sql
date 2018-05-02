@@ -478,7 +478,7 @@ create view observation_locations as  SELECT obs.id,
                     recommendation r
                       WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND (obs.is_showable = true OR obs.external_id is not null);
 
-create view checklist_species_view as SELECT obs.source_id AS id,
+create materialized view checklist_species_view as SELECT obs.source_id AS id,
     r.name AS species_name
        FROM observation obs,
         recommendation r
@@ -486,7 +486,7 @@ create view checklist_species_view as SELECT obs.source_id AS id,
           GROUP BY obs.source_id, r.name;
 
 
-create view checklist_species_locations as SELECT csv.id,
+create materialized view checklist_species_locations as SELECT csv.id,
 'checklist:'::text || csv.id AS source,
     cls.title,
         csv.species_name,
@@ -495,6 +495,8 @@ create view checklist_species_locations as SELECT csv.id,
                 observation obs,
                     checklists cls
                         WHERE csv.id = obs.id AND obs.id = cls.id;
+create index on checklist_species_locations using gist(topology);
+create index on checklist_species_locations using btree(species_name);
 
 drop sequence document_id_seq; drop sequence observation_id_seq; drop sequence species_id_seq; drop sequence suser_id_seq;
 select max(id) from document; select max(id) from observation; select max(id) from species; select max(id) from suser;
@@ -785,6 +787,74 @@ alter table external_links add column frlht_url varchar;
 #2nd June 2017
 alter table user_group add column filter_rule text;
 
+#27thOct2017
+create index on activity_feed(root_holder_type,activity_type,is_showable,date_created);
+create index on process_image (status) where status = 'Scheduled';
+create index on document_token_url(status) where status = 'Scheduled';
+create index on download_log(status) where status = 'Scheduled';
+create index on upload_log(status) where status = 'Scheduled';
+create index on names_report_generator(status) where status = 'Scheduled';
+
+alter table process_image add column finished_on timestamp without time zone;
+
+
+
+
+#30th Oct 2017
+
+create table observation_locations as SELECT obs.id, 'observation:'::text || obs.id AS source,
+r.name AS species_name,
+obs.topology,
+obs.last_revised                                                              
+FROM observation obs,                                                                            
+recommendation r                                                                                                   
+WHERE obs.max_voted_reco_id = r.id AND obs.is_deleted = false AND (obs.is_showable = true OR obs.external_id is not null);
+
+create or replace function observation_locations_insert () returns trigger as
+$$
+BEGIN
+    if NEW.is_deleted = false AND (NEW.is_showable = true OR NEW.external_id IS NOT NULL) then
+    INSERT INTO observation_locations(id,source,topology,last_revised) values(NEW.id, 'observation:'::text || NEW.id, NEW.topology, NEW.last_revised);
+    RETURN NEW;
+    end if;
+END;
+$$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER observation_locations_insert_trigger
+  AFTER INSERT
+  ON observation 
+  FOR EACH ROW
+      EXECUTE PROCEDURE observation_locations_insert();
+
+
+create or replace function observation_locations_update() returns trigger as
+$$
+BEGIN
+    if NEW.is_deleted = false AND (NEW.is_showable = true OR NEW.external_id IS NOT NULL) then
+        UPDATE observation_locations set topology = NEW.topology, last_revised = NEW.last_revised where id = NEW.id;
+        if (OLD.max_voted_reco_id is null and NEW.max_voted_reco_id is not null) or NEW.max_voted_reco_id <> OLD.max_voted_reco_id then
+            UPDATE observation_locations set species_name = r.name from (select name from recommendation where id=NEW.max_voted_reco_id) as r ;
+        end if;
+        RETURN NEW;
+    elsif NEW.is_deleted = true then
+        DELETE from observation_locations where id = NEW.id;
+        RETURN NEW;
+    end if;
+    
+END;
+$$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER observation_locations_update_trigger
+  AFTER UPDATE
+  ON observation
+  FOR EACH ROW
+      EXECUTE PROCEDURE observation_locations_update();
+
+create index on  observation_locations using gist(topology);
+create index on  observation_locations(species_name);
+
 #24 Oct 2017
 alter table newsletter add column show_in_footer boolean;
 update newsletter set show_in_footer = 'f';
@@ -918,4 +988,41 @@ update data_package set has_role_user_allowed=false;
 
 alter table data_table add column images_file_id bigint;
 alter table data_table add constraint fk_images_file_id foreign key(images_file_id) references ufile(id);
+
+
+#5th Feb2018 for biodiv-api
+create table token(id bigint not null, value varchar(255) not null, type varchar(255) not null, user_id bigint not null, created_on timestamp without time zone not null);
+alter table token add  PRIMARY KEY (id);
+alter table token add constraint user_id_fk foreign key(user_id) references suser(id);
+alter table token add  constraint value_user_id_uk unique (value, user_id);
+create index on token(user_id);
+create index on token(value);
+create index on token(value,user_id);
+
+alter table trait_value rename trait_id to trait_instance_id;
+alter table fact rename trait_id to trait_instance_id;
+
+#7th Feb2018 grails 2.3.9 to grails 2.4.3
+#change applicationContext.xml .. create new app with 2.4.3 and update applicationContext.xml
+#remove ~/.grails/2.4.3/....project/biodiv folder
+#compile
+#replace ConfigurationHolder & ApplicationHolder with grails.util.Holders
+#correct RedirectAction import path
+#replace BaseOAuthClient to OAuth20Client
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy
+
+scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy
+
 

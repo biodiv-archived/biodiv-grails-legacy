@@ -4,7 +4,7 @@ import species.auth.SUser;
 import species.groups.SpeciesGroup
 import species.Habitat
 
-import org.hibernatespatial.GeometryUserType
+//import org.hibernatespatial.GeometryUserType
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -21,6 +21,12 @@ import species.dataset.Dataset;
 import species.dataset.DataTable;
 import species.trait.Fact;
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@JsonIgnoreProperties([])
 abstract class Metadata {
 	
 	public enum LocationScale {
@@ -113,8 +119,9 @@ abstract class Metadata {
 	//XXX to be removed after locationScale migration
 	String locationAccuracy;
 	LocationScale locationScale;
-    Geometry topology;
-     
+
+    @JsonIgnore
+    Geometry topology; 
 	double latitude;
 	double longitude;
 	
@@ -143,7 +150,9 @@ abstract class Metadata {
     Date lastInterpreted;
     Date lastCrawled;
 
+    @JsonIgnore
     Dataset dataset;
+    @JsonIgnore
     DataTable dataTable;
 
     def grailsApplication
@@ -201,8 +210,10 @@ abstract class Metadata {
 	
     static mapping = {
         columns {
-            topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
+//            topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
+            topology (type:org.hibernate.spatial.GeometryType, class:com.vividsolutions.jts.geom.Geometry)
         }
+        cache include: 'non-lazy'
     }
 
     String title(){
@@ -273,27 +284,28 @@ abstract class Metadata {
 		return Utils.getRandomFloat()
 	}
 
+    @JsonIgnore
     Map getTraitFacts() {
         def factList = Fact.findAllByObjectIdAndObjectTypeAndIsDeleted(this.id, this.class.getCanonicalName(), false);
         Map traitFactMap = [:]
         Map queryParams = ['trait':[:]];
         //def conRef = []
         factList.each { fact ->
-            if(!traitFactMap[fact.trait.id]) {
-                traitFactMap[fact.trait.id] = []
-                queryParams['trait'][fact.trait.id] = '';
+            if(!traitFactMap[fact.traitInstance.id]) {
+                traitFactMap[fact.traitInstance.id] = []
+                queryParams['trait'][fact.traitInstance.id] = '';
                 traitFactMap['fact'] = []
             }
             if(fact.traitValue) {
-                traitFactMap[fact.trait.id] << fact.traitValue
-                queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+                traitFactMap[fact.traitInstance.id] << fact.traitValue
+                queryParams['trait'][fact.traitInstance.id] += fact.traitValue.id+',';
             } else if(fact.value) {
-                traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
-                queryParams['trait'][fact.trait.id] += fact.value+(fact.toValue?":"+fact.toValue:'') +','
+                traitFactMap[fact.traitInstance.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+                queryParams['trait'][fact.traitInstance.id] += fact.value+(fact.toValue?":"+fact.toValue:'') +','
             } 
             if(fact.fromDate && fact.toDate) {
-                traitFactMap[fact.trait.id] << fact.fromDate+";"+fact.toDate
-                queryParams['trait'][fact.trait.id] += fact.fromDate+";"+fact.toDate+',';
+                traitFactMap[fact.traitInstance.id] << fact.fromDate+";"+fact.toDate
+                queryParams['trait'][fact.traitInstance.id] += fact.fromDate+";"+fact.toDate+',';
             }
 
             traitFactMap['fact'] << fact.id
@@ -309,6 +321,7 @@ abstract class Metadata {
         return ['traitFactMap':traitFactMap, 'queryParams':queryParams];
     }
 
+    @JsonIgnore
     Map getTraits(Boolean isObservationTrait=false, Boolean isParticipatory = true, Boolean showInObservation=false) {
         Map queryParams = ['sGroup':this.group.id];
         
@@ -324,4 +337,23 @@ abstract class Metadata {
     }
 
 
+    public void setLocationScale(locationScale) {
+        println "locationScale##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.locationScale = locationScale;
+    }
+
+    public void setDateAccuracy(dateAccuracy) {
+        println "dateAccuracy##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.dateAccuracy = dateAccuracy;
+    }
 }

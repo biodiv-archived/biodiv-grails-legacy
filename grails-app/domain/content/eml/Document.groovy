@@ -20,6 +20,13 @@ import species.groups.UserGroup.FilterRule;
 import com.vividsolutions.jts.geom.GeometryFactory
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="document", include = "non-lazy")
+//@JsonIgnoreProperties([])
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -81,7 +88,7 @@ class Document extends DataObject implements Comparable {
 
 	DocumentType type
 	String title
-	
+
 	UFile uFile   //covers physical file formats
 	//String uri
 	
@@ -143,6 +150,7 @@ class Document extends DataObject implements Comparable {
         contributors type:"text"
         title type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "document_id_seq"] 
+        //cache include: 'non-lazy'
     }
 
     List fetchAllFlags(){
@@ -291,4 +299,29 @@ class Document extends DataObject implements Comparable {
         return res
     }
 
+    static long countDocuments() {
+        def c = Document.createCriteria();
+println "countDocuments%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        def count = c.count {
+            cache true;
+        }
+println "countDocuments%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        return count;
+    }
+
+    public void setType(type) {
+        println "documentType##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.type = type;
+    }
 }

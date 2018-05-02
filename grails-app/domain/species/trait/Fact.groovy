@@ -10,9 +10,16 @@ import species.trait.Trait.DataTypes;
 
 import grails.converters.JSON
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="fact", include = "non-lazy")
+//@JsonIgnoreProperties([])
 class Fact {
 
-    Trait trait;
+    Trait traitInstance;
     TraitValue traitValue;
     String value;//default from value if trait type is range
     String toValue;
@@ -28,8 +35,8 @@ class Fact {
 
     boolean isDeleted = false;
 
-     static constraints = {
-      trait nullable:false, unique:['objectType', 'objectId','traitValue']
+    static constraints = {
+      traitInstance nullable:false, unique:['objectType', 'objectId','traitValue']
       //attribution nullable:true
       //contributor nullable:true
       //license nullable:true
@@ -48,15 +55,16 @@ class Fact {
         description type:"text"
         attribution type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "fact_id_seq"] 
+        //cache include: 'non-lazy'
     }
 
     String getActivityDescription() {
         if(this.traitValue) {
-            return trait.name +':'+ traitValue.value;
-        } else if (trait.dataTypes == DataTypes.DATE) {
-            return trait.name +':'+ fromDate + (toDate ? "-" + toDate:'')
+            return traitInstance.name +':'+ traitValue.value;
+        } else if (traitInstance.dataTypes == DataTypes.DATE) {
+            return traitInstance.name +':'+ fromDate + (toDate ? "-" + toDate:'')
         }else {
-            return trait.name +':'+ value + (toValue ? "-" + toValue:'')
+            return traitInstance.name +':'+ value + (toValue ? "-" + toValue:'')
         }
     }
 
@@ -82,6 +90,6 @@ class Fact {
 
     @Override
     String toString() {
-        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}${toValue?'-'+toValue:''})>";
+        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${traitInstance.name}, ${traitValue?traitValue.value:value}${toValue?'-'+toValue:''})>";
     }
 }

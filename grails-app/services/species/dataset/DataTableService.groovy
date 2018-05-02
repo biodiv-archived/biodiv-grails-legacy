@@ -5,7 +5,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.grails.taggable.TagLink;
 import species.Classification;
 import content.eml.UFile;
@@ -63,13 +63,8 @@ import species.SpeciesPermission;
 import content.eml.Contact;
 import org.apache.commons.io.FilenameUtils;
 import species.dataset.DataTable;
-//import org.apache.lucene.document.DateField;
-import org.apache.lucene.document.DateTools;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 
 import java.net.URLDecoder;
-import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
@@ -129,7 +124,15 @@ class DataTableService extends AbstractMetadataService {
             instance.properties = params;
 
             instance.clearErrors();
-
+println instance.uploadLog
+println instance.uploadLog?.logFile
+println instance.uFile
+println instance.uFile?.path
+println instance.traitValueFile
+println instance.imagesFile;
+println instance.imagesFile?.path;
+            if(instance.imagesFile && instance.imagesFile.path == null) instance.imagesFile = null;
+            if(instance.traitValueFile && instance.traitValueFile.path == null) instance.traitValueFile = null;
             instance.initParams(params);
 
             if(params.dataset) {
@@ -144,7 +147,7 @@ class DataTableService extends AbstractMetadataService {
 
             //setting ufile and uri
             if(params.uFile.path) {
-                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                def config = Holders.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 try{
                     File destinationFile = new File(contentRootDir, params.uFile.path);
@@ -163,7 +166,6 @@ class DataTableService extends AbstractMetadataService {
                     } else if(params.imagesFile.path) {
                         imagesFile = new File(contentRootDir, params.imagesFile.path);
                     }
-                    println  imagesFile
 
                     if(imagesFile && imagesFile.exists()) {
                         if(FilenameUtils.getExtension(imagesFile.getName()).equals('zip')) {
@@ -171,7 +173,6 @@ class DataTableService extends AbstractMetadataService {
                             def ant = new AntBuilder().unzip( src: imagesFile, dest: destDir, overwrite:true)
                             imagesFile = destDir;
                         }
-
                         UFile f = new UFile()
                         f.size = imagesFile.length()
                         f.path = imagesFile.getAbsolutePath().replaceFirst(contentRootDir, "");
@@ -179,6 +180,8 @@ class DataTableService extends AbstractMetadataService {
                         if(f.save()) {
                             instance.imagesFile = f
                         }
+                    } else {
+                        instance.imagesFile = null;
                     }
 
                 } catch(e){
@@ -191,7 +194,7 @@ class DataTableService extends AbstractMetadataService {
                 instance.dataTableType = DataTableType.values()[params.int('dataTableType')];
             }
 
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir
             if(instance.uFile) {
                 File dataTableFile = new File(contentRootDir, instance.uFile.path);
@@ -326,6 +329,10 @@ class DataTableService extends AbstractMetadataService {
                 HashSet uGs = new HashSet();
                 uGs.addAll(dataTable.dataset.userGroups);
                 log.debug uGs
+                if(params.webaddress) {
+		            UserGroup ug = UserGroup.findByWebaddress(params.webaddress)
+                    uGs.add(ug);
+                }
                 userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
             }
 
@@ -354,7 +361,7 @@ class DataTableService extends AbstractMetadataService {
 
                  }
 
-                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                def config = Holders.config
                 String contentRootDir = config.speciesPortal.content.rootDir
                 File dataTableFile = new File(contentRootDir, dataTable.uFile.path);
                 File imagesDir = dataTable.imagesFile ? new File(contentRootDir, dataTable.imagesFile.path) : null;
@@ -367,6 +374,9 @@ class DataTableService extends AbstractMetadataService {
 
                         case DataTableType.OBSERVATIONS.ordinal() :
                         Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir?.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id, 'isMarkingDirty':dataTable.isMarkingDirty, 'changedCols':dataTable.changedCols];
+                        if(params.webaddress) {
+                            p['webaddress'] = params.webaddress;
+                        }
                         p.putAll(paramsToPropagate);
                         def r = observationService.upload(p);
                         if(r.success) {

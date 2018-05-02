@@ -169,29 +169,29 @@ class FactService extends AbstractObjectService {
                 key = key.trim();
 
                 switch(key) {
-                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts', 'dataTable', ObvUtilService.LOCATION, ObvUtilService.TOPOLOGY, ObvUtilService.LATITUDE, ObvUtilService.LONGITUDE, ObvUtilService.LOCATION_SCALE, ObvUtilService.OBSERVED_ON, ObvUtilService.TO_DATE, ObvUtilService.DATE_ACCURACY, ObvUtilService.AUTHOR_EMAIL] : break;
+                    case ['name', 'taxonid', 'attribution','contributor', 'license', 'objectId', 'objectType', 'controller', 'action', 'traitId', 'replaceFacts', 'dataTable', ObvUtilService.LOCATION, ObvUtilService.TOPOLOGY, ObvUtilService.LATITUDE, ObvUtilService.LONGITUDE, ObvUtilService.LOCATION_SCALE, ObvUtilService.OBSERVED_ON, ObvUtilService.TO_DATE, ObvUtilService.DATE_ACCURACY, ObvUtilService.AUTHOR_EMAIL, 'traitInstance'] : break;
                     default :
                     value = (value && value instanceof String)? value.trim() : null ;
 
                     writeLog("Loading trait ${key} : ${value}", Level.INFO);
-                    Trait trait;
+                    Trait traitInstance;
                     TaxonomyDefinition pageTaxon;
                     switch(object.class.getCanonicalName()) {
                         case 'species.Species':
                         pageTaxon = object.taxonConcept;
                         if(pageTaxon) {
-                            println m.traitId
+                            println m.traitInstance
                             writeLog("validate if this trait ${key} can be given to this pageTaxon ${pageTaxon} as per traits taxon scope");
-                            if(m.traitId) {
-                                Trait t  = Trait.read(Long.parseLong(m.traitId));
+                            if(m.traitInstance) {
+                                Trait t  = m.traitInstance;//Trait.read(Long.parseLong(m.traitId));
                                 println t
                                 if(Trait.isValidTrait(t, pageTaxon)) {
-                                    trait = t;
+                                    traitInstance = t;
                                 } else {
                                     writeLog("Trait ${t} is not valid as per taxon", Level.ERROR);
                                 }
                             } else {
-                                trait = Trait.getValidTrait(key, pageTaxon);
+                                traitInstance = Trait.getValidTrait(key, pageTaxon);
                             }
                         }
                         break;
@@ -199,33 +199,33 @@ class FactService extends AbstractObjectService {
                         //TODO:validatetrait as per speciesgroup taxon list for observations
                         def t = Trait.read(Long.parseLong(key));
                         if(Trait.isValidTrait(t, object.group.getTaxon())) {
-                            trait = t;
+                            traitInstance = t;
                         } else {
                             writeLog("Trait ${t} is not valid as per taxon", Level.ERROR);
                         }
 
                         if(t.isNotObservationTrait) {
-                            trait = null;
+                            traitInstance = null;
                             writeLog("Trait ${t} is not observation trait", Level.ERROR);
                         }
                         break;
                     }
 
-                    println "Got trait ${trait}";
+                    println "Got trait ${traitInstance}";
 
-                    if(!trait) {
+                    if(!traitInstance) {
                         writeLog("Cannot find trait ${key}\n", Level.ERROR);
                     } else {
                         Fact.withTransaction {
                             def factsCriteria = Fact.createCriteria();
                             List<Fact> facts = factsCriteria.list {
-                                eq ('trait', trait)
+                                eq ('traitInstance', traitInstance)
                                 eq ('objectType', object.class.getCanonicalName())
                                 eq ('objectId', object.id)
                             }
 
                             List traitValues = [];
-                            if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
+                            if(traitInstance.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
                                 if(replaceFacts) {
                                     writeLog("Replacing old facts with new ones");
                                     facts.each {fact ->
@@ -234,19 +234,19 @@ class FactService extends AbstractObjectService {
                                     facts.clear();
                                 }
                                 value?.split(',').each { v ->
-                                    writeLog("Loading trait ${trait} with value ${v.trim()}");
-                                    def x = getTraitValue(trait, v.trim());
+                                    writeLog("Loading trait ${traitInstance} with value ${v.trim()}");
+                                    def x = getTraitValue(traitInstance, v.trim());
                                     if(x) traitValues << x;
                                 }
                             } else {
-                                def x = getTraitValue(trait, value);
+                                def x = getTraitValue(traitInstance, value);
                                 if(x) traitValues << x;
                             }
                             println "Got traitValues ====================="
                             println traitValues;
 
                             if(!traitValues) {
-                                writeLog("Cannot find [trait:value] [${trait} : ${value}]", Level.ERROR);
+                                writeLog("Cannot find [trait:value] [${traitInstance} : ${value}]", Level.ERROR);
                                 return;
                             }
 
@@ -254,7 +254,7 @@ class FactService extends AbstractObjectService {
                             if(!facts) {
                                 //writeLog("Creating new fact");
                                 Fact fact = new Fact();
-                                fact.trait = trait;
+                                fact.traitInstance = traitInstance;
                                 fact.pageTaxon = pageTaxon;
                                 fact.objectId = object.id;
                                 fact.objectType = object.class.getCanonicalName();
@@ -264,7 +264,7 @@ class FactService extends AbstractObjectService {
                             println facts;
                             //fact = facts[0];
 
-                            if(trait.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
+                            if(traitInstance.traitTypes == Trait.TraitTypes.MULTIPLE_CATEGORICAL) {
                                 boolean isExistingValue = false;
                                 traitValues.each { tV ->
                                     if(tV) {
@@ -292,7 +292,7 @@ class FactService extends AbstractObjectService {
 
                                         if(!isExistingValue) {
                                             Fact fact = new Fact();
-                                            fact.trait = trait;
+                                            fact.traitInstance = traitInstance;
                                             fact.pageTaxon = pageTaxon;
                                             fact.objectId = object.id;
                                             fact.objectType = object.class.getCanonicalName();
@@ -322,7 +322,7 @@ class FactService extends AbstractObjectService {
                                     fact.dataTable = DataTable.read(Long.parseLong(''+m['dataTable']));
                                 }
                                 if(!fact.hasErrors() && !fact.save()) {
-                                    writeLog("Error saving fact ${fact.id} ${fact.trait.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
+                                    writeLog("Error saving fact ${fact.id} ${fact.traitInstance.name} : ${fact.traitValue} ${fact.pageTaxon}", Level.ERROR);
                                     fact.errors.allErrors.each { writeLog(it.toString(), Level.ERROR) }
                                     writeLog('\n');
                                     success = false;
@@ -352,17 +352,17 @@ class FactService extends AbstractObjectService {
             Sql sql = Sql.newInstance(dataSource);
             println sql.executeUpdate("""
             update observation set traits = g.item from (
-                             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id
+                             select x.object_id, array_agg_custom(ARRAY[ARRAY[x.tid, x.tvid]]) as item from (select f.object_id, f.object_type, t.id as tid, tv.id as tvid, tv.value from fact f, trait t, trait_value tv where f.trait_instance_id = t.id and f.trait_value_id = tv.id and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id
                              ) g where g.object_id=id
             """);
             println sql.executeUpdate("""
 update observation set traits_json = g.item from (
      select x1.object_id, format('{%s}', string_agg(x1.item,','))::json as item from (
-        (select x.object_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.object_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        (select x.object_id,  string_agg(format('"%s":{"value":%s,"to_value":%s}', to_json(x.tid), to_json(x.value), to_json(x.to_value)), ',') as item from (select f.object_id, t.id as tid, f.value::numeric as value, f.to_value::numeric as to_value from fact f, trait t where f.trait_instance_id = t.id and (t.data_types='NUMERIC') and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
         union
-        (select x.object_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.object_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        (select x.object_id,  string_agg(format('"%s":{"from_date":%s,"to_date":%s}', to_json(x.tid), to_json(x.from_date), to_json(x.to_date)), ',') as item from (select f.object_id, t.id as tid, f.from_date as from_date, f.to_date as to_date from fact f, trait t where f.trait_instance_id = t.id and (t.data_types='DATE')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
         union
-        (select x.object_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.object_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
+        (select x.object_id,  string_agg(format('"%s":{"r":%s,"g":%s,"b":%s}', to_json(x.tid), to_json(x.value[1]::integer), to_json(x.value[2]::integer), to_json(x.value[3]::integer)), ',') as item from (select f.object_id, t.id as tid, string_to_array(substring(f.value from 5 for length(f.value)-5),',') as value from fact f, trait t where f.trait_instance_id = t.id and (t.data_types='COLOR')  and f.object_type='species.participation.Observation' and f.object_id="""+object.id+""") x group by x.object_id)
     ) x1 group by x1.object_id
 ) g where g.object_id=id;
 
@@ -378,22 +378,22 @@ update observation set traits_json = g.item from (
         return result;
     }
 
-    private def getTraitValue(Trait trait, String value) {
+    private def getTraitValue(Trait traitInstance, String value) {
         if(!value) return;
-        if(!(trait.traitTypes == TraitTypes.RANGE || trait.dataTypes == DataTypes.COLOR)) {
-            return TraitValue.findByTraitAndValueIlike(trait, value.trim());
+        if(!(traitInstance.traitTypes == TraitTypes.RANGE || traitInstance.dataTypes == DataTypes.COLOR)) { 
+            return TraitValue.findByTraitInstanceAndValueIlike(traitInstance, value.trim());
         } else {
             return value.trim();
         }
     }
 
     private void setTraitValue(Fact fact, value) {
-        switch(fact.trait.traitTypes) {
-            case Trait.TraitTypes.RANGE :
+        switch(fact.traitInstance.traitTypes) {
+            case Trait.TraitTypes.RANGE : 
             setTraitRange(fact, value);
             break;
             default:
-            if(fact.trait.dataTypes == DataTypes.COLOR) {
+            if(fact.traitInstance.dataTypes == DataTypes.COLOR) {
                 fact.value = utilsService.hex2Rgb(value);
             } else {
                 fact.traitValue = value;
@@ -404,10 +404,10 @@ update observation set traits_json = g.item from (
     private void setTraitRange(Fact fact, value) {
         String[] v = value.split(':');
         if(v.length > 1) {
-            switch(fact.trait.dataTypes) {
+            switch(fact.traitInstance.dataTypes) {
                 case Trait.DataTypes.DATE:
-                fact.fromDate = getFromDate(v[0], fact.trait.units);
-                fact.toDate = getToDate(v[1], fact.trait.units);
+                fact.fromDate = getFromDate(v[0], fact.traitInstance.units);
+                fact.toDate = getToDate(v[1], fact.traitInstance.units);
                 if(fact.fromDate>fact.toDate) {
                     Date x = fact.fromDate;
                     fact.fromDate = fact.toDate;
@@ -419,7 +419,7 @@ update observation set traits_json = g.item from (
                 fact.toValue = v[1];
             }
         } else if(v[0]) {
-            switch(fact.trait.dataTypes) {
+            switch(fact.traitInstance.dataTypes) {
                 case Trait.DataTypes.DATE:
                 fact.fromDate = getFromDate(v[0]);
                 fact.toDate = getToDate(v[0]);

@@ -264,7 +264,8 @@ class ObservationTagLib {
 	def showCustomFields = {attrs, body->
         if(attrs.model.customFields == null)
     		attrs.model.customFields = customFieldService.fetchAllCustomFields(attrs.model.observationInstance);
-		out << render(template:"/observation/showCustomFieldsTemplate", model:attrs.model);
+        if(attrs.model.customFields?.size() > 0)
+    		out << render(template:"/observation/showCustomFieldsTemplate", model:attrs.model);
 	}
 
 	def rating = {attrs, body->
@@ -455,17 +456,17 @@ class ObservationTagLib {
     def showNoOfBulkUploadResOfUser = { attrs, body ->
         def res;
         utilsService.logSql({
-        res = UsersResource.findAllByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+        res = UsersResource.countByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'], [cache:true])
         },'showNoOfBulkUploadResOfUser') 
-        out << res.size()
+        out << res
     }
 
     def showBulkUploadRes = { attrs, body ->
         def res;
         utilsService.logSql({
-        res = UsersResource.findAllByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'])
+        res = UsersResource.countByUserAndStatus(attrs.model.user, UsersResource.UsersResourceStatus.NOT_USED.toString() ,[sort:'id', order:'desc'], [cache:true])
         },'showBulkUploadRes') 
-        if(res.size() > 0){
+        if(res > 0){
             out << body()
         }
     }
@@ -479,21 +480,21 @@ class ObservationTagLib {
     def showNoOfSuggestedUponOfUser={attrs, body->
         def noOfObvs;
         utilsService.logSql({
-            noOfObvs = observationService.getAllSuggestedRecommendationsOfUser(attrs.model.user, attrs.model.userGroup);
+            noOfObvs = observationService.getAllSuggestedRecommendationsOfUser(attrs.model.user, attrs.model.userGroup, [cache:true]);
         }, 'showNoOfSuggestedUponOfUser') 
         out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 	def showNoOfDownloadUponOfUser={attrs, body->
         def noOfObvs;
         utilsService.logSql({
-            noOfObvs = DownloadLog.findAllByAuthorAndSourceType(attrs.model.user, attrs.model.sourceType).size();
+            noOfObvs = DownloadLog.countByAuthorAndSourceType(attrs.model.user, attrs.model.sourceType, [cache:true]);
         },'showNoOfDownloadUponOfUser') 
 		out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
 	def showNoOfCommentUponOfUser={attrs, body->
         def noOfObvs;
         utilsService.logSql({
-        noOfObvs = Comment.findAllByAuthorAndRootHolderType(attrs.model.user, attrs.model.rootHolderType).size();
+        noOfObvs = Comment.countByAuthorAndRootHolderType(attrs.model.user, attrs.model.rootHolderType, [cache:true]);
         }, 'showNoOfCommentUponOfUser')
 		out <<  "<td class=countvalue>"+noOfObvs+"</td>"
 	}
@@ -501,7 +502,7 @@ class ObservationTagLib {
 		String[] activityType=["obv locked","obv unlocked","Featured","UnFeatured","Flagged","Flag removed","Flag deleted"];
 		def totalOrganizedObv=0;
 		activityType.each{
-		def noOfOrganizedOvb=ActivityFeed.findAllByAuthorAndActivityType(attrs.model.user,it).size()
+		def noOfOrganizedOvb=ActivityFeed.countByAuthorAndActivityType(attrs.model.user,it, [cache:true])
 		totalOrganizedObv=noOfOrganizedOvb+totalOrganizedObv
 		}
 		out << "<td class=countvalue>"+totalOrganizedObv+"</td>"
@@ -510,7 +511,7 @@ class ObservationTagLib {
 	def showNoOfDiscussionCreated={attrs,body->
 		def noOfDiscussionCreated;
         utilsService.logSql({
-        noOfDiscussionCreated = Discussion.findAllByAuthor(attrs.model.user).size()
+        noOfDiscussionCreated = Discussion.countByAuthor(attrs.model.user, [cache:true])
         }, 'showNoOfDiscussionCreated');
 		out << "<td class=countvaluecontributed>"+noOfDiscussionCreated+"</td>"
 
@@ -518,7 +519,7 @@ class ObservationTagLib {
 	def showNoOfDocsUploaded={attrs,body->
 		def noOfDocsUploaded;
         utilsService.logSql({
-        noOfDocsUploaded=Document.findAllByAuthor(attrs.model.user).size()
+            noOfDocsUploaded=Document.countByAuthor(attrs.model.user, [cache:true])
         }, 'showNoOfDocsUploaded');
 		out << "<td class=countvaluecontributed>"+noOfDocsUploaded+"</td>"
 
@@ -529,8 +530,8 @@ class ObservationTagLib {
 
         utilsService.logSql({
 		activityType.each{
-		def noOfDocsOraganized=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it)
-		totalDocsOrganized=noOfDocsOraganized.size()+totalDocsOrganized
+		def noOfDocsOraganized=ActivityFeed.countByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it, [cache:true])
+		totalDocsOrganized=noOfDocsOraganized+totalDocsOrganized
 		
 	}},'showNoofOrganizedDocs');
 	out << "<td class=countvalue>"+totalDocsOrganized+"</td>";
@@ -545,8 +546,8 @@ class ObservationTagLib {
 
         utilsService.logSql({
 		activityType.each{ 
-		def noOfDiscussionOraganized=ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it)
-		totalDiscussionOrganized=noOfDiscussionOraganized.size()+totalDiscussionOrganized
+		def noOfDiscussionOraganized=ActivityFeed.countByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,it, [cache:true])
+		totalDiscussionOrganized=noOfDiscussionOraganized+totalDiscussionOrganized
 		
 	
         }},'showNoofOrganizedDiscussion');
@@ -556,14 +557,14 @@ class ObservationTagLib {
 		def noOfParticipationDiscussion;
 
         utilsService.logSql({
-        noOfParticipationDiscussion = ActivityFeed.findAllByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType).size()
+        noOfParticipationDiscussion = ActivityFeed.countByAuthorAndRootHolderTypeAndActivityType(attrs.model.user,attrs.model.rootHolderType,attrs.model.activityType, [cache:true])
         }, 'showNoofParticipationDiscussion');
 		out << "<td class=countvalue>"+noOfParticipationDiscussion+"</td>"
 	}
 	def showNoOfAgreedUponOfUser = {attrs, body->
         def noOfObvsSuggested;
         utilsService.logSql({
-        noOfObvsSuggested= ActivityFeed.findAllByAuthorAndActivityTypeAndActivityHolderType(attrs.model.user,attrs.model.activityType,attrs.model.activityHolderType).size()
+        noOfObvsSuggested= ActivityFeed.countByAuthorAndActivityTypeAndActivityHolderType(attrs.model.user,attrs.model.activityType,attrs.model.activityHolderType, [cache:true])
         }, 'showNoOfAgreedUponOfUser');
 		out << "<td class=countvalue>"+noOfObvsSuggested+"</td>"
 	}

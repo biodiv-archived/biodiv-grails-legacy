@@ -7,14 +7,6 @@ import java.util.Date;
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import org.springframework.transaction.annotation.Transactional
 
 import species.CommonNames
@@ -36,13 +28,13 @@ class ResourceSearchService extends AbstractSearchService {
     static transactional = false
 
     /**
-     * 
+     *
      */
     def publishSearchIndex() {
         log.info "Initializing publishing to resources search index"
 
         //TODO: change limit
-        int limit = BATCH_SIZE//Resource.count()+1, 
+        int limit = BATCH_SIZE//Resource.count()+1,
         int offset = 0;
         int noIndexed = 0;
 
@@ -73,57 +65,59 @@ class ResourceSearchService extends AbstractSearchService {
      * @return
      */
     def publishSearchIndex(List<Resource> resources, boolean commit) {
-        /*if(!resources) return;
+        if(!resources) return;
         log.info "Initializing publishing to resource search index : "+resources.size();
 
-        //def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
+        //def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 
-        Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+        List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
+
         Map docsMap = [:]
 
         resources.each { r ->
             log.debug "Reading Resource : "+r.id;
-            List ds = getSolrDocument(r);
-            docs.addAll(ds);
-        }
+            Map<String,Object> doc = getDocument(r);
 
-        return commitDocs(docs, commit);
-        */
+            eDocs.add(doc);
+        }
+        postToElastic(eDocs,"resource")
+      //  return commitDocs(docs, commit);
+
     }
 
     /**
      */
-    public SolrInputDocument getSolrDocument(Resource r) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
-        SolrInputDocument doc = new SolrInputDocument();
-        doc.addField(searchFieldsConfig.ID, r.class.simpleName +"_"+r.id.toString());
-        doc.addField(searchFieldsConfig.OBJECT_TYPE, r.class.simpleName);
+    public Map<String,Object> getDocument(Resource r) {
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
+        Map<String,Object> doc=new HashMap<String,Object>();
+        doc.put(searchFieldsConfig.ID, r.id.toString());
+        doc.put(searchFieldsConfig.OBJECT_TYPE, r.class.simpleName);
 
-//        doc.addField(searchFieldsConfig.TITLE, r.fileName?:r.url);
-        doc.addField(searchFieldsConfig.RESOURCETYPE, r.type.value());
-        doc.addField(searchFieldsConfig.CONTEXT, r.context.value());
+//        doc.put(searchFieldsConfig.TITLE, r.fileName?:r.url);
+        doc.put(searchFieldsConfig.RESOURCETYPE, r.type.value());
+        doc.put(searchFieldsConfig.CONTEXT, r.context.value());
 
-//        doc.addField(searchFieldsConfig.AUTHOR, r.uploader.name);
-//        doc.addField(searchFieldsConfig.AUTHOR+"_id", r.uploader.id);
+//        doc.put(searchFieldsConfig.AUTHOR, r.uploader.name);
+//        doc.put(searchFieldsConfig.AUTHOR+"_id", r.uploader.id);
         r.contributors.each { contributor ->
             if(contributor.user) {
-                doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.user.name +" ### "+contributor.user.email +" "+contributor.user.username+" "+contributor.user.id.toString());
+                doc.put(searchFieldsConfig.CONTRIBUTOR, contributor.user.name +" ### "+contributor.user.email +" "+contributor.user.username+" "+contributor.user.id.toString());
             } else {
-                doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name);
+                doc.put(searchFieldsConfig.CONTRIBUTOR, contributor.name);
             }
         }
 
         r.attributors.each { attributor ->
-            doc.addField(searchFieldsConfig.ATTRIBUTION, attributor.name);
+            doc.put(searchFieldsConfig.ATTRIBUTION, attributor.name);
         }
 
-        doc.addField(searchFieldsConfig.UPLOADED_ON, r.uploadTime);
+        doc.put(searchFieldsConfig.UPLOADED_ON, r.uploadTime);
 //        r.licenses.each { license ->
-            doc.addField(searchFieldsConfig.LICENSE, r.license.name.name());
+            doc.put(searchFieldsConfig.LICENSE, r.license.name.name());
 //        }
 
         if(r.description) {
-            doc.addField(searchFieldsConfig.MESSAGE, r.description);
+            doc.put(searchFieldsConfig.MESSAGE, r.description);
         }
 
         String memberInfo = ""
@@ -131,7 +125,7 @@ class ResourceSearchService extends AbstractSearchService {
         allMembers.each { mem ->
 			if(mem){
 				memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
-				doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+				doc.put(searchFieldsConfig.MEMBERS, memberInfo);
 			}
         }
 
@@ -141,6 +135,6 @@ class ResourceSearchService extends AbstractSearchService {
     }
 
     def delete(long id) {
-        super.delete(Resource.simpleName +"_"+id.toString());
+        super.delete("resource",id.toString());
     }
 }

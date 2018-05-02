@@ -52,6 +52,11 @@ import java.text.SimpleDateFormat;
 
 import java.text.Format;
 
+import org.hibernate.cache.redis.util.RedisCacheUtil;
+import org.hibernate.cache.redis.client.RedisClientFactory;
+import org.hibernate.cache.CacheException;
+import org.hibernate.cache.redis.client.RedisClient;
+     
 class UtilsService {
 
     static transactional = false
@@ -98,6 +103,12 @@ class UtilsService {
 
     private Map bannerMessageMap;
     private Map filterMap;
+
+    private RedisClient redisClient;
+
+    UtilsService() { 
+       redisClient = RedisClientFactory.createRedisClient(RedisCacheUtil.getRedissonConfigPath());
+    }
 
     public void cleanUpGorm() {
         cleanUpGorm(true)
@@ -303,8 +314,6 @@ class UtilsService {
     }
 
     Language getCurrentLanguage(request = null,cuRLocale = null){
-       // println "====================================="+request
-        
         if(!defaultLanguage) defaultLanguage = Language.getLanguage(Language.DEFAULT_LANGUAGE);
         String langStr = (cuRLocale)?:LCH.getLocale()
         def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
@@ -364,12 +373,11 @@ class UtilsService {
                 break
 
                 case [FACT_UPDATE]:
-                    println "fact update mail"
                     def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
 //                    def user = springSecurityService.currentUser;
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
-                    templateMap["trait"] = otherParams["trait"]
+                    templateMap["traitInstance"] = otherParams["trait"]
                     templateMap["traitValueStr"] = otherParams["traitValueStr"]
                     bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/factUpdate"
                     populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
@@ -1194,20 +1202,34 @@ class UtilsService {
 		return "custom_fields_group_" + ug.id
 	}
 
-    def getFromCache(String cacheName, String cacheKey) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
-        if(!cache) return null;
-        log.debug "Returning from cache ${cache.name}" 
-        return cache.get(cacheKey)?.get();
+    def getFromCache(final String cacheName, final String cacheKey) {
+/*        def cache = grailsCacheManager.getCache(cacheName);
+        println "CACHE CACHE CACHE CACHE ${cacheName}================================================"
+        if(!cacheName || !cacheKey) return null;
+        //return cache.get(cacheKey)?.get();
+*/
+        log.debug "Get from cache ${cacheName} ${cacheKey}" 
+        return redisClient.get(cacheName, cacheKey);
     }
 
-    def putInCache(String cacheName, String cacheKey, value) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+    def putInCache(final String cacheName, final String cacheKey, value) {
+/*        def cache = grailsCacheManager.getCache(cacheName);
+        println "CACHE CACHE CACHE CACHE ${cacheName}================================================"
+        println cache
+ 
         if(!cache) return null;
-        log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
         cache.put(cacheKey,value);
+*/
+        if(cacheKey && value) {
+            log.debug "Putting result in cache ${cacheName} at key ${cacheKey} ${value?.class}"
+            redisClient.set(cacheName, cacheKey, value);
+        }
     }  
-    
+   
+    void shutdownRedisClient() {
+        redisClient.shutdown();
+    }
+
     Map getBannerMessages() {  
         return bannerMessageMap;
     }
@@ -1265,7 +1287,6 @@ class UtilsService {
         filterMap = [:];
         if(filterFile.exists()) {
             filterFile.eachLine { line ->
-                println line;
                 def (level,filter) = line.tokenize('-');
                 level = level?.replaceAll("<(.|\n)*?>", '')?.trim();
                 filter = (filter?.replaceAll("</?p>", ''))?.trim();
@@ -1281,17 +1302,23 @@ class UtilsService {
     }
 
     def evictInCache(String cacheName, String cacheKey) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        /*org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Evict result in cache ${cache.name} at key ${cacheKey}"
         return cache.evict(cacheKey);
+        */
+        log.debug "Evict result in cache ${cacheName} at key ${cacheKey}"
+        redisClient.del(cacheName, cacheKey)
     }
 
     def clearCache(String cacheName) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+/*        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
-        log.debug "Clearing Cache ${cache.name}"
+        log.debug "Clearing Cache ${cacheName}"
         return cache.clear();
+*/
+        log.debug "Clearing Cache ${cacheName}"
+        redisClient.flushDb();
     }
 
     def CSVWriter getCSVWriter(def directory, def fileName) {
@@ -1349,7 +1376,6 @@ class UtilsService {
         Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateStr)
         Format formatter = new SimpleDateFormat("MMMM"); 
             String s = formatter.format(date);
-                System.out.println(s);
                 return s;
     }
     

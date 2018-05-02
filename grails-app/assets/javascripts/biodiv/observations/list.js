@@ -615,18 +615,7 @@ $(document).ready(function(){
     $(document).on('submit','#updateSpeciesGrp', function(event) {
 
         var that = $(this);
-        $(this).ajaxSubmit({ 
-            url: "/observation/updateSpeciesGrp",
-            dataType: 'json', 
-            type: 'GET',  
-            beforeSubmit: function(formData, jqForm, options) {
-                /*console.log(formData);
-                  if(formData.group_id == formData.prev_group){
-                  alert("Nothing Changes!");
-                  return false;
-                  }*/
-            },               
-            success: function(data, statusText, xhr, form) {
+        function updateSpeciesGrpSuccessHandler (data, statusText, xhr, form) {
                 var parentWrap = that.parent();
                 parentWrap.parent().find('.group_icon_show').removeClass(data.model.prevgroupIcon).addClass(data.model.groupIcon).attr('title',data.model.groupName);
                 parentWrap.parent().find('.group_icon_show_wrap').show();                
@@ -638,15 +627,29 @@ $(document).ready(function(){
                 //$('#propagateGrpHab_'+data.instance.id).hide();
                 //$('.prev_group_'+data.instance.id).val(data.model.prev_group);
                 updateFeeds();
-            },
-            error:function (xhr, ajaxOptions, thrownError){
-                //successHandler is used when ajax login succedes
-                var successHandler = this.success, errorHandler = showUpdateStatus;
-                handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
-            } 
+            }
+            $(this).ajaxSubmit({ 
+                url: "/observation/updateSpeciesGrp",
+                dataType: 'json', 
+                type: 'GET',  
+                beforeSubmit: function(formData, jqForm, options) {
+                    /*console.log(formData);
+                    if(formData.group_id == formData.prev_group){
+                    alert("Nothing Changes!");
+                    return false;
+                    }*/
+                },               
+                success: updateSpeciesGrpSuccessHandler,
+                error:function (xhr, ajaxOptions, thrownError){
+                    //successHandler is used when ajax login succedes
+                    var successHandler = function(){
+                        $('#updateSpeciesGrp').submit();
+                    }; 
+                    var errorHandler = showUpdateStatus;
+                    handleError(xhr, ajaxOptions, thrownError, successHandler, errorHandler);
+                } 
 
-        });    
-
+            });    
         event.preventDefault(); 
     }); 
 

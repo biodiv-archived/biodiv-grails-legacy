@@ -4,7 +4,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.grails.taggable.TagLink;
@@ -64,11 +64,8 @@ import au.com.bytecode.opencsv.CSVWriter
 
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 
 import java.net.URLDecoder;
-import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
@@ -92,7 +89,6 @@ import static org.springframework.http.HttpStatus.*;
 import species.ScientificName.TaxonomyRank;
 
 import species.NamesMetadata.NameStatus;
-import grails.plugin.cache.Cacheable;
 
 import species.trait.Fact;
 import species.trait.Trait;
@@ -707,8 +703,10 @@ class ObservationService extends AbstractMetadataService {
                 order("lastRevised", "desc")
             }*/
             String countQuery = "select count(*) from Observation obv  join obv.maxVotedReco.taxonConcept.hierarchies as reg where obv.isDeleted = :isDeleted  and reg.classification = :classification and (reg.path like '%!_"+taxon.id+"!_%'  escape '!' or reg.path like '"+taxon.id+"!_%'  escape '!' or reg.path like '%!_"+taxon.id+"' escape '!') ";
-            def countRes = Observation.executeQuery (countQuery, ['classification':classification, 'isDeleted': false]);
-
+            def countRes = 0;
+            utilsService.logSql {
+                countRes = Observation.executeQuery (countQuery, ['classification':classification, 'isDeleted': false]);
+            }
 
             def count = countRes[0]//observations.totalCount;
             def result = [];
@@ -860,7 +858,7 @@ class ObservationService extends AbstractMetadataService {
 
         try {
             Observation observation = Observation.read(Long.parseLong(observationId));
-            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
 //           def rows = sql.rows("select count(*) as count from observation as g1 where ST_DWithin(ST_Centroid(g1.topology), ${centroid}, :maxRadius) and g1.is_deleted = false", [observationId: Long.parseLong(observationId), maxRadius:maxRadius]);
 //            totalResultCount = Math.min(rows[0].getProperty("count")-1, maxObvs);
             limit = Math.min(limit, maxObvs - offset);
@@ -891,7 +889,7 @@ class ObservationService extends AbstractMetadataService {
         long totalResultCount = 0;
         def sql =  Sql.newInstance(dataSource);
         try {
-            String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String point = "ST_GeomFromText('POINT(${longitude} ${latitude})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
             def rows = sql.rows("select count(*) as count from observation as g2 where ST_DWithin(${point}, ST_Centroid(g2.topology),"+maxRadius/111.32+") and g2.is_deleted = false");
             totalResultCount = Math.min(rows[0].getProperty("count"), maxObvs);
             limit = Math.min(limit, maxObvs - offset);
@@ -1035,10 +1033,10 @@ class ObservationService extends AbstractMetadataService {
 
         def hqlQuery = sessionFactory.currentSession.createSQLQuery(query)
         if(params.bounds && boundGeometry) {
-            hqlQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            hqlQuery.setParameter("boundGeometry", boundGeometry);// new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
             if(checklistCountQuery)
-                checklistCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-                allObservationCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+                checklistCountQuery.setParameter("boundGeometry", boundGeometry);//, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+                allObservationCountQuery.setParameter("boundGeometry", boundGeometry);//, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
                 //speciesCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
                 //distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
                 //speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(org.hibernatespatial.GeometryUserType))
@@ -1077,17 +1075,12 @@ class ObservationService extends AbstractMetadataService {
             allObservationCount = observationInstanceList.size()
         }
         else {
-            utilsService.logSql {
             observationInstanceList = hqlQuery.addEntity('obv', Observation).list();
             for(int i=0;i < observationInstanceList.size(); i++) {
                 if(observationInstanceList[i].isChecklist) {
                     //observationInstanceList[i] = Checklists.read(observationInstanceList[i].id);
                 }
             }
-            }
-println "*******************************************"
-println "*******************************************"
-println "*******************************************"
             if(checklistCountQuery){
                 checklistCountQuery.setProperties(queryParts.queryParams);
                 checklistCount = checklistCountQuery.list()[0];
@@ -1288,15 +1281,6 @@ println "*******************************************"
             params.userGroup = userGroupInstance;
         }
 
-        if(params.userGroup) {
-            log.debug "Filtering from usergourp : ${params.userGroup}"
-            userGroupQuery = " join user_group_observations  userGroup on userGroup.observation_id = obv.id "
-            query += userGroupQuery
-            filterQuery += " and userGroup.user_group_id = :userGroupId "
-            queryParams['userGroupId'] = params.userGroup.id;
-            queryParams['userGroup'] = params.userGroup
-        }
-
         if(params.notInUserGroup) {
             log.debug "Filtering from notInUsergourp : ${params.userGroup}"
             userGroupQuery = " left outer join user_group_observations  userGroup on userGroup.observation_id = obv.id  and userGroup.user_group_id = :userGroupId"
@@ -1361,9 +1345,18 @@ println "*******************************************"
       }
           /*
         if(params.user){
+            if(params.user.indexOf(',') != -1) {
+            filterQuery += " and obv.author_id in :user "
+            def userIds = params.user;
+            queryParams["user"] = userIds
+            activeFilters["user"] = userIds
+
+            } else {
+            
             filterQuery += " and obv.author_id = :user "
             queryParams["user"] = params.user.toLong()
             activeFilters["user"] = params.user.toLong()
+            }
         }
 
         if(params.speciesName && (params.speciesName != grailsApplication.config.speciesPortal.group.ALL)){
@@ -1466,7 +1459,7 @@ println "*******************************************"
         }
 
         if(params.type == 'nearBy' && params.lat && params.long) {
-            String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String point = "ST_GeomFromText('POINT(${params.long.toFloat()} ${params.lat.toFloat()})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
             int maxRadius = params.maxRadius?params.int('maxRadius'):200
             filterQuery += " and (ST_DWithin(ST_Centroid(obv.topology), ${point}, "+(maxRadius/111.32)+")) = TRUE ";
             queryParams['maxRadius'] = maxRadius;
@@ -1520,7 +1513,7 @@ println "*******************************************"
             //nearByRelatedObvQuery = ', Observation as g2';
             //query += nearByRelatedObvQuery;
             Observation observation = Observation.read(params.parentId);
-            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${ConfigurationHolder.getConfig().speciesPortal.maps.SRID})"
+            String centroid = "ST_GeomFromText('POINT(${observation.longitude} ${observation.latitude})',${grails.util.Holders.getConfig().speciesPortal.maps.SRID})"
             filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, "+(params.maxNearByRadius/111.32)+") = true and obv.is_deleted = false "
 
 //            filterQuery += " and ST_DWithin(ST_Centroid(obv.topology), ${centroid}, :maxNearByRadius/111.32) and obv.isDeleted = false "                                              //removed check for not equal to parentId to include it in show page
@@ -1743,7 +1736,7 @@ println "*******************************************"
         arr[2] = p3
         arr[3] = p4
         arr[4] = p1
-        def gf = new GeometryFactory(new PrecisionModel(), ConfigurationHolder.getConfig().speciesPortal.maps.SRID)
+        def gf = new GeometryFactory(new PrecisionModel(), grails.util.Holders.getConfig().speciesPortal.maps.SRID)
         def lr = gf.createLinearRing(arr)
         def pl = gf.createPolygon(lr, null)
         return pl
@@ -1773,6 +1766,7 @@ println "*******************************************"
                     eq('id', userGroupInstance.id)
                 }
             }
+            cache true
         }
         //return (long)Observation.countByAuthorAndIsDeleted(user, false);
     }
@@ -1921,7 +1915,7 @@ println "*******************************************"
 
         try {
             model = getFilteredObservationsFromSearch(params, max, offset, false);
-        } catch(SolrException e) {
+        } catch(Exception e) {
             e.printStackTrace();
             //model = [params:params, observationInstanceTotal:0, observationInstanceList:[],  queryParams:[max:0], tags:[]];
         }
@@ -1934,8 +1928,9 @@ println "*******************************************"
      * offset: offset results: if offset = -1 its not passed to the
      * executing query
      */
+/*
     Map getFilteredObservationsFromSearch(params, max, offset, isMapView){
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, isMapView);
         def paramsList = queryParts.paramsList
         def queryParams = queryParts.queryParams
@@ -2011,16 +2006,13 @@ println "*******************************************"
             responseHeader = queryResponse?.responseHeader;
 
         }
-        /*if(responseHeader?.params?.q == "*:*") {
-          responseHeader.params.remove('q');
-          }*/
 
         return [responseHeader:responseHeader, observationInstanceList:instanceList, resultType:'observation', instanceTotal:noOfResults, checklistCount:checklistCount, observationCount: noOfResults-checklistCount , queryParams:queryParams, activeFilters:activeFilters, totalObservationIdList:totalObservationIdList, distinctRecoList:distinctRecoList, speciesGroupCountList:speciesGroupCountList, canPullResource:userGroupService.getResourcePullPermission(params)]
 
     }
 
-    private Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+  private Map getFilteredObservationsQueryFromSearch(params, max, offset, isMapView) {
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(grailsApplication.config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
@@ -2265,7 +2257,7 @@ println "*******************************************"
         log.debug "Along with faceting params : "+paramsList;
         return [paramsList:paramsList, queryParams:queryParams, activeFilters:activeFilters];
     }
-
+*/
     private boolean isValidSortParam(String sortParam) {
         if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("visitCount")  || sortParam.equalsIgnoreCase("createdOn") || sortParam.equalsIgnoreCase("lastRevised") )
             return true;
@@ -2277,12 +2269,12 @@ println "*******************************************"
 
         def queryResponse = observationsSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+/*            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Observations"]);
             }
-        }
+*/        }
         return result;
     }
 
@@ -2376,32 +2368,8 @@ println "*******************************************"
 
         if(!params.term) return result;
 
-        NamedList paramsList = new NamedList();
-        /*        paramsList.add('fl', 'location_exact');
-        if(springSecurityService.currentUser){
-        paramsList.add('q', "author_id:"+springSecurityService.currentUser.id.toLong())
-        } else {
-        paramsList.add('q', "*:*");
-        }
-        paramsList.add('facet', "true");
-        paramsList.add('facet.field', "location_exact")
-        paramsList.add('facet.mincount', "1")
-        paramsList.add('facet.prefix', params.term?:'*');
-        paramsList.add('facet.limit', 5);
-
-        def facetResults = []
-        if(paramsList) {
-        def queryResponse = observationsSearchService.search(paramsList);
-        List facets = queryResponse.getFacetField('location_exact').getValues()
-
-        facets.each {
-        facetResults.add([value:it.getName(), label:it.getName()+'('+it.getCount()+')',  "category":"My Locations"]);
-        }
-
-        }
-         */
-
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def paramsList = new HashMap();
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         String query = ""
         if(springSecurityService.currentUser){
             query += searchFieldsConfig.CONTRIBUTOR+":"+springSecurityService.currentUser.name+" AND "
@@ -2410,17 +2378,17 @@ println "*******************************************"
         }
         query += searchFieldsConfig.LOCATION_EXACT+":"+params.term+'*'?:'*';
 
-        paramsList.add("q", query);
-        paramsList.add("fl", searchFieldsConfig.LOCATION_EXACT+','+searchFieldsConfig.LATLONG+','+searchFieldsConfig.TOPOLOGY);
-        paramsList.add("start", 0);
-        paramsList.add("rows", 20);
+        paramsList.put("q", query);
+        paramsList.put("fl", searchFieldsConfig.LOCATION_EXACT+','+searchFieldsConfig.LATLONG+','+searchFieldsConfig.TOPOLOGY);
+        paramsList.put("start", 0);
+        paramsList.put("rows", 20);
         //paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc,'+searchFieldsConfig.SCORE + " desc ");
-        paramsList.add("sort", searchFieldsConfig.UPDATED_ON+' desc');
-        paramsList.add("sort", searchFieldsConfig.SCORE + " desc ");
+        paramsList.put("sort", searchFieldsConfig.UPDATED_ON+' desc');
+        paramsList.put("sort", searchFieldsConfig.SCORE + " desc ");
         def results = [];
         Map temp = [:]
         if(paramsList) {
-            def queryResponse = observationsSearchService.search(paramsList);
+        /*    def queryResponse = observationsSearchService.search(paramsList);
 
             Iterator iter = queryResponse.getResults().listIterator();
             while(iter.hasNext()) {
@@ -2431,7 +2399,7 @@ println "*******************************************"
                     temp[doc.getFieldValue(searchFieldsConfig.LOCATION_EXACT)] = true;
                 }
             }
-        }
+        */}
 
         return results
     }
@@ -2496,8 +2464,8 @@ println "*******************************************"
         def distinctRecoCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.distinctRecoCountQuery)
 
         if(params.bounds && boundGeometry) {
-            distinctRecoQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
-            distinctRecoCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            distinctRecoQuery.setParameter("boundGeometry", boundGeometry);//, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            distinctRecoCountQuery.setParameter("boundGeometry", boundGeometry);//, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         }
         if(max > -1){
             distinctRecoQuery.setMaxResults(max);
@@ -2531,7 +2499,7 @@ println "*******************************************"
     /**
      */
     def getDistinctRecoListFromSearch(params, int max, int offset) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, max, offset, false);
         def paramsList = queryParts.paramsList
         def queryParams = queryParts.queryParams
@@ -2621,7 +2589,7 @@ println "*******************************************"
         def speciesGroupCountQuery = sessionFactory.currentSession.createSQLQuery(queryParts.speciesGroupCountQuery)
 
         if(params.bounds && boundGeometry) {
-            speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
+            speciesGroupCountQuery.setParameter("boundGeometry", boundGeometry);//, new org.hibernate.type.CustomType(new org.hibernatespatial.GeometryUserType()))
         }
         speciesGroupCountQuery.setProperties(queryParts.queryParams)
         def speciesGroupCountList = getFormattedResult(speciesGroupCountQuery.list())
@@ -2632,7 +2600,7 @@ println "*******************************************"
     /**
      */
     def  getSpeciesGroupCountFromSearch(params) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObservationsQueryFromSearch(params, -1, -1, false);
         def paramsList = queryParts.paramsList
 
@@ -2751,7 +2719,6 @@ println "*******************************************"
      */
     def getObservationList(params, max, offset, String action, List eagerFetchProperties=null){
 		if(Utils.isSearchAction(params, action)){
-            //getting result from solr
             def idList = getFilteredObservationsFromSearch(params, max, offset, false).totalObservationIdList
             def res = []
             idList.each { obvId ->
@@ -3133,13 +3100,13 @@ println "*******************************************"
             List traitIcons = [];
             factInstances?.each { f ->
                 if(f.traitValue) { 
-                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                    traitIcons << [f.traitValue.value, f.traitInstance.name, f.traitValue.mainImage()?.fileName, f.traitInstance.dataTypes.value()]
                 } else if(f.value && f.toValue) {
-                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value+":"+f.toValue, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.fromDate && f.toDate) {
-                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.value) {
-                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 }
             }
 

@@ -53,7 +53,6 @@
                 </g:each>
                 </ul>
             </div>
-
         <g:set var="utilsService" bean="utilsService"/>
         <% def userFilePath=grailsApplication.config.speciesPortal.userDetailsFilePath %>
         <div>

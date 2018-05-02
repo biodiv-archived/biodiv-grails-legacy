@@ -5,7 +5,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.grails.taggable.TagLink;
 import species.Classification;
 
@@ -54,13 +54,7 @@ import species.Metadata
 import species.SpeciesPermission;
 import content.eml.Contact;
 
-//import org.apache.lucene.document.DateField;
-import org.apache.lucene.document.DateTools;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
-
 import java.net.URLDecoder;
-import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;

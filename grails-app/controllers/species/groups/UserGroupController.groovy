@@ -103,7 +103,6 @@ def dataSource;
 
 	def filteredList = {
 		def result;
-		//TODO: Dirty hack to feed results through solr if the request is from search
 		if(params.action == 'search') {
 			result = userGroupService.getUserGroupFromSearch(params)
 		} else {
@@ -1446,8 +1445,8 @@ def dataSource;
 	   def res = createFromFile(params.file, areIds)
 	   def oldUsers = res[0]
 	   def newUsers = res[1]
-       int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
-       dataSource.setUnreturnedConnectionTimeout(100000);
+//       int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//       dataSource.setUnreturnedConnectionTimeout(100000);
 
        SUser.withTransaction() { 
            newUsers.each { user ->
@@ -1473,8 +1472,8 @@ def dataSource;
                }
            }
        }
-       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
-       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+//       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+//       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
 
 	   render "== done"
    }
@@ -1705,14 +1704,14 @@ def dataSource;
         if(userGroupInstance.filterRule) {
             def filterRuleJson = JSON.parse(userGroupInstance.filterRule);
             JSON.parse(userGroupInstance.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 rules << rule
             }
         }
         render rules as JSON
     }
 }
-
+/*
 class UserGroupCommand {
 	String name
 	String webaddress
@@ -1724,5 +1723,6 @@ class UserGroupCommand {
 		name nullable: false, blank:false
 		webaddress nullable: false, blank:false, validator: UserGroupController.webaddressValidator
 		description nullable: false, blank:false
+
 	}
-}
+}*/

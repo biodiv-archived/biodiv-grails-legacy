@@ -1,6 +1,42 @@
+<%@page import="species.utils.Utils"%>
+<%@ page import="species.groups.SpeciesGroup"%>
+<%@ page import="species.Habitat"%>
+
+
 <head>
-<meta name="layout" content="main" />
+<!--meta name="layout" content="main" /-->
 <title><g:message code="button.login" /></title>
+
+<script type="text/javascript">
+    window.params = {  
+        'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
+        'login' : {
+            'googleApiKey' : "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.apikey}",
+            'googleClientID': "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.key}",
+            googleOAuthSuccessUrl : "/oauth/google/success",
+            ibpServerCookieDomain : "${Utils.getIBPServerCookieDomain()}",
+            authSuccessUrl : "${uGroup.createLink(controller:'login', action:'authSuccess')}",
+            checkauthUrl : "${uGroup.createLink(controller:'openId', action:'checkauth', base:Utils.getDomainServerUrl(request))}",
+            channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
+            springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
+            authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
+            'loginUrl':"biodiv-api/login",
+            'tokenUrl':"biodiv-api/login/token",
+            logoutUrl : "${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
+            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}",
+            api: {
+                cookie : {
+                    domain : "${grailsApplication.config.speciesPortal.api.cookie.domain}",
+                    path : "${grailsApplication.config.speciesPortal.api.cookie.path}"
+                }
+            }
+ 
+        }
+    }
+</script>
+ 
+
+
 </head>
 
 <body>
@@ -8,49 +44,30 @@
 		<div class="row">
 
 			<div class="openid-loginbox super-section">
-
-				<g:if test="${flash.error}">
-					<div class="alert alert-error">
-						${flash.error}
-					</div>
-				</g:if>
-				
-				<g:if test="${flash.message}">
-					<div class="alert alert-error">
-						${flash.message}
-					</div>
-				</g:if>
-			</div>
+    		</div>
 		</div>
 	</div>
-	<script type="text/javascript">
-<%--		alert("parent location" +window.opener.location );--%>
-<%--		alert("closing window " + window.location);--%>
-<%--		window.opener.mynewlocation = window.location.search;--%>
-		
-<%--		window.opener.mynewlocation = "abcd";--%>
-<%--		--%>
-<%--		alert("url params " + JSON.stringify(ee));--%>
-<%--		alert("=== " +  JSON.stringify($.param(ee)));--%>
-<%--		alert("=== " +  JSON.stringify(decodeURIComponent($.param(ee))));--%>
-		
-		window.opener.mynewparams = getUrlParams();
-		
-	    window.close();
-	    function getUrlParams(){
-	    	var prmstr = window.location.search.substr(1);
-			var prmarr = prmstr.split ("&");
-			var params = {};
+<asset:javascript src="jquery.js"/>
+<asset:javascript src="jquery.plugins/jquery.form.js"/>
+<asset:javascript src="jquery.plugins/popuplib.js"/>
+<asset:javascript src="jquery.plugins/jquery.cookie.js"/>
+<asset:javascript src="jquery.plugins/jquery.cookie.js"/>
+<asset:javascript src="jwt-decode.js"/>
+<script src="https://apis.google.com/js/auth.js" type="text/javascript">
 
-			for ( var i = 0; i < prmarr.length; i++) {
-    			var tmparr = prmarr[i].split("=");
-    			params[tmparr[0]] = decodeURIComponent(tmparr[1]);
-			}
-			
-			
-			
-			return params;
-	    }
-	    
+<asset:javascript src="biodiv/util.js"/>
+<asset:javascript src="biodiv/login.js"/>
+
+
+<script type="text/javascript">
+        $(document).ready(function(){
+            var loginInfo = {
+                "access_token":"${access_token}",
+                "refresh_token":"${refresh_token}",
+                "pic":"${pic}"
+            };
+            window.setLoginInfo(loginInfo);
+            window.location.href='/';
+        });
 	</script>	
 </body>

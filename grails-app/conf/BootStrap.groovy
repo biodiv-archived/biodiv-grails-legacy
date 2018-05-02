@@ -25,7 +25,10 @@ import species.TaxonomyRegistry;
 import species.Classification;
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils;
-
+import java.security.Provider;
+import java.security.Security;
+import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
+import grails.util.Holders;
 
 class BootStrap {
 
@@ -56,8 +59,11 @@ class BootStrap {
         initCaches();
         initBannerMessageMap();
         initFiltersMap();
+		initUserGroupFilterRules();
         //speciesTraitsService.init();
-       
+        log.debug "BouncyCastleProviderSingleton.getInstance"
+        Provider bc = BouncyCastleProviderSingleton.getInstance();
+        Security.addProvider(bc);
   	}
 
 	def initDefs() {
@@ -98,12 +104,12 @@ class BootStrap {
 				enabled: true,
                 language:Language.getLanguage(Language.DEFAULT_LANGUAGE)).save(failOnError: true)
 
-		if (!user.authorities.contains(userRole)) {
+		if (!user.fetchAuthorities().contains(userRole)) {
 			SUserRole.create user, userRole
 		}
 
 		if(isAdmin) {
-			if (!user.authorities.contains(adminRole)) {
+			if (!user.fetchAuthorities().contains(adminRole)) {
 				SUserRole.create user, adminRole
 			}
 		}
@@ -144,14 +150,14 @@ class BootStrap {
 	 * 
 	 */
 	def initFilters() {
+//        SpringSecurityUtils.clientRegisterFilter 'facebookAuthCookieTransparentFilter', 721
+
+//        SpringSecurityUtils.registerProvider 'jwtAuthTokenProvider'
         //SpringSecurityUtils.clientRegisterFilter('openIDAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+50)
 /*        SpringSecurityUtils.registerProvider 'openIDAuthProvider'
         SpringSecurityUtils.clientRegisterFilter 'openIDAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+1
         SpringSecurityUtils.clientRegisterFilter 'restAuthenticationFilter', SecurityFilterPosition.OPENID_FILTER.getOrder()+2
-        println SpringSecurityUtils.providerNames;
-        println SpringSecurityUtils.afterInvocationManagerProviderNames;
-        println SpringSecurityUtils.orderedFilters;
-*/
+        */
 	}
 
 	def initEmailConfirmationService() {
@@ -218,6 +224,14 @@ class BootStrap {
 		utilsService.loadBannerMessageMap();
 	}
 
+	def initUserGroupFilterRules() {
+		List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
+		userGroupsWithFilterRule.each {uG ->
+			UserGroup.userGroupFilterRules[uG.id] = uG.getFilterRules();
+		}
+		println "Usergroup filter rules initialized ${UserGroup.userGroupFilterRules}"
+	}
+
 	def initFiltersMap(){
 		utilsService.loadFilterMap();
 	}
@@ -229,6 +243,7 @@ class BootStrap {
 	def destroy = {
 		def indexStoreDir = grailsApplication.config.speciesPortal.nameSearch.indexStore;
 		//namesIndexerService.store(indexStoreDir);
+        utilsService.shutdownRedisClient();
 	}
 	
 }

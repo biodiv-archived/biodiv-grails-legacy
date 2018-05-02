@@ -24,7 +24,11 @@ class BiodivAdminController {
     def speciesSearchService;
     def observationsSearchService;
     def SUserSearchService;
+    def resourceSearchService;
+    def newsletterSearchService;
     def documentSearchService;
+    def projectSearchService;
+
     def userGroupSearchService;
     def namesLoaderService;
     def namesIndexerService;
@@ -38,7 +42,7 @@ class BiodivAdminController {
     def banner;
     Map bannerMessageMap;
     /**
-     * 
+     *
      */
     def index = {
          render(view:"index")
@@ -96,7 +100,7 @@ class BiodivAdminController {
         try {
             log.debug "Syncing names into recommendations"
             List taxonConcepts = [];
-            params.id?.split(',').each { 
+            params.id?.split(',').each {
                 def s = Species.read(Integer.parseInt(it));
                 if(s) taxonConcepts << s.taxonConcept;
             }
@@ -120,7 +124,7 @@ class BiodivAdminController {
             if(indexDocs > -1) {
                 speciesSearchService.INDEX_DOCS = indexDocs
             }
- 
+
             speciesSearchService.publishSearchIndex();
             speciesSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['species'] as Object[], RCU.getLocale(request))
@@ -139,7 +143,7 @@ class BiodivAdminController {
             if(indexDocs > -1) {
                 observationsSearchService.INDEX_DOCS = indexDocs
             }
- 
+
             observationsSearchService.publishSearchIndex();
             observationsSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['observations'] as Object[], RCU.getLocale(request))
@@ -158,14 +162,14 @@ class BiodivAdminController {
             if(indexDocs > -1) {
                 SUserSearchService.INDEX_DOCS = indexDocs
             }
- 
+
             SUserSearchService.publishSearchIndex();
             SUserSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['users'] as Object[], RCU.getLocale(request))
         } catch(e) {
             e.printStackTrace();
             flash.message = e.getMessage()
-        } 
+        }
         redirect(action: "index")
     }
 
@@ -177,7 +181,7 @@ class BiodivAdminController {
             if(indexDocs > -1) {
                 documentSearchService.INDEX_DOCS = indexDocs
             }
- 
+
             documentSearchService.publishSearchIndex();
             documentSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['documents'] as Object[], RCU.getLocale(request))
@@ -187,6 +191,61 @@ class BiodivAdminController {
         }
         redirect(action: "index")
     }
+    def reloadResourceSearchIndex = {
+        try {
+            if(params.deleteIndex)
+                resourceSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                resourceSearchService.INDEX_DOCS = indexDocs
+            }
+
+            resourceSearchService.publishSearchIndex();
+            resourceSearchService.optimize();
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['resources'] as Object[], RCU.getLocale(request))
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+        redirect(action: "index")
+    }
+    def reloadNewsletterSearchIndex = {
+        try {
+            if(params.deleteIndex)
+                newsletterSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                newsletterSearchService.INDEX_DOCS = indexDocs
+            }
+
+            newsletterSearchService.publishSearchIndex();
+            newsletterSearchService.optimize();
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['newsletter'] as Object[], RCU.getLocale(request))
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+        redirect(action: "index")
+    }
+    def reloadProjectSearchIndex = {
+        try {
+            if(params.deleteIndex)
+                projectSearchService.deleteIndex();
+            int indexDocs = params.indexDocs?params.int('indexDocs'):-1
+            if(indexDocs > -1) {
+                projectSearchService.INDEX_DOCS = indexDocs
+            }
+
+            projectSearchService.publishSearchIndex();
+            projectSearchService.optimize();
+            flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['project'] as Object[], RCU.getLocale(request))
+        } catch(e) {
+            e.printStackTrace();
+            flash.message = e.getMessage()
+        }
+        redirect(action: "index")
+    }
+
 
     def reloadUserGroupSearchIndex = {
         try {
@@ -196,7 +255,6 @@ class BiodivAdminController {
             if(indexDocs > -1) {
                 userGroupSearchService.INDEX_DOCS = indexDocs
             }
- 
             userGroupSearchService.publishSearchIndex();
             userGroupSearchService.optimize();
             flash.message = messageSource.getMessage("default.admin.success.createdSearchIndex", ['user group'] as Object[], RCU.getLocale(request))
@@ -223,10 +281,10 @@ class BiodivAdminController {
         try {
             if(params.taxonId) {
             noOfUpdations = groupHandlerService.updateGroup(TaxonomyDefinition.get(Long.parseLong(params.taxonId)));
-            flash.message = noOfUpdations +" taxon updated" 
+            flash.message = noOfUpdations +" taxon updated"
             } else if(params.speciesId) {
             noOfUpdations = groupHandlerService.updateGroups([Species.get(Long.parseLong(params.speciesId))], true);
-            flash.message = noOfUpdations +" species updated" 
+            flash.message = noOfUpdations +" species updated"
             } else {
             noOfUpdations = groupHandlerService.updateGroups(params.runForSynonyms?params.runForSynonyms.toBoolean():false, params.updateWhereNoGroup?params.updateWhereNoGroup.toBoolean():false);
             flash.message = messageSource.getMessage("default.admin.success.updated.group", ['associations',noOfUpdations] as Object[], RCU.getLocale(request))
@@ -326,7 +384,7 @@ println "Can't find authority for name '$roleName'"
     }
     namesLoaderService.syncNamesAndRecos(true);
     }
-     */	
+     */
 def user = {
     String actionId = params.id ?: "list"
     log.debug actionId
@@ -335,7 +393,7 @@ def user = {
 
     def reloadBiodivSearchIndex = {
         try {
-            if(params.deleteIndex) 
+            if(params.deleteIndex)
                 biodivSearchService.deleteIndex();
             int indexDocs = params.indexDocs?params.int('indexDocs'):-1
             if(indexDocs > -1) {
@@ -352,7 +410,7 @@ def user = {
     }
 
 /**
- * 
+ *
  */
 def contentupdate(){
       String content = params.content?.trim()
@@ -373,7 +431,7 @@ def contentupdate(){
 
 }
 
-def getMessage(){     
+def getMessage(){
     String groupName=params.groupId;
     def bMessage=utilsService.getBannerMessage(groupName);
     render (view:"index" , model:[getMessage:bMessage,getGroup:groupName])

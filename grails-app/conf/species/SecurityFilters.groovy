@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import org.springframework.web.servlet.support.RequestContextUtils as RCU; 
 import javax.servlet.http.HttpServletResponse;
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders;
 import static org.springframework.http.HttpStatus.*;
 
 class SecurityFilters {
@@ -31,6 +31,7 @@ class SecurityFilters {
         all(controller:'*', action:'*') {
 
             before = {
+                println "security filters ======================================="
                 log.info "^Request ${request.getRequestURL()} with params: ${params}"
 
                 grailsApplication.config.speciesPortal.domain = Utils.getDomain(request);
@@ -64,7 +65,8 @@ class SecurityFilters {
                 if(request.forwardURI.startsWith("/${appName}/api/")) {
                     if (!actionName) actionName = 'index'
                         println "MATCHED--------${params.controller}------${params.action}---${controllerName}--${actionName}------------)"
-                        for( cc in ApplicationHolder.application.controllerClasses) {
+                        params.format='json';
+                        for( cc in grailsApplication.controllerClasses) {
                             for (m in cc.clazz.methods) {
                                 def ann = m.getAnnotation(grails.plugin.springsecurity.annotation.Secured)
                                 if (ann) {
@@ -247,10 +249,6 @@ stats.clear() // We assume no one else is using stats
                 }
             }
         }
-
-
-
-
     }
 
 }

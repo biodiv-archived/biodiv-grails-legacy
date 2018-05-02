@@ -1,8 +1,8 @@
 package species.auth
 
-import com.odobo.grails.plugin.springsecurity.rest.*
+import grails.plugin.springsecurity.rest.*
 
-import com.odobo.grails.plugin.springsecurity.rest.token.reader.TokenReader
+import grails.plugin.springsecurity.rest.token.reader.TokenReader
 import grails.plugin.springsecurity.authentication.GrailsAnonymousAuthenticationToken
 import groovy.util.logging.Slf4j
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
@@ -19,9 +19,10 @@ import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import static org.springframework.http.HttpStatus.*;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import grails.plugin.springsecurity.rest.token.AccessToken;
 
 /**
  * This filter starts the token validation flow. It extracts the token from the configured header name, and pass it to
@@ -34,7 +35,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
  * {@link AuthenticationSuccessHandler}. Otherwise, an {@link AuthenticationFailureHandler} is called.
  */
 @Slf4j
-class RestTokenValidationFilter extends GenericFilterBean {
+class RestTokenValidationFilter extends grails.plugin.springsecurity.rest.RestTokenValidationFilter {
 
     String headerName
 
@@ -54,6 +55,8 @@ class RestTokenValidationFilter extends GenericFilterBean {
 
     @Override
     void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        super.doFilter(request,response,chain);
+ /*       
         HttpServletRequest httpRequest = request as HttpServletRequest
         HttpServletResponse httpResponse = response as HttpServletResponse
 
@@ -83,10 +86,10 @@ class RestTokenValidationFilter extends GenericFilterBean {
             log.debug "Authentication failed: ${ae.message}"
             authenticationFailureHandler.onAuthenticationFailure(httpRequest, httpResponse, ae)
         }
-
+*/
     }
 
-    private processFilterChain(ServletRequest request, ServletResponse response, FilterChain chain, String tokenValue, RestAuthenticationToken authenticationResult) {
+    private processFilterChain(ServletRequest request, ServletResponse response, FilterChain chain, String tokenValue, AccessToken authenticationResult) {
         HttpServletRequest httpRequest = request as HttpServletRequest
         HttpServletResponse httpResponse = response as HttpServletResponse
 
@@ -111,11 +114,6 @@ class RestTokenValidationFilter extends GenericFilterBean {
             Authentication authentication = SecurityContextHolder.context.authentication
         //    processReadRequest(httpRequest);
              boolean isAllowed = webInvocationPrivilegeEvaluator.isAllowed(httpRequest.contextPath, actualUri, httpRequest.method, authentication);
-            println "******************************************************************"
-            println actualUri +"   "+ httpRequest.method+"    "
-            println authentication
-            println isAllowed
-            println "******************************************************************"
             if (authentication && authentication instanceof AbstractAuthenticationToken && isAllowed) {
                 log.debug "Request is already authenticated as anonymous request. Continuing the filter chain"
                 chain.doFilter(request, response)

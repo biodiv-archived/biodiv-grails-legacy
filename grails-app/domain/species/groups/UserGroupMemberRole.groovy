@@ -40,6 +40,14 @@ class UserGroupMemberRole implements Serializable {
 		}
 	
 	}
+
+	static mapping = {
+		id composite: ['userGroup', 'role', 'sUser']
+		version false
+//        cache usage: 'nonstrict-read-write', include: 'non-lazy'
+
+	}
+
 	boolean equals(other) {
 		if (!(other instanceof UserGroupMemberRole)) {
 			return false
@@ -103,8 +111,4 @@ class UserGroupMemberRole implements Serializable {
 		return executeUpdate('UPDATE UserGroupMemberRole SET role=:role WHERE sUser=:sUser and userGroup=:userGroup', [userGroup:userGroup, sUser:sUser, role: role]);
 	}
 	
-	static mapping = {
-		id composite: ['userGroup', 'role', 'sUser']
-		version false
-	}
 }

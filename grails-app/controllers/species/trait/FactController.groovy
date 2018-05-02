@@ -78,12 +78,12 @@ class FactController extends AbstractObjectController {
     def update() {
         boolean success=false;
         Map model = [:], result=[:];
-        Trait trait;
+        Trait traitInstance;
         try {
         if(params.traitId) {
-            trait = Trait.read(params.long('traitId'));
+            traitInstance = Trait.read(params.long('traitId'));
         }
-        if(trait) {
+        if(traitInstance) {
             if(params.objectId && params.objectType) {
                 def object;
                 switch(params.objectType) {
@@ -100,8 +100,9 @@ class FactController extends AbstractObjectController {
                     p['contributor'] = springSecurityService.currentUser.email;
                     p['attribution'] = springSecurityService.currentUser.email;
                     p['license'] = License.LicenseType.CC_BY.value();
+                    p['traitInstance'] = traitInstance;
                     Map traits = factService.getTraits(params.traits);
-                    if(traits && traits[trait.id+'']) {
+                    if(traits && traits[traitInstance.id+'']) {
                         p.putAll(traits);
                         p['replaceFacts'] = 'true';
                         Map r = factService.updateFacts(p, object, null, true);
@@ -117,26 +118,26 @@ class FactController extends AbstractObjectController {
                                 activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
                             }
 
-                            List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
+                            List<Fact> facts = Fact.findAllByTraitInstanceAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
                             Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
-                            queryParams.trait[trait.id] = '';
+                            queryParams.trait[traitInstance.id] = '';
                             facts.each { fact ->
                                 String tvStr = '';
                                 if(fact.traitValue) {
                                     tvStr = fact.traitValue.id;
-                                } else if (trait.dataTypes == DataTypes.DATE) {
+                                } else if (traitInstance.dataTypes == DataTypes.DATE) {
                                     tvStr = fact.fromDate + (fact.toDate ? ":" + fact.toDate:'')
                                 }else {
                                     tvStr = fact.value + (fact.toValue ? ":" + fact.toValue:'')
                                 }
 
-                                queryParams.trait[trait.id] += tvStr+',';
-                                if(!factInstance[trait.id]) {
-                                    factInstance[trait.id] = [];
+                                queryParams.trait[traitInstance.id] += tvStr+',';
+                                if(!factInstance[traitInstance.id]) {
+                                    factInstance[traitInstance.id] = [];
                                 }
-                                factInstance[trait.id] << (fact.traitValue ?: tvStr);
+                                factInstance[traitInstance.id] << (fact.traitValue ?: tvStr);
 
-                                otherParams["trait"] = trait.name
+                                otherParams["trait"] = traitInstance.name
                                 otherParams["traitValueStr"] = fact.getActivityDescription()
                                 utilsService.sendNotificationMail(utilsService.FACT_UPDATE,object,null,null,null,otherParams)
                             }
@@ -154,20 +155,20 @@ class FactController extends AbstractObjectController {
                             println "======================"
                             println queryParams
 
-                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':traitInstance, 'traitInstance':traitInstance, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
                         } else {
 
                         }
                     } else {
                         // if no traitValue selected 
-                        log.debug "No trait value .. so deleting all facts for this trait ${trait}"
-                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
+                        log.debug "No trait value .. so deleting all facts for this trait ${traitInstance}"
+                        List<Fact> facts = Fact.findAllByTraitInstanceAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
 
                         facts.each { fact ->
                             fact.isDeleted = true;
                             fact.save();
                             result = [success:true, msg:'Successfully deleted fact']
-                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'object':object, 'queryParams':'', displayAny:false, editable:true]);
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':traitInstance, 'object':object, 'queryParams':'', displayAny:false, editable:true]);
                         }
 
                     }
@@ -318,26 +319,26 @@ class FactController extends AbstractObjectController {
                     if(tv_str) {
                         tv_str.split(',').each {v->
                         def tv = v.trim().split("\\|");
-                        def taxon,trait,traitValue;
+                        def taxon,traitInstance,traitValue;
                         if(cf_taxons[cf+' taxonID']) {
                             taxon = TaxonomyDefinition.read(Long.parseLong(cf_taxons[cf+' taxonID'])); 
                             def traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [tv[0], taxon]);
-                            if(traits) trait = traits[0];
+                            if(traits) traitInstance = traits[0];
                         } else {
-                            trait = Trait.findByName(tv[0]);
+                            traitInstance = Trait.findByName(tv[0]);
                         }
-                        traitValue = TraitValue.findByTraitAndValue(trait, tv[1]);
-                        if(traitValue && trait) {
+                        traitValue = TraitValue.findByTraitAndValue(traitInstance, tv[1]);
+                        if(traitValue && traitInstance) {
                             //TODO:do get contri and attr from activity feed
                             def contributor;
                             def authors = ActivityFeed.executeQuery("select author from ActivityFeed where activity_holder_id=:oid and activity_type='Custom field edited' order by last_updated desc limit 1",[oid:obv.id]);
                             if(authors) contributor = authors[0];
                             if(!contributor) contributor = SUser.findByEmail('admin@strandls.com');
                             Map m = ['attribution':contributor.name, 'contributor':contributor.email, 'license':'BY'];
-                            if(!m[trait.id+''])  {
-                                m[trait.id+''] = traitValue.value
+                            if(!m[traitInstance.id+''])  {
+                                m[traitInstance.id+''] = traitValue.value
                             } else {
-                                m[trait.id+''] += ','+traitValue.value
+                                m[traitInstance.id+''] += ','+traitValue.value
                             }
                             println '=================='
                             println m;

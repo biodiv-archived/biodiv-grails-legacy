@@ -1,6 +1,6 @@
 package species.auth;
 
-import com.odobo.grails.plugin.springsecurity.rest.oauth.DefaultOauthUserDetailsService;
+import grails.plugin.springsecurity.rest.oauth.DefaultOauthUserDetailsService;
 import groovy.util.logging.Slf4j
 import org.pac4j.core.profile.CommonProfile
 import org.pac4j.core.profile.UserProfile
@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import com.odobo.grails.plugin.springsecurity.rest.oauth.OauthUser;
+import grails.plugin.springsecurity.rest.oauth.OauthUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import speciespage.SUserService;
 import species.auth.SUser;

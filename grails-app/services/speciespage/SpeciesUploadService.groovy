@@ -4,16 +4,7 @@ import java.util.List;
 
 import java.util.List
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
-
-
-import org.apache.solr.common.util.DateUtil;
-import org.apache.solr.common.util.NamedList;
-
 import org.apache.commons.logging.LogFactory
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -97,7 +88,7 @@ class SpeciesUploadService {
     //def namelistService;
     def userGroupService;
 
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
 
 	static int BATCH_SIZE = 1;
 	//int noOfFields = Field.count();

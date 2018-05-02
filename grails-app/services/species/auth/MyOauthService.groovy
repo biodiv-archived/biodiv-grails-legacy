@@ -1,30 +1,29 @@
 package species.auth;
 
-import com.odobo.grails.plugin.springsecurity.rest.RestOauthService;
-import com.odobo.grails.plugin.springsecurity.rest.oauth.OauthUser
-import com.odobo.grails.plugin.springsecurity.rest.oauth.OauthUserDetailsService
-import com.odobo.grails.plugin.springsecurity.rest.token.generation.TokenGenerator
-import com.odobo.grails.plugin.springsecurity.rest.token.storage.TokenStorageService
+import grails.plugin.springsecurity.rest.oauth.OauthUser
+import grails.plugin.springsecurity.rest.RestOauthService;
+import grails.plugin.springsecurity.rest.oauth.OauthUserDetailsService
+import grails.plugin.springsecurity.rest.token.generation.TokenGenerator
+import grails.plugin.springsecurity.rest.token.storage.TokenStorageService
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.pac4j.core.context.WebContext
 import org.pac4j.core.credentials.Credentials
 import org.pac4j.core.profile.CommonProfile
-import org.pac4j.oauth.client.BaseOAuthClient
 import org.pac4j.oauth.profile.OAuth20Profile
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
-import com.odobo.grails.plugin.springsecurity.rest.RestAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.scribe.model.Token;
-import org.pac4j.oauth.client.exception.OAuthCredentialsException;
 
 class MyOauthService extends RestOauthService {
 
     @Override
     String storeAuthentication(String provider, WebContext context) {
+        super.storeAuthentication(provider, context);
+        /*
         BaseOAuthClient client = getClient(provider)
         Credentials credentials 
         try {
@@ -60,7 +59,7 @@ class MyOauthService extends RestOauthService {
             e.printStackTrace();
             throw e;
         }
-
+*/
     }
 
 }

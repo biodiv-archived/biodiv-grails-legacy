@@ -132,6 +132,7 @@
 //= require biodiv/pages.js
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
 //= require jquery.plugins/ion.rangeSlider.min
+//= require jwt-decode.min.js
 //= require biodiv/dataset/dataset.js
 //= require biodiv/dataset/create.js
 //= require biodiv/datatable/create.js

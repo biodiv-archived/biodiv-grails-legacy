@@ -5,7 +5,7 @@ import grails.util.Environment;
 import grails.util.GrailsNameUtils;
 import groovy.sql.Sql
 import groovy.text.SimpleTemplateEngine
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.grails.taggable.TagLink;
 import species.Classification;
 import content.eml.UFile;
@@ -60,13 +60,8 @@ import species.SpeciesPermission;
 import content.eml.Contact;
 import org.apache.commons.io.FilenameUtils;
 
-//import org.apache.lucene.document.DateField;
-import org.apache.lucene.document.DateTools;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 
 import java.net.URLDecoder;
-import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
@@ -132,7 +127,7 @@ class DatasetService extends AbstractMetadataService {
         }
 
         //setting ufile and uri
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+        def config = Holders.config
         String contentRootDir = config.speciesPortal.content.rootDir
         if(!instance.uFile) {
             String uploadDir = "datasets/"+ UUID.randomUUID().toString()	
@@ -181,6 +176,15 @@ class DatasetService extends AbstractMetadataService {
         
         if(hasPermission(dataset, springSecurityService.currentUser)) {
             result = save(dataset, params, true, feedAuthor, feedType, null);
+            if(result.success) {
+                log.debug "Posting dataset to all user groups"
+                HashSet uGs = new HashSet();
+                if(params.webaddress) {
+		            UserGroup ug = UserGroup.findByWebaddress(params.webaddress)
+                    uGs.add(ug);
+                }
+                userGroupService.addResourceOnGroups(dataset, uGs.collect{it.id}, false);
+            }
         } else {
             result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
         }

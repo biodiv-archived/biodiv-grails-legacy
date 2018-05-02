@@ -235,14 +235,6 @@ class DiscussionController extends AbstractObjectController {
 		def canPullResource = filtereddiscussion.canPullResource
 		
 		def count = discussionService.getFilteredDiscussions(params, -1, -1).discussionInstanceList.size()
-		if(params.append?.toBoolean()) {
-            session["doc_ids_list"].addAll(discussionInstanceList.collect {it.id});
-        } else {
-            session["doc_ids_list_params"] = params.clone();
-            session["doc_ids_list"] = discussionInstanceList.collect {it.id};
-        }
-
-		log.debug "Storing all doc ids list in session ${session['doc_ids_list']} for params ${params}";
 
 		return [discussionInstanceList: discussionInstanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'discussion', canPullResource:canPullResource]
 

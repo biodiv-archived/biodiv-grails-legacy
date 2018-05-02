@@ -1,5 +1,5 @@
 package species.sourcehandler.exporter
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 import org.hibernate.SessionFactory;
 import java.text.SimpleDateFormat;
 import org.hibernate.exception.ConstraintViolationException;

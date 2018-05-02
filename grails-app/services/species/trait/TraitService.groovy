@@ -139,25 +139,25 @@ class TraitService extends AbstractObjectService {
             }
 
             //            taxons_scope.each { taxon_scope ->
-            Trait trait = null;
+            Trait traitInstance = null;
             if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {
                 if(row[traitIdHeaderIndex]) {
-                    trait = Trait.get(Long.parseLong(row[traitIdHeaderIndex]));
-                    dl.writeLog("Updating trait ${trait} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}", Level.INFO);
+                    traitInstance = Trait.get(Long.parseLong(row[traitIdHeaderIndex]));
+                    dl.writeLog("Updating trait ${traitInstance} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}", Level.INFO);
                 } 
                 else {
                     if(taxon_scope.size() == 1) {
-                        trait = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [row[traitNameHeaderIndex],  taxons_scope[0]]);
+                        traitInstance = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [row[traitNameHeaderIndex],  taxons_scope[0]]);
                     } else {
                         dl.writeLog("Trait id is required to update trait ${row[traitNameHeaderIndex]}", Level.ERROR);
                     }
                 }
             } else if( row[updateHeaderIndex]?.equalsIgnoreCase('new') ){
-                trait = new Trait();
+                traitInstance = new Trait();
                 dl.writeLog("Creating new trait with name ${row[traitNameHeaderIndex]}", Level.INFO);
             }
 
-            if(trait) {
+            if(traitInstance) {
                 //trait = new Trait();
                 //headers.eachWithIndex { header, index ->
                 row.each { header, value ->
@@ -167,61 +167,61 @@ class TraitService extends AbstractObjectService {
                         //traitInstance = Trait.findByName(value.toLowerCase().trim())
                         //if(!traitInstance){trait.name = value.toLowerCase().trim();}
                         //else{i 
-                        if(!trait.name) trait.name = value.trim();
+                        if(!traitInstance.name) trait.name = value.trim();
                         //}
                         break;
 
                         /*case 'values' : 
-                        if(!traitInstance){trait.values = value.trim()}
+                       if(!traitInstance){traitInstance.values = value.trim()}
                         else{traitInstance.values = value.trim()}
                         break;
                          */
                         case 'datatype' : 
-                        trait.dataTypes = Trait.fetchDataTypes(value.trim());
+                        traitInstance.dataTypes = Trait.fetchDataTypes(value.trim());
                         break;
 
                         case 'traittype' :
-                        trait.traitTypes = Trait.fetchTraitTypes(value.trim());
+                        traitInstance.traitTypes = Trait.fetchTraitTypes(value.trim());
                         break;
 
                         case 'units' : 
-                        trait.units = Trait.fetchUnits(value.trim());
+                        traitInstance.units = Trait.fetchUnits(value.trim());
                         break;
 
                         case 'trait source' : 
-                        trait.source = value.trim();
+                        traitInstance.source = value.trim();
                         break;
 
                         case 'trait icon' : 
-                        trait.icon = migrateIcons(value.trim(), traitResourceDir, resourceFromDir);
+                        traitInstance.icon = migrateIcons(value.trim(), traitResourceDir, resourceFromDir);
                         break;
 
                         case 'taxonid':
                         //TODO: if taxon id is wrong catch exception/trow exception
-                        trait.taxon?.clear();
+                        traitInstance.taxon?.clear();
                         taxons_scope.each { taxon_scope ->
-                            trait.addToTaxon(taxon_scope);
+                            traitInstance.addToTaxon(taxon_scope);
                         }
                         break;
 
                         case 'trait definition':
-                        trait.description = value.trim();
+                        traitInstance.description = value.trim();
                         break;
 
                         case 'spm':
-                        trait.field = getField(value, languageInstance);
+                        traitInstance.field = getField(value, languageInstance);
                         break;
 
                         case 'isobvtrait':
-                        trait.isNotObservationTrait = !value?.trim()?.toBoolean();
+                        traitInstance.isNotObservationTrait = !value?.trim()?.toBoolean();
                         break;
 
                         case 'isparticipatory':
-                        trait.isParticipatory = value?.trim()?.toBoolean();
+                        traitInstance.isParticipatory = value?.trim()?.toBoolean();
                         break;
 
                         case 'showinobservation':
-                        trait.showInObservation = value?.trim()?.toBoolean();
+                        traitInstance.showInObservation = value?.trim()?.toBoolean();
                         break;
 
 
@@ -229,15 +229,15 @@ class TraitService extends AbstractObjectService {
                 }
 
                 if(dataTable) {
-                    trait.dataTable = dataTable;//DataTable.read(Long.parseLong(''+m['dataTable'])); 
+                    traitInstance.dataTable = dataTable;//DataTable.read(Long.parseLong(''+m['dataTable'])); 
                 }
 
-                if(!trait.hasErrors() && trait.save(flush:true)) {
+                if(!traitInstance.hasErrors() && traitInstance.save(flush:true)) {
                     dl.writeLog("Successfully inserted/updated trait", Level.INFO);
                     noOfTraitsLoaded++;
                 } else {
                     dl.writeLog("Failed to save trait", Level.ERROR);
-                    trait.errors.allErrors.each { 
+                    traitInstance.errors.allErrors.each { 
                         dl.writeLog(it.toString(), Level.ERROR); 
                     }
 
@@ -358,20 +358,20 @@ println f
             e.printStackTrace();
             }
              */
-            Trait trait;
+            Trait traitInstance;
             try {
                 if(row[traitIdHeaderIndex]) {
-                    trait = Trait.read(Long.parseLong(row[traitIdHeaderIndex]));
+                    traitInstance = Trait.read(Long.parseLong(row[traitIdHeaderIndex]));
                 } else if(taxonIdHeaderIndex != -1 && row[taxonIdHeaderIndex] && row[taxonIdHeaderIndex]!= '') {
                     List traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon.id = ?", [row[traitNameHeaderIndex], Long.parseLong(row[taxonIdHeaderIndex])]);
                     if(traits?.size() == 1)
-                        trait = traits[0];
+                        traitInstance = traits[0];
                     else
                         dl.writeLog("There are multiple traits ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${traits}", Level.ERROR);
                 } else {
                     List traits = Trait.executeQuery("select t from Trait t where t.name=? ", [row[traitNameHeaderIndex].trim()]);
                     if(traits?.size() == 1)
-                        trait = traits[0];
+                        traitInstance = traits[0];
                     else
                         dl.writeLog("There are multiple traits ${row[traitNameHeaderIndex]} : ${traits}", Level.ERROR);
                     //trait = Trait.findByNameAndTaxon(row[traitNameHeaderIndex].trim(), taxon);
@@ -380,14 +380,14 @@ println f
                 dl.writeLog("Error getting trait from ${row[traitNameHeaderIndex]} and ${row[taxonIdHeaderIndex]} : ${e.getMessage()}", Level.ERROR);
                 e.printStackTrace();
             }
-            if(!trait){
+            if(!traitInstance){
                 dl.writeLog("Cannot find trait ${row[traitNameHeaderIndex]}", Level.ERROR);
                 //row = reader.readNext();
                 return;
             }
 
 
-            TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), trait);
+            TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), traitInstance);
 
             if(!traitValue) {
                 dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name}", Level.INFO);
@@ -399,7 +399,7 @@ println f
             row.each { header, value ->
                 switch(header.toLowerCase()) {
                     case 'trait' :
-                    traitValue.trait = trait;
+                    traitValue.trait = traitInstance;
                     break;
                     case 'value' :
                     println "====="
@@ -482,7 +482,7 @@ println f
 
         Sql sql = Sql.newInstance(dataSource);
         List numericTraitMinMax =  sql.rows("""
-        select min(f.value::float)::integer,max(f.to_value::float)::integer,t.id from fact f,trait t where f.trait_id = t.id and t.data_types='NUMERIC' group by t.id;
+        select min(f.value::float)::integer,max(f.to_value::float)::integer,t.id from fact f,trait t where f.trait_instance_id = t.id and t.data_types='NUMERIC' group by t.id;
         """);
         return [instanceList:instanceList, instanceTotal:allInstanceCount, queryParams:queryParts.queryParams, activeFilters:queryParts.activeFilters, 'traitFactMap':queryParts.traitFactMap, 'object':queryParts.object,numericTraitMinMax:numericTraitMinMax];
     }
@@ -684,12 +684,12 @@ println f
     }
 
     def getAllFilter(filters){
-        def trait,traitValue,traitFilter=[:];
+        def traitInstance,traitValue,traitFilter=[:];
         filters.each{ f -> 
-            trait = Trait.findByName(f);
-            if(trait){
-                traitValue = TraitValue.findAllByTrait(trait);
-                traitFilter[""+trait.name]=traitValue          
+            traitInstance = Trait.findByName(f);
+            if(traitInstance){ 
+                traitValue = TraitValue.findAllByTraitInstance(traitInstance);
+                traitFilter[""+traitInstance.name]=traitValue          
             }
         }
         return traitFilter

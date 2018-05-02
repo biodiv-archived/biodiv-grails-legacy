@@ -3,8 +3,8 @@ package species.participation
 import java.util.Map;
 
 import grails.util.Environment
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
+import grails.util.Holders;
+import grails.util.Holders;
 
 import com.grailsrocks.emailconfirmation.PendingEmailConfirmation;
 
@@ -13,7 +13,7 @@ class EmailConfirmationService extends com.grailsrocks.emailconfirmation.EmailCo
 	def makeURL(token, userGroupInstance) {
 		//@todo this needs to change to do a reverse mapping lookup
 		//@todo also if uri already exists in binding, append token to it
-		def grailsApplication = ApplicationHolder.application
+		def grailsApplication = Holders.getGrailsApplication()
 		def uGroup = grailsApplication.mainContext.getBean('species.UserGroupTagLib');
 		return uGroup.createLink(controller:'emailConfirmation', action:'index', id:token.encodeAsURL(), userGroup:userGroupInstance, absolute:true);		
 	}
@@ -21,7 +21,7 @@ class EmailConfirmationService extends com.grailsrocks.emailconfirmation.EmailCo
 	def sendConfirmation(String emailAddress, String thesubject,
 		Map binding = null, String userToken = null) {
 		def conf = new PendingEmailConfirmation(emailAddress:emailAddress, userToken:userToken)
-		conf.makeToken()
+		makeToken(conf);
 		if (!conf.save()) {
 			throw new IllegalArgumentException( "Unable to save pending confirmation: ${conf.errors}")
 		}
@@ -41,7 +41,7 @@ class EmailConfirmationService extends com.grailsrocks.emailconfirmation.EmailCo
 		try {
 			mailService.sendMail {
 				to emailAddress
-				from binding.from ?: ConfigurationHolder.config.emailConfirmation.from
+				from binding.from ?: grails.util.Holders.config.emailConfirmation.from
 				subject thesubject
 				def bodyArgs = [view:viewName, model:binding]
 				if (pluginName) {

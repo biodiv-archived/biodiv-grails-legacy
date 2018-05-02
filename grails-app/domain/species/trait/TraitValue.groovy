@@ -10,9 +10,16 @@ import species.utils.ImageUtils;
 import species.dataset.DataTable;
 import grails.converters.JSON
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="traitValue", include = "non-lazy")
+//@JsonIgnoreProperties([])
 class TraitValue {
 
-    Trait trait;
+    Trait traitInstance;
     String value;
     String description;
     String icon;
@@ -25,7 +32,7 @@ class TraitValue {
     DataTable dataTable;
 
     static constraints = {
-        trait nullable:false, blank:false, unique:['value']
+        traitInstance nullable:false, blank:false, unique:['value']
         value nullable:false, validator : { val, obj ->
             println obj.trait.dataTypes
             switch(obj.trait.dataTypes) {
@@ -47,6 +54,7 @@ class TraitValue {
     static mapping = {
         description type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_value_id_seq"] 
+        //cache include: 'non-lazy'
     }
 
 	Resource icon(ImageType type) {

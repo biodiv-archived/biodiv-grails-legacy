@@ -1,1 +1,1 @@
-<g:layoutBody/>
+<g:layoutBody />

@@ -69,7 +69,7 @@ $(document).ready(function() {
             'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}",
             'hasPermissionToCreateSpeciesPageUrl':"${uGroup.createLink(controller:'species', action:'hasPermissionToCreateSpeciesPage')}"
         },
-        'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
+        'loginUrl':"${uGroup.createLink(controller:'login','userGroup':userGroupInstance)}",
         'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
         'login' : {
             'googleApiKey' : "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.apikey}",
@@ -81,8 +81,26 @@ $(document).ready(function() {
             channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
             springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
             authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
-            logoutUrl : "${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
-            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
+            logoutUrl : "${uGroup.createLink(controller:'logout', action:'index')}",
+            defaultLogoutUrl : "${userGroupInstance?uGroup.createLink(mapping:'onlyUserGroup', controller:'userGroup', action:'index', 'userGroup':userGroupInstance):'/'}",
+            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}",
+            api : {
+                loginUrl : "${grailsApplication.config.speciesPortal.api.loginURL}", 
+                tokenUrl : "${grailsApplication.config.speciesPortal.api.tokenURL}", 
+                logoutUrl : "${grailsApplication.config.speciesPortal.api.logoutURL}", 
+                cookie : {
+                    domain : "${grailsApplication.config.speciesPortal.api.cookie.domain}",
+                    path : "${grailsApplication.config.speciesPortal.api.cookie.path}"
+                },
+                facebook : {
+                    apiKey : "${grailsApplication.config.speciesPortal.api.facebook.apiKey}",
+                    redirect_uri : "${grailsApplication.config.speciesPortal.api.facebook.redirect_uri}"
+                },
+                google : {
+                    apiKey : "${grailsApplication.config.speciesPortal.api.google.apiKey}",
+                    redirect_uri : "${grailsApplication.config.speciesPortal.api.google.redirect_uri}"
+                }
+            }
         },
         'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
         'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",

@@ -121,7 +121,6 @@ display:none;
                         def value=[];
                         value=traitValues;
                         %>
-${value?.size()}
                         <table class="table" id="valueTable">
                         <tr>
                         <th>Value</th>

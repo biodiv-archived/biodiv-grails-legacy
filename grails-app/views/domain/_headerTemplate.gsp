@@ -63,7 +63,7 @@
               <li class="mega-menu-column">
                 <ul>
                   <li><a href="${uGroup.createLink('controller':'observation', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observation.label')}"><g:message code="default.observation.label" /></a></li>
-                  <li><a href="${uGroup.createLink('controller':'checklist', action:'list', 'userGroup':userGroupInstance)}" title="${g.message(code:'heading.browse.checklists')}"><g:message code="heading.browse.checklists" /></a></li>
+                  <li><a href="${uGroup.createLink('controller':'dataTable', action:'list', params:['type':'observations'], 'userGroup':userGroupInstance)}" title="${g.message(code:'heading.browse.checklists')}"><g:message code="heading.browse.checklists" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'observation', 'action':'traits', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observationTrait.label')}"><g:message code="default.observationTrait.label" /></a></li>
                   <li><a href="${uGroup.createLink('controller':'dataTable', 'action':'list', params:['type':'observations'], 'userGroup':userGroupInstance)}" title="${g.message(code:'default.observation.dataTables.label')}"><g:message code="default.observation.dataTables.label" /></a></li>
                   <!--li><a href="${uGroup.createLink('controller':'dataset', 'userGroup':userGroupInstance)}" title="${g.message(code:'default.datasets.label')}"><g:message code="default.datasets.label" /></a></li-->

@@ -1,7 +1,5 @@
 package utils
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.springframework.security.acls.domain.BasePermission;
 

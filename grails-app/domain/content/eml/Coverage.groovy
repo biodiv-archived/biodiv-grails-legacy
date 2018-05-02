@@ -4,7 +4,7 @@ import species.groups.SpeciesGroup
 import species.Habitat
 import speciespage.ObservationService
 
-import org.hibernatespatial.GeometryUserType
+import org.hibernate.spatial.GeometryType
 import com.vividsolutions.jts.geom.Point;
 import species.participation.Observation
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -46,7 +46,7 @@ class Coverage {
 	
     static mapping = {
         columns {
-            topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
+//            topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
         }
     }
 

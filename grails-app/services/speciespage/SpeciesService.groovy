@@ -3,10 +3,7 @@ package speciespage
 
 import java.util.List
 import java.text.DateFormat
-import org.apache.solr.common.util.DateUtil;
 import org.apache.commons.logging.LogFactory
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
 import grails.plugin.springsecurity.SpringSecurityUtils;
@@ -102,15 +99,16 @@ class SpeciesService extends AbstractObjectService  {
         List result = new ArrayList();
         def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            /*NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
             }
+        */
         }
         return result;
     }
-
+/*
     def search(params) {
         def result;
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -286,14 +284,14 @@ class SpeciesService extends AbstractObjectService  {
             //queryParams = queryResponse.responseHeader.params
             result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()]
             return result;
-        } catch(SolrException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
 
         result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
         return result;
     }
-
+*/
     private boolean isValidSortParam(String sortParam) {
         if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
             return true;
@@ -356,6 +354,7 @@ class SpeciesService extends AbstractObjectService  {
             def newSpeciesFieldInstance = (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
             newSpeciesFieldInstance.species = speciesInstance;
             newSpeciesFieldInstance.field = fieldInstance;
+            newSpeciesFieldInstance.description = null;
             return newSpeciesFieldInstance;
     }
 
@@ -2510,13 +2509,13 @@ def checking(){
             List traitIcons = [];
             factInstances?.each { f ->
                 if(f.traitValue) { 
-                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                    traitIcons << [f.traitValue.value, f.traitInstance.name, f.traitValue.mainImage()?.fileName, f.traitInstance.dataTypes.value()]
                 } else if(f.value && f.toValue) {
-                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value+":"+f.toValue, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.fromDate && f.toDate) {
-                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.value) {
-                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 }
             }
 

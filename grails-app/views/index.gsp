@@ -52,10 +52,10 @@
                   <li id="about-us"><a href="/bbp/aboutus"><div class="textoverlay">${ActivityFeed.count()} User Activities</div></a></li>
                </ul>          
           </div>
-            <div class="navblock" style="margin-top:20px;">
+           <div class="navblock" style="margin-top:20px;">
                 <b><big>&nbsp;<a name="latestObservations"><g:message code="index.button.latest.observations" /></a></big></b>
                 <div class="sidebar_section" style="margin: 5px; overflow: hidden; background-color: white;">
-                    <div class="jcarousel-skin-ie7" data-contextfreeurl="/observation/show&quot;" data-url="/observation/related" id="carousel_latestUpdatedObservations" style="clear: both; width: 880px; margin-top: 23px;">
+                    <div class="jcarousel-skin-ie7" data-contextfreeurl="/observation/show&quot;" data-url="/biodiv-api/naksha/search/observation/observation?sort=lastrevised&max=11" id="carousel_latestUpdatedObservations" style="clear: both; width: 880px; margin-top: 23px;">
                         <ul style="list-style: none; width: 880px; margin-left: 0px;">
                         </ul>
                         <div class="observation_links" style="margin-top: 5px; margin-bottom: 3px;">
@@ -67,7 +67,7 @@
         </div>
         <asset:script>
         $(document).ready(function() {
-            relatedStory([], "latestUpdatedObservations", "latestUpdatedObservations", "", "");
+            relatedStory_latestObvs([], "latestUpdatedObservations", "latestUpdatedObservations", "", "");
         });
         </asset:script>
     </body>

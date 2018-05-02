@@ -14,15 +14,15 @@ import org.apache.lucene.util.PriorityQueue;
 class TSTLookup<E> extends Lookup<E> implements Serializable {
 
 	private static final long serialVersionUID = 7526472295622776157L;
-	
+
 	TernaryTreeNode root;
 	TSTAutocomplete autocomplete = new TSTAutocomplete();
 	Map valueKeys;
-	
+
 	TSTLookup() {
 		valueKeys = new HashMap()
 	}
-	
+
 	/**
 	 * Adds a key with value into the index.
 	 * If there are already some values at this node this new value is appended to this list
@@ -66,18 +66,18 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			LookupPriorityQueue queue = new LookupPriorityQueue(num);
 			for (TernaryTreeNode ttn : list) {
 				for (obj in ttn.val) {
-					//println "=====" +  obj.recoId + " ori name  " + obj.originalName +"  syn name "+obj.synName  +"  accname "+obj.acceptedName+"   wt  "+obj.wt 
+					//println "=====" +  obj.recoId + " ori name  " + obj.originalName +"  syn name "+obj.synName  +"  accname "+obj.acceptedName+"   wt  "+obj.wt
 					if(nameFilter && nameFilter.equalsIgnoreCase("scientificNames") && !obj.isScientificName){
 						continue;
 					}
 					if(nameFilter && nameFilter.equalsIgnoreCase("commonNames") && obj.isScientificName){
 						continue;
 					}
-					
+
 					if(!added.contains(obj)) {
 						added.add(obj);
 						//TODO:Hack to push records with exact prefix to the top
-						//clone not supported 
+						//clone not supported
 						Record record = new Record()
 						PropertyUtils.copyProperties(record, obj);
 						if(record.originalName){
@@ -87,7 +87,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 							}else if(name.startsWith(key)) {
 								record.wt += 50;
 							}
-							
+
 							LookupResult r = new LookupResult(ttn.token, record);
 							queue.insertWithOverflow(r);
 						}
@@ -99,7 +99,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 			}
 		} else {
 			for (int i = 0; i < maxCnt; i++) {
-				TernaryTreeNode ttn = list.get(i);				
+				TernaryTreeNode ttn = list.get(i);
 				for (obj in ttn.val) {
 					if(!added.contains(obj)) {
 						added.add(obj);
@@ -128,7 +128,7 @@ class TSTLookup<E> extends Lookup<E> implements Serializable {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get record by original name
 	 */

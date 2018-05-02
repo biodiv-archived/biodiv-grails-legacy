@@ -145,8 +145,8 @@
         window.is_species_admin = ${SpringSecurityUtils.ifAllGranted('ROLE_SPECIES_ADMIN')} 
         </script>
 
-        <script type="text/javascript"
-            src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script>
+        <!-- <script type="text/javascript"
+            src="/geoserver/ows?request=getOccurrenceCount&service=amdb&version=1.0.0&species_name=${speciesName}"></script> -->
 
         <asset:script>
 
@@ -185,7 +185,8 @@
                     enterMode:CKEDITOR.ENTER_BR,
                     autoParagraph:false,
                     fillEmptyBlocks:false,
-                    contentsCss:'/assets/all/ckeditorCss.css'
+                    contentsCss:'/assets/all/ckeditorCss.css',
+                    allowedContent : true
                     //uiColor:'#AADC6F'
                 };
                 var speciesId = ${speciesInstance?.id}

@@ -18,7 +18,7 @@ import groovyx.net.http.Method;
 class NamesParser {
 
 	private static final log = LogFactory.getLog(this);
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 	/**
 	 * max 5000 
 	 * @param names

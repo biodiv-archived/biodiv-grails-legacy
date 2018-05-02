@@ -8,6 +8,7 @@ import species.dataset.DataPackage
 
 class CustomField {
 	public static final String PREFIX = 'CustomField_'
+	public static final String SQL_PREFIX = 'cf_'
 	
 	def customFieldService
 	def utilsService
@@ -89,6 +90,7 @@ class CustomField {
 		version : false
 		notes type:'text'
 		options type:'text'
+        cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
 	def List fetchOptions(){
@@ -161,7 +163,7 @@ class CustomField {
 	}
 
 	def fetchSqlColName(){
-		return 'cf_' + id 
+		return SQL_PREFIX + id 
 	}
 	
 	private parseDate( val){
@@ -170,4 +172,14 @@ class CustomField {
 			return new java.sql.Timestamp(date.getTime())
 		
 	}
+
+    public void setDataType(dataType) {
+        println "dataType##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+        println "##########################"
+ 
+        this.dataType = dataType;
+    }
 }

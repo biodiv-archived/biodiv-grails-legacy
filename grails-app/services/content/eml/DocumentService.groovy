@@ -14,9 +14,7 @@ import species.TaxonomyDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
-import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
-import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
 import species.participation.UploadLog;
@@ -90,9 +88,15 @@ class DocumentService extends AbstractMetadataService {
 	Document update(Document document, params, klass = null) {
 		params.remove('latitude')
 		params.remove('longitude')
+        
+        println params.uFile
+
 		def locationScale = params.remove('locationScale')
         
         document = super.update(document, params, Document.class);
+
+        if(!params.uFile.path)
+            document.uFile = null;
 
 		document.group = null
 		document.habitat = null
@@ -213,6 +217,7 @@ class DocumentService extends AbstractMetadataService {
 	 * @param params
 	 * @return
 	 */
+/*
 	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -306,14 +311,14 @@ class DocumentService extends AbstractMetadataService {
             }
 			log.debug "result returned from search: "+ result
 			return result;
-		} catch(SolrException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
-
+*/
 	private boolean isValidSortParam(String sortParam) {
 		if(sortParam.equalsIgnoreCase('createdOn'))
 			return true;
@@ -323,12 +328,12 @@ class DocumentService extends AbstractMetadataService {
 	def nameTerms(params) {
 		List result = new ArrayList();
 
-		def queryResponse = documentSearchService.terms(params.term, params.field, params.max);
+		/*def queryResponse = documentSearchService.terms(params.term, params.field, params.max);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();
 			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Documents"]);
-		}
+		}*/
 		return result;
 	}
 
@@ -492,14 +497,16 @@ println queryParts.queryParams
 		switch(tagType){
 			case GrailsNameUtils.getPropertyName(Document.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Document)
+					//tags = TagCloudUtil.tags(Document)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.documents?.collect{it.id}, tagType)
 				}
 				break
 			case GrailsNameUtils.getPropertyName(Project.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Project)
+					//tags = TagCloudUtil.tags(Project)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.projects?.collect{it.id}, tagType)
 				}
@@ -507,7 +514,8 @@ println queryParts.queryParams
 			
 			case GrailsNameUtils.getPropertyName(Discussion.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Discussion)
+					//tags = TagCloudUtil.tags(Discussion)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.discussions?.collect{it.id}, tagType)
 				}
@@ -523,16 +531,24 @@ println queryParts.queryParams
 	private Map getTags(ids, tagType){
 		int tagsLimit = 1000;
 		LinkedHashMap tags = [:]
-		if(!ids){
-			return tags
-		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.tag_ref in " + getSqlInCluase(ids)  + " and  tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query;
+        if(ids == null) {
+            query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+            sql.rows(query).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
+        } else {
+            query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.tag_ref in " + getSqlInCluase(ids)  + " and  tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+            sql.rows(query, ids).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
 
-		sql.rows(query, ids).each{
-			tags[it.getProperty("name")] = it.getProperty("obv_count");
-		};
+        }
+        println "#######################################tags"
+        log.debug query;
+
 		return tags;
 	}
 	
@@ -635,11 +651,12 @@ println queryParts.queryParams
         //setting ufile and uri
         File sourceFile = new File(fileDir, m['file path'])
         if(sourceFile.exists()){
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = grails.util.Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir
-            File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
+            File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents', contentRootDir)
             try{
                 Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
+                println "++++++++++++UUUUUFFFFIIIILLLLEEEE++++++"
                 UFile f = new UFile()
                 f.size = destinationFile.length()
                 f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "")

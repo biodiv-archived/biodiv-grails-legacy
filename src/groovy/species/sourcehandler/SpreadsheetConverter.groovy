@@ -27,7 +27,7 @@ import species.formatReader.SpreadsheetReader;
 class SpreadsheetConverter extends SourceConverter {
 	protected static SourceConverter _instance;
 	
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 	def fieldsConfig = config.speciesPortal.fields
 	
 	private SpreadsheetConverter() {
