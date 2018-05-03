@@ -327,7 +327,7 @@ class AbstractMetadataService extends AbstractObjectService {
         }
     }
 
-    public void flagIt(instance, FlagType flagType, String notes=null) {
+    void flagIt(instance, FlagType flagType, String notes=null) {
         log.info "Flagging instance ${instance}"
         def flagInstance = Flag.findWhere(author: instance.author, objectId: instance.id, objectType:instance.class.getCanonicalName());
         if (!flagInstance) {
