@@ -304,8 +304,9 @@ abstract class Metadata {
                 queryParams['trait'][fact.traitInstance.id] += fact.value+(fact.toValue?":"+fact.toValue:'') +','
             } 
             if(fact.fromDate && fact.toDate) {
-                traitFactMap[fact.traitInstance.id] << fact.fromDate+";"+fact.toDate
-                queryParams['trait'][fact.traitInstance.id] += fact.fromDate+";"+fact.toDate+',';
+                String dateStr = fact.fromDate.format('dd/MM/YYYY')+";"+fact.toDate.format('dd/MM/YYYY')
+                traitFactMap[fact.traitInstance.id] << dateStr;//fact.fromDate.format('dd-MM-yyyy')+";"+fact.toDate.format('dd-MM-yyyy')
+                queryParams['trait'][fact.traitInstance.id] += dateStr;//fact.fromDate+";"+fact.toDate+',';
             }
 
             traitFactMap['fact'] << fact.id
