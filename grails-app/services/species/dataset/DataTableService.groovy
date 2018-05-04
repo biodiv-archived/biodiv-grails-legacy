@@ -329,6 +329,10 @@ println instance.imagesFile?.path;
                 HashSet uGs = new HashSet();
                 uGs.addAll(dataTable.dataset.userGroups);
                 log.debug uGs
+                if(params.webaddress) {
+		            UserGroup ug = UserGroup.findByWebaddress(params.webaddress)
+                    uGs.add(ug);
+                }
                 userGroupService.addResourceOnGroups(dataTable, uGs.collect{it.id}, false);
             }
 
@@ -370,6 +374,9 @@ println instance.imagesFile?.path;
 
                         case DataTableType.OBSERVATIONS.ordinal() :
                         Map p = ['file':dataTableFile.getAbsolutePath(), 'mappingFile':mappingFile.getAbsolutePath(), 'imagesDir':imagesDir?.getAbsolutePath(), 'uploadType':UploadJob.OBSERVATION_LIST, 'dataTable':dataTable.id, 'isMarkingDirty':dataTable.isMarkingDirty, 'changedCols':dataTable.changedCols];
+                        if(params.webaddress) {
+                            p['webaddress'] = params.webaddress;
+                        }
                         p.putAll(paramsToPropagate);
                         def r = observationService.upload(p);
                         if(r.success) {

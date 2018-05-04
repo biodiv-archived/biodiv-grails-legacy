@@ -176,6 +176,15 @@ class DatasetService extends AbstractMetadataService {
         
         if(hasPermission(dataset, springSecurityService.currentUser)) {
             result = save(dataset, params, true, feedAuthor, feedType, null);
+            if(result.success) {
+                log.debug "Posting dataset to all user groups"
+                HashSet uGs = new HashSet();
+                if(params.webaddress) {
+		            UserGroup ug = UserGroup.findByWebaddress(params.webaddress)
+                    uGs.add(ug);
+                }
+                userGroupService.addResourceOnGroups(dataset, uGs.collect{it.id}, false);
+            }
         } else {
             result = utilsService.getErrorModel("The logged in user doesnt have permissions to save ${dataset}", dataset, OK.value(), errors);
         }

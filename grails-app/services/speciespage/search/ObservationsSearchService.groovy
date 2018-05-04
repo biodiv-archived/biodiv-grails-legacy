@@ -37,7 +37,7 @@ class ObservationsSearchService extends AbstractSearchService {
 
     static transactional = false
     def dataSource
-    def CustomFieldService
+    def customFieldService
 
     def publishSearchIndex() {
         log.info "Initializing publishing to observations search index"
@@ -84,7 +84,7 @@ class ObservationsSearchService extends AbstractSearchService {
         obvs.each { obv ->
             log.debug "Reading Observation : "+obv.id;
             ids.push(obv.id);
-            Map cf=CustomFieldService.fetchAllCustomFields(obv);
+            Map cf=customFieldService.fetchAllCustomFields(obv);
             customFieldMapToObjectId.put(obv.id.toString(),cf);
         }
         List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
