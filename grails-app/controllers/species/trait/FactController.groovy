@@ -87,10 +87,10 @@ class FactController extends AbstractObjectController {
             if(params.objectId && params.objectType) {
                 def object;
                 switch(params.objectType) {
-                    case 'species.Species': 
+                    case 'species.Species':
                     object = Species.read(Long.parseLong(params.objectId));
                     break;
-                    case 'species.participation.Observation': 
+                    case 'species.participation.Observation':
                     object = Observation.read(Long.parseLong(params.objectId));
                     break;
                 }
@@ -126,7 +126,7 @@ class FactController extends AbstractObjectController {
                                 if(fact.traitValue) {
                                     tvStr = fact.traitValue.id;
                                 } else if (traitInstance.dataTypes == DataTypes.DATE) {
-                                    tvStr = fact.fromDate + (fact.toDate ? ":" + fact.toDate:'')
+                                    tvStr = fact.fromDate.format('dd/MM/yyyy') + (fact.toDate ? ";" + fact.toDate.format('dd/MM/yyyy'):'')
                                 }else {
                                     tvStr = fact.value + (fact.toValue ? ":" + fact.toValue:'')
                                 }
@@ -160,7 +160,7 @@ class FactController extends AbstractObjectController {
 
                         }
                     } else {
-                        // if no traitValue selected 
+                        // if no traitValue selected
                         log.debug "No trait value .. so deleting all facts for this trait ${traitInstance}"
                         List<Fact> facts = Fact.findAllByTraitInstanceAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
 
@@ -174,8 +174,8 @@ class FactController extends AbstractObjectController {
                     }
 
                 } else {
-                    result['msg'] = 'Not a valid object'; 
-                }               
+                    result['msg'] = 'Not a valid object';
+                }
             } else {
                 result['msg'] = 'Not a valid object';
             }
@@ -197,7 +197,7 @@ class FactController extends AbstractObjectController {
         }
 
     }
-    
+
     private saveAndRender(params, sendMail=true) {
         println "saveAndRender==============="+params
         params.locale_language = utilsService.getCurrentLanguage(request);
@@ -208,7 +208,7 @@ class FactController extends AbstractObjectController {
             }
             json {
                 result.remove('instance');
-                render result as JSON 
+                render result as JSON
             }
             xml {
                 result.remove('instance');
@@ -236,7 +236,7 @@ class FactController extends AbstractObjectController {
         params.file = params.fFile;
 
         def fFileValidation = factService.validateFactsFile(params.fFile, new UploadLog());
-        
+
         if(fFileValidation.success) {
             log.debug "Validation of fact file is done. Proceeding with upload"
             def r = factService.upload(params);
@@ -255,7 +255,7 @@ class FactController extends AbstractObjectController {
     }
 
     def migrateCustomFields() {
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);          
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);
         println "Loading 7";
         int noOfUpdatedFacts_7 = migrateCustomFieldsToFacts(contentRootDir.getAbsolutePath()+'/customfields_group/gp 7.tsv','7');
         println noOfUpdatedFacts_7;
@@ -276,14 +276,14 @@ class FactController extends AbstractObjectController {
         println noOfUpdatedFacts_13;
 
         render noOfUpdatedFacts_7+" "+noOfUpdatedFacts_38+" "+noOfUpdatedFacts_33+" "+noOfUpdatedFacts_30+" "+noOfUpdatedFacts_18+" "+noOfUpdatedFacts_13;
-    } 
+    }
 
     private int migrateCustomFieldsToFacts(tsvFile,groupNo) {
         int i=0;
         String[] headers;
         String l;
         int noOfUpdatedFacts = 0;
-        new File(tsvFile).withReader { l = it.readLine() }  
+        new File(tsvFile).withReader { l = it.readLine() }
         headers = l.split('\t');
         i=0;
         Observation obv;
@@ -321,7 +321,7 @@ class FactController extends AbstractObjectController {
                         def tv = v.trim().split("\\|");
                         def taxon,traitInstance,traitValue;
                         if(cf_taxons[cf+' taxonID']) {
-                            taxon = TaxonomyDefinition.read(Long.parseLong(cf_taxons[cf+' taxonID'])); 
+                            taxon = TaxonomyDefinition.read(Long.parseLong(cf_taxons[cf+' taxonID']));
                             def traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [tv[0], taxon]);
                             if(traits) traitInstance = traits[0];
                         } else {
