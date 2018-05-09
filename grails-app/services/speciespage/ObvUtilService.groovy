@@ -876,7 +876,11 @@ class ObvUtilService {
                 println "Saving customfields"
                 def customfieldsMap = [:]
                 params.customfields.each {
-                    customfieldsMap[CustomField.SQL_PREFIX+it.key] = it.value;
+                    if(it.value.size() == 1) {
+                        customfieldsMap[CustomField.SQL_PREFIX+it.key] = it.value[0];
+                    } else {
+                        customfieldsMap[CustomField.SQL_PREFIX+it.key] = it.value;
+                    }
                 }
                 customfieldsMap.webaddress = params.webaddress;
                 println customfieldsMap

@@ -575,5 +575,13 @@ class ObservationTagLib {
         }, 'showNoOfRecommendationsSuggested');
 		out << "<td class=countvalue>"+noOfObvs+"</td>"
 	}
-}
+
+    def hasPermissionForCustomField = {attrs, body ->
+		def observationInstance = attrs.model ? attrs.model.observationInstance : null;
+		def customFieldInstance = attrs.model ? attrs.model.customFieldInstance : null;
+        if (observationInstance && customFieldInstance && (observationInstance.author.id == springSecurityService.currentUser.id || customFieldInstance.allowedParticipation)) {
+			out << body()
+		}
+    }
+}   
 
