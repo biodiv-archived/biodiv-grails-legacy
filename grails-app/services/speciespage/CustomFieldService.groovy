@@ -106,7 +106,6 @@ class CustomFieldService {
         deleteRow(ug, obvId)
         customFieldMap.observation_id = obvId
         insertRow(ug, customFieldMap)
-
 	}
 
 

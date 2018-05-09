@@ -85,11 +85,12 @@ class ObservationsSearchService extends AbstractSearchService {
             log.debug "Reading Observation : "+obv.id;
             ids.push(obv.id);
             Map cf=customFieldService.fetchAllCustomFields(obv);
+            println  cf
             customFieldMapToObjectId.put(obv.id.toString(),cf);
         }
         List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
          dataToElastic=getJson(ids,customFieldMapToObjectId);
-
+println customFieldMapToObjectId
          postToElastic(dataToElastic);
 //        return commitDocs(docs, commit);
     }

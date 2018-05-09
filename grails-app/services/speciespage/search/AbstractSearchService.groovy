@@ -183,7 +183,7 @@ abstract class AbstractSearchService {
     /**
      *
      */
-     void cleanUpGorm() {
+     public void cleanUpGorm() {
 
         def hibSession = sessionFactory?.getCurrentSession();
 

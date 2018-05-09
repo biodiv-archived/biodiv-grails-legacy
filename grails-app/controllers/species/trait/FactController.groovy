@@ -105,6 +105,7 @@ class FactController extends AbstractObjectController {
                     if(traits && traits[traitInstance.id+'']) {
                         p.putAll(traits);
                         p['replaceFacts'] = 'true';
+                        print (p)
                         Map r = factService.updateFacts(p, object, null, true);
                         //TODO: to update this from approprite result from factService.update
                         success = r.success;

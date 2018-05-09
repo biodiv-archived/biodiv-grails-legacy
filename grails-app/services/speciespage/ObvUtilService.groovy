@@ -1224,6 +1224,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
                     }
                 }
 
+                utilsService.cleanUpGorm(true);
                 def obvs = resultObv.collect { Observation.read(it) }
                 try {
                     observationsSearchService.publishSearchIndex(obvs, true);
