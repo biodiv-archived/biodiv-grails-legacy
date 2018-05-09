@@ -85,7 +85,11 @@ function showSampleDataTable(){
         if(input) {
             $('#createDataTableSubmit').removeAttr('disabled');
             console.log($('#xlsxFileUrl:first').val());
-            if($('#xlsxFileUrl:first').val() && !$('#xlsxFileUrl:first').val().endsWith(input) )  {
+            if($('#xlsxFileUrl:first').val()) {
+                if(!$('#xlsxFileUrl:first').val().endsWith(input) )  {
+                    parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+                }
+            } else {
                 parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
             }
         }
