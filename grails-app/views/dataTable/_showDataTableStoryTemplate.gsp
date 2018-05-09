@@ -17,7 +17,7 @@ String instanceType = dataTableInstance.dataTableType;
             <h5>
 
                 <span><g:message code="default.dataTable.label" /> : </span>
-                <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
+                <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress, 'id':dataTableInstance.id) }">
                 ${dataTableInstance.title} <g:if test="${instanceCount}">(${instanceCount} ${instanceType})</g:if>
                 </g:link>
     
@@ -103,7 +103,7 @@ String instanceType = dataTableInstance.dataTableType;
                     </g:else>
 
                     <div class="value">
-                        <g:link url="${uGroup.createLink(controller:'dataset', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.dataset.id) }">${dataTableInstance.dataset.title}</g:link>
+                        <g:link url="${uGroup.createLink(controller:'dataset', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress, 'id':dataTableInstance.dataset.id) }">${dataTableInstance.dataset.title}</g:link>
                     </div>
                 </div>
                 </g:if>

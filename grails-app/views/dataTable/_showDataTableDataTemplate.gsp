@@ -61,7 +61,7 @@
         </tbody>
     </table>
     <g:if test="${(params.action == 'list' && params.controller=='dataTable') || (params.action == 'show' && params.controller=='dataset')}">
-        <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress, 'id':dataTableInstance.id) }">
+        <g:link url="${uGroup.createLink(controller:'dataTable', action:'show', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress, 'id':dataTableInstance.id) }">
         <div class="centered">
         <div class="btn " style="width:50%;margin-top:50px;">
        View in show page
