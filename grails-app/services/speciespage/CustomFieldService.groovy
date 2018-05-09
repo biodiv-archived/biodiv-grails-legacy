@@ -87,20 +87,55 @@ class CustomFieldService {
             if(k.startsWith(CustomField.PREFIX)){
                 String cfName = k.replace(CustomField.PREFIX, "")
                 CustomField cf = CustomField.findByUserGroupAndName(ug, cfName)
-                if(v && !(v instanceof String)){
-                    v = v.join(",")
+                if(v && isCollectionOrArray(v)) {
+                    if(!cf.allowedMultiple) {
+                        // if multiple cols were mapped for single categorical value choosing first col only
+                        v = [v[0]];
+                    }
+                    String vStr = '';
+                    v.each {
+                        if(cf.isValidValue(it)) {
+                            vStr += it+',';
+                        }
+                    }
+                    v = vStr.size() > 1? vStr[0..-2] : vStr;
+                } else {
+                    v = cf.isValidValue(v) ? v :null
                 }
-                customFieldMap.put(cf.fetchSqlColName(), cf.fetchTypeCastValue(v))
+                println v
+                if(v)
+                    customFieldMap.put(cf.fetchSqlColName(), cf.fetchTypeCastValue(v))
             }
         }
         params.each { String k, v ->
+            println "##@@##@@##@@##@@"
+            println "##@@##@@##@@##@@"
+            println "##@@##@@##@@##@@"
+            println "##@@##@@##@@##@@"
+            println "##@@##@@##@@##@@"
+            println k
+            println v
             if(k.startsWith(CustomField.SQL_PREFIX)){
                 String cfId = k.replace(CustomField.SQL_PREFIX, "")
                 CustomField cf = CustomField.read(cfId)
-                if(v && !(v instanceof String)){
-                    v = v.join(",")
+                if(v && isCollectionOrArray(v)) {
+                    if(!cf.allowedMultiple) {
+                        // if multiple cols were mapped for single categorical value choosing first col only
+                        v = [v[0]];
+                    }
+                    String vStr = '';
+                    v.each {
+                        if(cf.isValidValue(it)) {
+                            vStr += it+',';
+                        }
+                    }
+                    v = vStr.size() > 1? vStr[0..-2] : vStr;
+                } else {
+                    v = cf.isValidValue(v) ? v : null
                 }
-                customFieldMap.put(cf.fetchSqlColName(), cf.fetchTypeCastValue(v))
+                println v
+                if(v)
+                    customFieldMap.put(cf.fetchSqlColName(), cf.fetchTypeCastValue(v))
             }
         }
         deleteRow(ug, obvId)
@@ -280,6 +315,9 @@ class CustomFieldService {
         executeQuery(query,params);
     }
 
+    boolean isCollectionOrArray(object) {    
+        [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
+    }
 }
 
 
