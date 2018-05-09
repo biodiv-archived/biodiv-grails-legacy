@@ -50,7 +50,7 @@
                             <sUser:ifOwnsDataset model="['dataset':datasetInstance]">
 
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataTable', action:'create', dataset:datasetInstance.id)}"
+                                href="${uGroup.createLink(controller:'dataTable', action:'create', dataset:datasetInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                 ><i class="icon-plus"></i><g:message code="button.create.dataTable" /></a>
 
 

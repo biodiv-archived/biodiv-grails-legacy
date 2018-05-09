@@ -84,7 +84,10 @@ function showSampleDataTable(){
     } else {
         if(input) {
             $('#createDataTableSubmit').removeAttr('disabled');
-            parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+            console.log($('#xlsxFileUrl:first').val());
+            if($('#xlsxFileUrl:first').val() && !$('#xlsxFileUrl:first').val().endsWith(input) )  {
+                parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+            }
         }
     }
 }
@@ -105,9 +108,11 @@ console.log('loadSampleData');
     if(speciesGroupTraitsList === undefined) {
         //alert("Please click a species group to show respective traits");
     }
-    var customFieldList = JSON.parse($('#customFields').val());//data('customFieldList');
-    if(customFieldList === undefined) {
-        //alert("Please click a species group to show respective traits");
+    if($('#customFields').val()) {
+        var customFieldList = JSON.parse($('#customFields').val());//data('customFieldList');
+        if(customFieldList === undefined) {
+            //alert("Please click a species group to show respective traits");
+        }
     }
 
 
@@ -155,7 +160,8 @@ console.log('loadSampleData');
             });
         }
         el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
-        var customFieldList = JSON.parse($('#customFields').val());//data('customFieldList');
+        $('#customFields').val()
+        var customFieldList = $('#customFields').val() ? JSON.parse($('#customFields').val()) : undefined;//data('customFieldList');
         if(customFieldList === undefined) {
             //    alert("Please click a species group to show respective traits");
         } else {
