@@ -266,10 +266,22 @@ class CustomFieldService {
 			return
 		}
 		def v = params.fieldValue ?  params.fieldValue :  params.get('fieldValue[]')
-		if(v && !(v instanceof String)){
-			v = v.join(",")
-		}
-
+        if(v && isCollectionOrArray(v)) {
+            if(!cf.allowedMultiple) {
+                // if multiple cols were mapped for single categorical value choosing first col only
+                v = [v[0]];
+            }
+            String vStr = '';
+            v.each {
+                if(cf.isValidValue(it)) {
+                    vStr += it+',';
+                }
+            }
+            v = vStr.size() > 1? vStr[0..-2] : vStr;
+        } else {
+            v = cf.isValidValue(v) ? v : null
+        }
+        println v
 		def m = ['columnName': cf.fetchSqlColName(), 'columnValue' :cf.fetchTypeCastValue(v), 'obvId':params.obvId?.toLong()]
 		def oldValue = fetchValue(cf, params.obvId?.toLong())
 		updateRow(cf, m)
