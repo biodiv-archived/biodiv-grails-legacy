@@ -112,7 +112,7 @@ class ObservationService extends AbstractMetadataService {
     def resourcesService;
     def request;
     def speciesPermissionService;
-	def customFieldService;
+	  def customFieldService;
     def factService;
     /**
      *
@@ -200,7 +200,10 @@ class ObservationService extends AbstractMetadataService {
                     mailType = activityFeedService.OBSERVATION_UPDATED
                 }
             }
-            def result = super.save(observationInstance, params, sendMail, feedAuthor, feedType, null);
+            def result;
+            //Observation.withTransaction {
+              result = super.save(observationInstance, params, sendMail, feedAuthor, feedType, null);
+            //}
 
             if(result.success) {
                 log.debug "Successfully created observation : "+observationInstance
@@ -313,7 +316,11 @@ class ObservationService extends AbstractMetadataService {
 
                     }
                 }
-
+println "******************************"
+println "******************************"
+println observationInstance;
+println "******************************"
+println "******************************"
 				customFieldService.updateCustomFields(params, observationInstance.id)
                 def traitParams = ['contributor':observationInstance.author.email, 'attribution':observationInstance.author.email, 'license':License.LicenseType.CC_BY.value(), replaceFacts:true];
                 traitParams.putAll(getTraits(params.traits));
@@ -1352,7 +1359,7 @@ class ObservationService extends AbstractMetadataService {
             activeFilters["user"] = userIds
 
             } else {
-            
+
             filterQuery += " and obv.author_id = :user "
             queryParams["user"] = params.user.toLong()
             activeFilters["user"] = params.user.toLong()
@@ -1629,7 +1636,7 @@ class ObservationService extends AbstractMetadataService {
             }
         }
 
-        
+
         if(params.isMediaFilter && params.isMediaFilter.toBoolean()){
             filterQuery += " and obv.is_showable = true ";
         }
@@ -1665,7 +1672,7 @@ class ObservationService extends AbstractMetadataService {
             queryParams['trait'] = params.trait;
 
         }
-        
+
         if(params.otrait){
             traitQuery = getTraitQuery(params.otrait);
             traitQuery.filterQuery = traitQuery.filterQuery.replaceAll(" t.traits"," obv.traits");
@@ -3092,14 +3099,14 @@ class ObservationService extends AbstractMetadataService {
             List factInstances = Fact.findAllByObjectIdAndObjectType(it.id, it.class.canonicalName);
             //println "fact Instance"+factInstance?.traitValue?.icon
             def speciesGroupIcon =  it.group.icon(ImageType.ORIGINAL)
-            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+            if(mainImage?.fileName == speciesGroupIcon.fileName) {
                 imagePath = mainImage.thumbnailUrl(null, '.png');
             } else
                 imagePath = mainImage?mainImage.thumbnailUrl():null;
 
             List traitIcons = [];
             factInstances?.each { f ->
-                if(f.traitValue) { 
+                if(f.traitValue) {
                     traitIcons << [f.traitValue.value, f.traitInstance.name, f.traitValue.mainImage()?.fileName, f.traitInstance.dataTypes.value()]
                 } else if(f.value && f.toValue) {
                     traitIcons << [f.value+":"+f.toValue, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
@@ -3139,21 +3146,21 @@ println result;
 
         if(!matchingListResult) {
             return null;
-        } 
+        }
         if(matchingListResult.totalCount == 0) {
             return null;
         }
         File downloadDir = new File(grailsApplication.config.speciesPortal.observations.observationDownloadDir)
 		if(!downloadDir.exists()){
 			downloadDir.mkdirs()
-		} 
+		}
 		return exportMatchingObservationsAsCSV(downloadDir, matchingListResult);
     }
-	
+
     private File exportMatchingObservationsAsCSV(downloadDir, Map matchingListResult){
         File csvFile = new File(downloadDir, "MatchingObservation_" + new Date().getTime() + ".csv")
         CSVWriter writer = utilsService.getCSVWriter(csvFile.getParent(), csvFile.getName())
-        
+
         def header = ['Observation Id', 'Observation Title', 'URL',  'Traits'];
         writer.writeNext(header.toArray(new String[0]))
         def matchingList = matchingListResult.matchingList;

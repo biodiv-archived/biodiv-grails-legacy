@@ -160,7 +160,6 @@ console.log('loadSampleData');
             });
         }
         el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
-        $('#customFields').val()
         var customFieldList = $('#customFields').val() ? JSON.parse($('#customFields').val()) : undefined;//data('customFieldList');
         if(customFieldList === undefined) {
             //    alert("Please click a species group to show respective traits");
