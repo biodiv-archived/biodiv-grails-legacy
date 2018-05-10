@@ -186,6 +186,8 @@ class DataTableObservationImporter extends AbstractObservationImporter {
                                 //TODO:post2Usergroups check
                             } else if(oldColUrl.startsWith("http://ibp.org/terms/trait/")) {
                                 m[TRAIT_HEADER][oldColUrl.replace("http://ibp.org/terms/trait/","")]=null;
+                            } else if(oldColUrl.startsWith("http://ibp.org/terms/customfield/")) {
+                                m[CUSTOMFIELD_HEADER][oldColUrl.replace("http://ibp.org/terms/customfield/","")]=null;
                             } else {
                                 log.debug "Could not remove ${oldColUrl}"
                             }
@@ -230,6 +232,9 @@ class DataTableObservationImporter extends AbstractObservationImporter {
                         } else if(newColUrl.startsWith("http://ibp.org/terms/trait/")) {
                             if(!m[TRAIT_HEADER]) m[TRAIT_HEADER] =  new java.util.LinkedHashMap();
                             m[TRAIT_HEADER][newColUrl.replace("http://ibp.org/terms/trait/","")] = getValue(obvParams, header[1], oldColUrl);
+                        } else if(newColUrl.startsWith("http://ibp.org/terms/customfield/")) {
+                            if(!m[CUSTOMFIELD_HEADER]) m[CUSTOMFIELD_HEADER] =  new java.util.LinkedHashMap();
+                            m[CUSTOMFIELD_HEADER][newColUrl.replace("http://ibp.org/terms/customfield/","")] = getValue(obvParams, header[1], oldColUrl);
                         } else {
                             log.debug "Ignoring changed column marking ${changedColMarking}"
                         }
@@ -268,6 +273,8 @@ class DataTableObservationImporter extends AbstractObservationImporter {
             //TODO:post2Usergroups check
         } else if(oldColUrl.startsWith("http://ibp.org/terms/trait/")) {
             return obvParams[TRAIT_HEADER][oldColUrl.replace("http://ibp.org/terms/trait/","")];
+        } else if(oldColUrl.startsWith("http://ibp.org/terms/customfield/")) {
+            return obvParams[CUSTOMFIELD_HEADER][oldColUrl.replace("http://ibp.org/terms/customfield/","")];
         } else {
             log.debug "Could not gete ${oldColUrl}"
         }

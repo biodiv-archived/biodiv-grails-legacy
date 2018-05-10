@@ -11,6 +11,7 @@ abstract class AbstractObservationImporter extends AbstractImporter {
 
     public static String ANNOTATION_HEADER = 'Annotations';
     public static String TRAIT_HEADER = 'traits';
+    public static String CUSTOMFIELD_HEADER = 'customfields';
     public static String MEDIA_ANNOTATION_HEADER = 'media_annotations';
 
     protected CSVReader observationReader
@@ -88,7 +89,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         //String[] metaFields = new String[metaXML.core.field.size()];
         Map metaFields = [:]//new String[metaXML.core.field.size()];
         metaXML.core.field.each {
-            metaFields[it.attribute('term')] = ['index':Integer.parseInt(it.attribute('index'))];
+            if(!metaFields[it.attribute('term')]) {
+                metaFields[it.attribute('term')] = [];
+            }
+            metaFields[it.attribute('term')] << ['index':Integer.parseInt(it.attribute('index'))];
         }
 
         log.debug "Read headers mapping from meta ${metaFields}"
@@ -96,7 +100,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         //String[] multiMediaMetaFields = new String[metaXML.extension.files.location.findAll{it.text() == 'multimedia.txt'}[0].parent().parent().field.size()];
         Map multimediaMetaFields = [:];
         metaXML.extension.files.location.findAll{it.text() == 'multimedia.txt'}[0].parent().parent().field.each {
-            multimediaMetaFields[it.attribute('term')] = ['index':Integer.parseInt(it.attribute('index'))];
+            if(!multimediaMetaFields[it.attribute('term')]) {
+                multimediaMetaFields[it.attribute('term')] = [];
+            }
+            multimediaMetaFields[it.attribute('term')] << ['index':Integer.parseInt(it.attribute('index'))];
         }
 
         log.debug "Read multimedia headers mapping from meta ${multimediaMetaFields}"
@@ -112,7 +119,11 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         String[] row = mappingFileReader.readNext();
         while(row) {
             println row;
-            metaFields[row[0]] = ['columnName':row[1]];
+            if(!metaFields[row[0]]) {
+                metaFields[row[0]] =[];
+            }
+            metaFields[row[0]] << ['columnName':row[1]];
+            
             row = mappingFileReader.readNext();
         }
 
@@ -123,7 +134,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
             def multimediaMappingFileReader = getCSVReader(multimediaMappingFile);
             row = multimediaMappingFileReader.readNext()
             while(row) {
-                multimediaMetaFields[row[0]] = ['columnName':row[1]];
+                if(!multimediaMetaFields[row[0]]) {
+                    multimediaMetaFields[row[0]] = [];
+                }
+                multimediaMetaFields[row[0]] << ['columnName':row[1]];
                 row = multimediaMappingFileReader.readNext();
             }
 
@@ -179,10 +193,19 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         println columnName+"   "+index
         List mappedCol = [];
         metaFields.each { key, value ->
-            f = null;
-            if(value.columnName == columnName) f = key;
-            else if(value.index == index) f = key;
-            if(f) mappedCol << f
+            println key
+            println value
+            value.each { val ->
+                f = null;
+                println val
+                if(val.columnName == columnName) f = key;
+                else if(val.index == index) f = key;
+                if(f) {
+                    println "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxX"
+                    mappedCol << f
+                }
+println "111"
+            }
         }
         if(!mappedCol) mappedCol << null;
         println mappedCol;
@@ -272,6 +295,15 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                 temp.add("http://ibp.org/terms/trait/"+mappedColumnName.replace("trait.",""));
                 temp.add(column);
                 temp.add("10000");
+                dataToWrite.add(temp.toArray(new String[0]))
+            } else if(mappedColumnName.startsWith("customfield.")) {
+                println "^^^^^^^^^^^^^^CUSTOMFIELD^^^^^^^^^^^^^^^^^^^^"
+                println mappedColumnName 
+                if(uploadLog) uploadLog << "\n"+ipColumnName+" : "+mappedColumnName;
+                def temp = [];
+                temp.add("http://ibp.org/terms/customfield/"+mappedColumnName.replace("customfield.",""));
+                temp.add(column);
+                temp.add("20000");
                 dataToWrite.add(temp.toArray(new String[0]))
             } else if(!mapped){
                 println "^^^^^^^^^^^^^^IBP TERMS^^^^^^^^^^^^^^^^^^^^"
@@ -406,10 +438,17 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                         m[ANNOTATION_HEADER][dwcObvHeader[header.column]] = value;  
                         
                         if(!m[TRAIT_HEADER]) m[TRAIT_HEADER] =  new java.util.LinkedHashMap();
+                        if(!m[CUSTOMFIELD_HEADER]) m[CUSTOMFIELD_HEADER] =  new java.util.LinkedHashMap();
                         if(header.url && header.url.startsWith("http://ibp.org/terms/trait") && row[header.column]) {
                             m[TRAIT_HEADER][header.url.replace("http://ibp.org/terms/trait/","")] = value;  
                         }
-
+                        else if(header.url && header.url.startsWith("http://ibp.org/terms/customfield") && row[header.column]) {
+                            if(!m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")]) {
+                                m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")] = [];
+                            } 
+                            m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")] << value;  
+                            
+                        }
                         else if(header.url && header.url.startsWith("http://ibp.org/terms/observation/") && row[header.column]) {
                             m[header.url.replace("http://ibp.org/terms/observation/","")] = value;  
                         }

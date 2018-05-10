@@ -1,5 +1,5 @@
 var dataTable_contributor_autofillUsersComp;
-function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
+function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId, webaddress) {
     event.preventDefault();
     if(CKEDITOR.instances.summary)  CKEDITOR.instances.summary.destroy();
     if(CKEDITOR.instances.description)  CKEDITOR.instances.description.destroy();
@@ -8,7 +8,7 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
         $.ajax({
             url:'/dataset/dataTableTypeChanged',
             type:'POST',
-            data:{'dataTableTypeId':dataTableTypeId,'datasetId':datasetId, dataTableId:dataTableId}, 
+            data:{'dataTableTypeId':dataTableTypeId,'datasetId':datasetId, dataTableId:dataTableId, webaddress:webaddress}, 
             success:function(data,textStatus){
                 if(data.success) {
                     $('#addDataTable').html(data.model.tmpl);
@@ -34,11 +34,13 @@ function onDataTableClick(event, dataTableTypeId, datasetId, dataTableId) {
                         console.log('speciesGroupFilter button click');
                         e.preventDefault();
                         loadSpeciesGroupTraits();
+                        loadCustomFieldList();
                         showSampleDataTable();
                         return false;
                     });
 
                     loadSpeciesGroupTraits();
+                    loadCustomFieldList();
                 }  else {
                     $('#addDataTable').html(data.msg);
                 }
@@ -70,6 +72,9 @@ function loadSpeciesGroupTraits() {
     return false;
 }
 
+function loadCustomFieldList() {
+}
+
 function showSampleDataTable(){
     var input = $("#dataTableFile_path").val();
     var res = "dataTable";
@@ -79,7 +84,14 @@ function showSampleDataTable(){
     } else {
         if(input) {
             $('#createDataTableSubmit').removeAttr('disabled');
-            parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+            console.log($('#xlsxFileUrl:first').val());
+            if($('#xlsxFileUrl:first').val()) {
+                if(!$('#xlsxFileUrl:first').val().endsWith(input) )  {
+                    parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+                }
+            } else {
+                parseData(  window.params.content.url + input , {callBack:loadSampleData, res: res});
+            }
         }
     }
 }
@@ -100,6 +112,13 @@ console.log('loadSampleData');
     if(speciesGroupTraitsList === undefined) {
         //alert("Please click a species group to show respective traits");
     }
+    if($('#customFields').val()) {
+        var customFieldList = JSON.parse($('#customFields').val());//data('customFieldList');
+        if(customFieldList === undefined) {
+            //alert("Please click a species group to show respective traits");
+        }
+    }
+
 
     var mappedColumns;
     if($('#mappedColumns').val()) {
@@ -144,7 +163,16 @@ console.log('loadSampleData');
                 el += "<option class='traitColumn' value='trait."+val.id+"' "+((mappedColumn[1] == 'trait.'+val.id)?'selected':'')+">"+val.name+"</option>"; 
             });
         }
-        //el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
+        el += "</optgroup><optgroup label='Custom Fields'></optgroup>"
+        var customFieldList = $('#customFields').val() ? JSON.parse($('#customFields').val()) : undefined;//data('customFieldList');
+        if(customFieldList === undefined) {
+            //    alert("Please click a species group to show respective traits");
+        } else {
+            $.each(customFieldList, function(index, val) {
+                el += "<option class='customFieldColumn' value='customfield."+val.id+"' "+((mappedColumn[1] == 'customfield.'+val.id)?'selected':'')+">"+val.name+"</option>"; 
+            });
+        }
+
         el += "</select>";
         el += "</th>";
     });
@@ -229,6 +257,7 @@ function getMappedColumn(cName, mappedColumns) {
             else if(mappedColumns[i][0] == 'http://purl.org/dc/terms/rights') {mapped=true; retMapping[1] = 'license'}
 
             else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/trait/')) {mapped=true; retMapping[1] = 'trait.'+mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('trait/')+6)}
+            else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/customfield/')) {mapped=true; retMapping[1] = 'customfield.'+mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('customfield/')+12)}
             else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/')) {mapped=true; retMapping[1] = mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('observation/')+12)}
             else if(mappedColumns[i][0].startsWith('http://ibp.org/terms/observation/annotation/')) {mapped=true; retMapping[1] = mappedColumns[i][0].substring(mappedColumns[i][0].indexOf('annotation')+11)}
             if(mapped) return retMapping;

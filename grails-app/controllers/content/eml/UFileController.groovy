@@ -113,13 +113,13 @@ class UFileController {
 			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
             String fileExt = fileExtension(originalFilename);
             def res;
-            def xlsxFileUrl = null;
+            def xlsxFileUrl = url;
             def isSimpleSheet;
             //Conversion of excel to csv 
             //FIND out a proper method to detect excel
             def headerMetadata;
             if(params.fileConvert == "true" && (fileExt == "xls" || fileExt == "xlsx") ) {
-                xlsxFileUrl = url;
+                //xlsxFileUrl = url;
                 if(params.fromChecklist == "false") {
                     headerMetadata = getHeaderMetaDataInFormat(uploaded);
                     //println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
@@ -138,14 +138,14 @@ class UFileController {
             }
             log.debug "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
             //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
-			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
+			render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
             e.printStackTrace();
 			log.error("Failed to upload file.", e)
-			return render(text: [success:false] as JSON, contentType:'text/html')
+			render(text: [success:false] as JSON, contentType:'text/html')
 		} catch(Exception e) {
             e.printStackTrace();
-			return render(text: [success:false, 'msg':"Failed to upload file. Error:"+e.getMessage()] as JSON, contentType:'text/html')
+			render(text: [success:false, 'msg':"Failed to upload file. Error:"+e.getMessage()] as JSON, contentType:'text/html')
         }
 	}
 

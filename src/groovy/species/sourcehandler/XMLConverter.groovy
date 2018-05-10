@@ -1532,14 +1532,13 @@ class XMLConverter extends SourceConverter {
             refs.each {
                 String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
                 String url = it?.url?.text().trim();
-		if(url) {
+                if(url) {
                     UrlValidator urlValidator = new UrlValidator();
                     if(!urlValidator.isValid(url)) {
                         title = title + url;
                         url = null;
                     }
                 }
-
                 if(title || url) {
                     def ref = new Reference(title:title, url:url);
                     references.add(ref);

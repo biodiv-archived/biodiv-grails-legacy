@@ -57,6 +57,7 @@ import species.dataset.Dataset;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import content.eml.UFile;
+import species.groups.CustomField;
 
 import java.text.SimpleDateFormat;
 
@@ -130,6 +131,7 @@ class ObvUtilService {
     def sessionFactory;
     def factService;
     def userGroupService;
+    def customFieldService;
 
     SpeciesGroup defaultSpeciesGroup;
     Habitat defaultHabitat;
@@ -741,6 +743,9 @@ class ObvUtilService {
             obvParams['checklistAnnotations'] = m[DwCObservationImporter.ANNOTATION_HEADER] as JSON;
         if(m[DwCObservationImporter.TRAIT_HEADER])
             obvParams['traits'] = m[DwCObservationImporter.TRAIT_HEADER];
+        if(m[DwCObservationImporter.CUSTOMFIELD_HEADER])
+            obvParams['customfields'] = m[DwCObservationImporter.CUSTOMFIELD_HEADER];
+        obvParams['webaddress'] = m['webaddress']
 
 
 
@@ -855,7 +860,6 @@ class ObvUtilService {
             }
         }
 
-        //customFieldService.updateCustomFields(params, observationInstance.id)
         if(params.traits) {
             utilsService.benchmark('setTraits') {
                 println "Saving Traits"
@@ -866,6 +870,24 @@ class ObvUtilService {
                 factService.updateFacts(traitParams, observationInstance);
             }
         }
+
+        if(params.customfields) {
+            utilsService.benchmark('setCustomFields') {
+                println "Saving customfields"
+                def customfieldsMap = [:]
+                params.customfields.each {
+                    if(it.value.size() == 1) {
+                        customfieldsMap[CustomField.SQL_PREFIX+it.key] = it.value[0];
+                    } else {
+                        customfieldsMap[CustomField.SQL_PREFIX+it.key] = it.value;
+                    }
+                }
+                customfieldsMap.webaddress = params.webaddress;
+                println customfieldsMap
+                customFieldService.updateCustomFields(customfieldsMap, observationInstance.id)
+            }
+        }
+
 
         /*switch(observationInstance.dateAccuracy) {
             case DateAccuracy.UNKNOWN:
@@ -1145,14 +1167,10 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
         if(params.isMarkingDirty) {
             //make inplace changes for existing observations
             dl.writeLog("Marking has changed. So doing a inplace edit for existing observations\n", Level.INFO);
-            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            println "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             DataTableObservationImporter importer = DataTableObservationImporter.getInstance();
             importer.separator = ',';
             Map o = importer.importData(dataTable, mappingFile, multimediaMappingFile, uploadLog, params.changedCols);
-            uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog);
+            uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog, params.webaddress);
 
         } else {
             //do a fresh upload from file
@@ -1160,7 +1178,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
             FileObservationImporter importer = FileObservationImporter.getInstance();
             importer.separator = ',';
             Map o = importer.importData(observationsFile, multimediaFile, mappingFile, multimediaMappingFile, uploadLog);
-            uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog);
+            uploadObservations(dataTable, observationsFile.getParentFile(), importer, o.mediaInfo, imagesDir, uploadLog, params.webaddress);
         }
         return ['success':true, 'msg':"Loaded observations."];
     }
@@ -1168,11 +1186,12 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
     /**
     * Upload observations using importer
     */
-    private void uploadObservations(DataTable dataTable, File directory, AbstractObservationImporter importer, Map mediaInfo, File imagesDir, File uploadLog) {
+    private void uploadObservations(DataTable dataTable, File directory, AbstractObservationImporter importer, Map mediaInfo, File imagesDir, File uploadLog, String webaddress=null) {
         Map paramsToPropagate = DataTable.getParamsToPropagate(dataTable);
+        if(webaddress) paramsToPropagate['webaddress'] = webaddress;
 
         List obvParamsList = importer.next(mediaInfo, IMPORT_BATCH_SIZE, uploadLog)
-				println "obvParamsList ${obvParamsList}"
+		println "obvParamsList ${obvParamsList}"
         int noOfUploadedObv=0, noOfFailedObv=0;
         boolean flushSingle = false;
         Date startTime = new Date();
@@ -1209,6 +1228,7 @@ println  obvParams[AbstractObservationImporter.TRAIT_HEADER]
                     }
                 }
 
+                utilsService.cleanUpGorm(true);
                 def obvs = resultObv.collect { Observation.read(it) }
                 try {
                     observationsSearchService.publishSearchIndex(obvs, true);

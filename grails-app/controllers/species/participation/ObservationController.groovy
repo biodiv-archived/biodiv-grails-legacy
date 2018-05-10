@@ -314,8 +314,16 @@ class ObservationController extends AbstractObjectController {
     private saveAndRender(params, sendMail=true){
 
         println "saveAndRender==============="+params
+
         params.locale_language = utilsService.getCurrentLanguage(request);
-        def result = observationService.saveObservation(params, sendMail)
+        def result;
+        Observation.withSession { session ->
+          result = observationService.saveObservation(params, sendMail)
+          session.flush();
+          session.clear();
+        }
+
+        // result.instance.save(flush:true);
         if(result.success){
             //if(params.format?.equalsIgnoreCase("json") || params.format?.equalsIgnoreCase("xml") )
             //    params.isMobileApp = true;

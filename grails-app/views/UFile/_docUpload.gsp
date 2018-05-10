@@ -23,6 +23,7 @@
                 $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
                 console.log('-------------------------------------');
                 console.log(responseJSON.xlsxFileUrl);
+                console.log($('#xlsxFileUrl').val());
                 $('#isSimpleSheet').val(responseJSON.isSimpleSheet);
                 $('#headerMetadata').val(JSON.stringify(responseJSON.headerMetadata));
             }

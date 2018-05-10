@@ -69,6 +69,7 @@
                                 <input type="hidden" id="dataTableType" name="dataTableType" value="${dataTableInstance.dataTableType.ordinal()}"/>
                                 <input type="hidden" id="dataTableFilePath" name="dataTableFilePath" value=""/>
                                 <input type="hidden" id="speciesGroupTraits" name="speciesGroupTraits" value=""/>
+                                <input type="hidden" id="customFields" name="customFields" value="${customFieldList?:''}"/>
                                 <input type="hidden" id="columns" name="columns" value="${dataTableInstance?.columns}"/>
                                 <input type="hidden" id="mappedColumns" name="mappedColumns" value="${dataTableInstance?.columns}"/>
 
@@ -113,5 +114,7 @@
         </div>
 
     </form>
+    <%def uploadLogParams = dataTableInstance?.uploadLog?.fetchMapFromText();%> 
+    <input type="hidden" id="xlsxFileUrl" value="${uploadLogParams?.xlsxFileUrl}">
 
 </div>
