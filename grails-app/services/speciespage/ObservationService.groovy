@@ -1285,7 +1285,7 @@ println "******************************"
         if(params.webaddress) {
 
             def userGroupInstance =	utilsService.getUserGroup(params)
-            params.userGroup = userGroupInstance;
+            params.userGroupList = userGroupInstance.id.toString();
         }
 
         if(params.notInUserGroup) {
