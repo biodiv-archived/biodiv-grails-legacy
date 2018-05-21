@@ -152,7 +152,8 @@ class XMLConverter extends SourceConverter {
 	
 	private updateNode(Node node, Map completeMap, String k){
 		def m = completeMap.get(k)
-		
+println completeMap
+println k
 		new Node(node, "matchStatus", m['status']);
 		new Node(node, "rank", m['rank']);
 				
@@ -191,11 +192,12 @@ class XMLConverter extends SourceConverter {
 		
 		String speciesName = getNodeDataFromSubCategory(species, fieldsConfig.SCIENTIFIC_NAME);
 		int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
-		
+	println "========================="
+    println speciesName +"   "+rank
 		NameInfo n = new NameInfo(speciesName, rank, index)
 		//getting hir
 		List taxonNodes = getNodesFromCategory(species.children(), fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-		//println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
+		println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
 		taxonNodes.each { tn ->
 			rank = getTaxonRank(tn.subcategory.text())
 			def hirNodeData = getData((tn && tn.data)?tn.data[0]:null)
@@ -229,6 +231,7 @@ class XMLConverter extends SourceConverter {
 	
 	private String getNodeDataFromSubCategory(species, subCat){
 		Node node =  getNodeFromSubCategory(species, subCat)
+        println node
 		return getData((node && node.data)?node.data[0]:null);
 	}
 
@@ -814,7 +817,20 @@ class XMLConverter extends SourceConverter {
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
+        println "+++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++"
+        println "+++++++++++++++++++++++++++"
+        println dataNode
+        println dataNode.localText().class
+        println dataNode.text()
+        println dataNode.localText()
+        println dataNode.localText()[0]
+        println dataNode.value();
+        println dataNode.children()
         return dataNode.localText().size() > 0 ? dataNode.localText()[0]:"";
+        //return dataNode.value()?:"";
     }
 
     /**

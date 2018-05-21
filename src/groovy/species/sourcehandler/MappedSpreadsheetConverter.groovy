@@ -18,7 +18,7 @@ import species.namelist.NameInfo;
 import species.participation.SpeciesBulkUpload
 import species.ScientificName.TaxonomyRank
 import species.participation.UploadLog
-
+import species.dataset.DataTable;
 
 class MappedSpreadsheetConverter extends SourceConverter {
 	
@@ -48,6 +48,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
 	public initCurationInfo(String file){
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, NameInfo.TAXON_NAMES_SHEET, 0);
+        println content
 		addToSummary("Checking TAXON_NAMES_SHEET for duplicates")
 		println "Checking TAXON_NAMES_SHEET for duplicates"
 		updateMap(content, speciesNameMap)
@@ -60,13 +61,13 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		println "Checking SYNONYM for duplicates"
 		updateMap(content, synonymMap)
 		
-//		println '---------------------------------------------------'
+		println '---------------------------------------------------'
 //		
-//		println speciesNameMap
-//		println taxonHirMap
-//		println synonymMap
-//		
-//		println '---------------------------------------------------'
+		println speciesNameMap
+		println taxonHirMap
+		println synonymMap
+		
+		println '---------------------------------------------------'
 	}
 	
 	private updateMap(List<Map> content, Map targetMap, boolean useRank=false){
@@ -97,8 +98,10 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 		boolean isValid = true
 		String tmpSummary
-		
+	println nList	
 		nList.each { NameInfo sc ->
+            println "-----"
+            println  sc
 			addToSummary(nameSeparator + sc.sourceIndex)
 			String key = sc.sourceIndex +  KEY_SEP + sc.sourceName +  KEY_SEP + sc.name
 			if(!speciesNameMap.containsKey(key) || !speciesNameMap.get(key)['match found']){
@@ -166,7 +169,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 //		return species;
 //	}
 	
-	public Node createSpeciesXML(Map speciesContent, String imagesDir="") {
+	public Node createSpeciesXML(Map speciesContent, String imagesDir="", DataTable dataTable = null) {
 		if(!mappingConfig) {
 			log.error "No mapping config";
 			return;
@@ -250,7 +253,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 											if(isCommonName){
 												createCommonNameNode(part, field, speciesContent, mappedField)
 											} else {
-												createDataNode(field, part, speciesContent, mappedField);
+												createDataNode(field, part, speciesContent, mappedField, dataTable);
 											}
 										}
 									}
@@ -258,14 +261,14 @@ class MappedSpreadsheetConverter extends SourceConverter {
 									if(isCommonName){
 										createCommonNameNode(text, field, speciesContent, mappedField)
 									}else{
-										createDataNode(field, text, speciesContent, mappedField);
+										createDataNode(field, text, speciesContent, mappedField, dataTable);
 									}
 								}
 							}
 						}
 					} else {
 						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, delimiterMap, speciesContent);
-						createDataNode(field, text, speciesContent, mappedField);
+						createDataNode(field, text, speciesContent, mappedField, dataTable);
 					}
 				}
 			}
@@ -615,16 +618,17 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	/////////////////////////////////////////// Name validation related //////////////////////////
 	
 	
-	public static boolean validateUserSheetForName(SpeciesBulkUpload sbu){
+	public static boolean validateUserSheetForName(SpeciesBulkUpload sbu, DataTable dataTable=null){
 		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
 		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(sbu.filePath, 2, 0);
 		List<Map> content = SpreadsheetReader.readSpreadSheet(sbu.filePath, 0, 0);
-		
+	    println ">>>>validateUserSheetForName:  createSpeciesXML"	
 		List sNodeList = []
 		content.each { m ->
-			sNodeList << converter.createSpeciesXML(m)
+            println m
+			sNodeList << converter.createSpeciesXML(m, null, dataTable);
+
 		}
-		
 		
 		//creating nameinfo object from input name sheet(ist sheet)
 		List nameInfoList = []
@@ -633,7 +637,11 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		sNodeList.each {
 			nameInfoList << xc.populateNameDetail(it, index++)
 		}
-		
+        println "*******"
+        println "*******"
+        println "*******"
+        println "*******"
+	println nameInfoList	
 		log.debug "Nameinfo list size " + nameInfoList.size()
 		
 		//taking info from the matched sheet generate system (taxonname, hier, synonyms)
