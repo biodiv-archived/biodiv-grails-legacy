@@ -152,8 +152,6 @@ class XMLConverter extends SourceConverter {
 	
 	private updateNode(Node node, Map completeMap, String k){
 		def m = completeMap.get(k)
-println completeMap
-println k
 		new Node(node, "matchStatus", m['status']);
 		new Node(node, "rank", m['rank']);
 				
@@ -192,8 +190,6 @@ println k
 		
 		String speciesName = getNodeDataFromSubCategory(species, fieldsConfig.SCIENTIFIC_NAME);
 		int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
-	println "========================="
-    println speciesName +"   "+rank
 		NameInfo n = new NameInfo(speciesName, rank, index)
 		//getting hir
 		List taxonNodes = getNodesFromCategory(species.children(), fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
@@ -231,7 +227,6 @@ println k
 	
 	private String getNodeDataFromSubCategory(species, subCat){
 		Node node =  getNodeFromSubCategory(species, subCat)
-        println node
 		return getData((node && node.data)?node.data[0]:null);
 	}
 
@@ -817,18 +812,6 @@ println k
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
-        println "+++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++"
-        println "+++++++++++++++++++++++++++"
-        println dataNode
-        println dataNode.localText().class
-        println dataNode.text()
-        println dataNode.localText()
-        println dataNode.localText()[0]
-        println dataNode.value();
-        println dataNode.children()
         return dataNode.localText().size() > 0 ? dataNode.localText()[0]:"";
         //return dataNode.value()?:"";
     }
@@ -1128,8 +1111,6 @@ println k
      * @return
      */
     private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
-        println ";;;;;;;;;;;;;;;::::"
-        println imageNode
         File tempFile = getImageFile(imageNode, relImagesFolder);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
         def absUrl = imageNode.url?.text() ? imageNode.url?.text() : "";
@@ -1175,10 +1156,8 @@ println k
                 res.url = absUrl?:sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
-                    println con
                     res.addToContributors(con);
                 }
-                println "-----------------------"
                 for(Contributor con : getAttributions(imageNode, true)) {
                     res.addToAttributors(con);
                 }
@@ -1197,9 +1176,7 @@ println k
                 res.license = null;//?.clear()
                 res.contributors?.clear()
                 res.attributors?.clear();
-                println "-----------------------"
                 for(Contributor  con : getContributors(imageNode, true)) {
-                    println con
                     res.addToContributors(con);
                 }
                 for(Contributor con : getAttributions(imageNode, true)) {
@@ -2513,10 +2490,6 @@ println k
         //          species.attach();
         //      }
         }
-        println "***********************************";
-        println s.guid;
-        println "***********************************";
-        println species;
         if(species)
             return species[0]
     }

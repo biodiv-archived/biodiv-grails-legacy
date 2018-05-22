@@ -48,26 +48,14 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	
 	public initCurationInfo(String file){
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, NameInfo.TAXON_NAMES_SHEET, 0);
-        println content
 		addToSummary("Checking TAXON_NAMES_SHEET for duplicates")
-		println "Checking TAXON_NAMES_SHEET for duplicates"
 		updateMap(content, speciesNameMap)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.HIR_SHEET, 0);
 		addToSummary("Checking HIR_SHEET for duplicates")
-		println "Checking HIR_SHEET for duplicates"
 		updateMap(content, taxonHirMap, true)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.SYNONYMS_SHEET, 0);
 		addToSummary("Checking SYNONYM for duplicates\n")
-		println "Checking SYNONYM for duplicates"
 		updateMap(content, synonymMap)
-		
-		println '---------------------------------------------------'
-//		
-		println speciesNameMap
-		println taxonHirMap
-		println synonymMap
-		
-		println '---------------------------------------------------'
 	}
 	
 	private updateMap(List<Map> content, Map targetMap, boolean useRank=false){
@@ -80,7 +68,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name'] + rankSuffix
 				if(targetMap.containsKey(key)){
 					addToSummary(" Multiple matching rows for given key " + key)
-					println " Multiple matching rows for given key " + key
 					multipleMatchingRow = true
 				}
 				m.id = m.id ? m.id.split('\\.')[0]:""
@@ -98,16 +85,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 		boolean isValid = true
 		String tmpSummary
-	println nList	
 		nList.each { NameInfo sc ->
-            println "-----"
-            println  sc
 			addToSummary(nameSeparator + sc.sourceIndex)
 			String key = sc.sourceIndex +  KEY_SEP + sc.sourceName +  KEY_SEP + sc.name
 			if(!speciesNameMap.containsKey(key) || !speciesNameMap.get(key)['match found']){
 				tmpSummary = "$ln" + "TAXON NAMES SHEET ::: key not present  or match column is empty -- key " +  key + sc
 				addToSummary(tmpSummary)
-				println tmpSummary
 				//println " map " + speciesNameMap
 				isValid = false
 				//return
@@ -119,7 +102,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(!taxonHirMap.containsKey(key) || !taxonHirMap.get(key)['match found']){
 					tmpSummary = "$ln" + "HIR NAMES SHEET ::: key not present  or match column is empty --  key " +  key +  ti
 					addToSummary(tmpSummary)
-					println tmpSummary
 					isValid = false
 					return
 				}
@@ -131,7 +113,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(!synonymMap.containsKey(key)|| !synonymMap.get(key)['match found']){
 					tmpSummary = "$ln" + "SYNONYMS NAMES SHEET ::: key not present  or match column is empty -- key " +  key + ti
 					addToSummary(tmpSummary)
-					println tmpSummary
 					isValid = false
 					return
 				}
@@ -627,10 +608,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
 		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(sbu.filePath, 2, 0);
 		List<Map> content = SpreadsheetReader.readSpreadSheet(sbu.filePath, 0, 0);
-	    println ">>>>validateUserSheetForName:  createSpeciesXML"	
 		List sNodeList = []
 		content.each { m ->
-            println m
 			sNodeList << converter.createSpeciesXML(m, null, dataTable);
 
 		}
@@ -642,11 +621,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		sNodeList.each {
 			nameInfoList << xc.populateNameDetail(it, index++)
 		}
-        println "*******"
-        println "*******"
-        println "*******"
-        println "*******"
-	println nameInfoList	
 		log.debug "Nameinfo list size " + nameInfoList.size()
 		
 		//taking info from the matched sheet generate system (taxonname, hier, synonyms)
