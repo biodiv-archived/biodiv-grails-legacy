@@ -548,13 +548,18 @@ class MappedSpreadsheetConverter extends SourceConverter {
         }
     }
 	
-	protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
+	protected void attachMetadata(Node data, Map speciesContent, Map mappedField, DataTable dataTable=null) {
 		addMetaAttibute("contributor", data, speciesContent, mappedField, "contributor", ",|;|\n")
 		addMetaAttibute("attributions", data, speciesContent, mappedField, "attribution", "\n")
 		addMetaAttibute("license", data, speciesContent, mappedField, "license", ",|;|\n")
 		addMetaAttibute("audience", data, speciesContent, mappedField, "audienceType", ",|;|\n")
 		addMetaAttibute("references", data, speciesContent, mappedField, "reference", "\n")
 		addMetaAttibute("images", data, speciesContent, mappedField, "image", "\n|\\s{3,}|,|;")
+		
+		if(dataTable) {
+        	    new Node(data, "dataTable", dataTable.id);
+	        }
+
 	}
 	
 	private void addMetaAttibute(String fieldName, Node data, Map speciesContent, Map mappedField, String resultNodeName, String defaultDelimiter="\n"){
