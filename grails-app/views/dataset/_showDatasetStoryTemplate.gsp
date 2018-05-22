@@ -175,7 +175,7 @@ int instanceCount = datasetInstance.countByDataTable();
         </g:if>
 
 
-         <g:if test="${datasetInstance.description}">
+         <g:if test="${datasetInstance.description && !hideDatasetBody}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.description.label" /></span>
