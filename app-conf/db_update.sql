@@ -1022,4 +1022,6 @@ scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-
 
 scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy
 
+#17th May 2018
+ insert into species_data_table (select id, data_table_id from species where data_table_id is not null);
 
