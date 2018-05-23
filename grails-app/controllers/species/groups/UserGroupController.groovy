@@ -1450,14 +1450,14 @@ def dataSource;
 
        SUser.withTransaction() { 
            newUsers.each { user ->
-               log.debug "adding new uesr " + user
+               println "adding new uesr " + user
                ug.addMember(user);
                if(sendMail) { 
                    sendNotificationMail(user, request, params, true, ug)
                }
            }
            oldUsers.each { user ->
-               log.debug "======== adding old user " + user
+               println "======== adding old user " + user
                ug.addMember(user);
                if(sendMail){
                    sendNotificationMail(user, request, params, false, ug)
@@ -1474,7 +1474,7 @@ def dataSource;
        }
 //       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
 //       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
-
+        println "addUserToGroup done"
 	   render "== done"
    }
    
