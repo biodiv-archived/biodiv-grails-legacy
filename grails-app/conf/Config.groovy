@@ -199,7 +199,7 @@ speciesPortal {
     resources {
         rootDir = "${app.rootDir}/img"
         serverURL = "http://hybrid.indiabiodiversity.org/${appName}/img"
-        filesutraURL = "http://fileops.pamba.strandls.com"
+        filesutraURL = "http://fileops.hybrid.indiabiodiversity.org"
         images {
             defaultType = "jpg"
             thumbnail {
