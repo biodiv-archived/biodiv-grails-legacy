@@ -221,12 +221,12 @@ class Utils {
 	static String getDomainServerUrl(HttpServletRequest request) {
         if(!request) return null;
 		def domain = getDomain(request);
-		return "$request.scheme://$domain";
+		return "https://$domain";
 	}
 
 	static String getDomainServerUrlWithContext(HttpServletRequest request) {
 		def domain = getDomain(request);
-		return "$request.scheme://$domain$request.contextPath";
+		return "https://$domain$request.contextPath";
 	}
 
 	//	static String getIBPServerUrl() {
