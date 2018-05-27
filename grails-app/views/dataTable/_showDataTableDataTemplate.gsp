@@ -43,7 +43,7 @@
         <tbody data-link="row" class="mainContentList rowlink">
             <g:each in="${dataObjects}" var="dataObject">
             <%def checklistAnnotations = dataObject.fetchChecklistAnnotation();%>
-            <tr class="mainContent">
+            <tr class="${((params.action == 'list' && params.controller=='dataTable') || (params.action == 'show' && params.controller=='dataset'))?'':'mainContent'}">
                 <td>
                     <a href="${uGroup.createLink(action:'show', controller:checklistAnnotations['type'], id:checklistAnnotations['id'], 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}">
                         ${raw(checklistAnnotations['title'])}
