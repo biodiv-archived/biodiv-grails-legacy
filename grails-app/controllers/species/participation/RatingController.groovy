@@ -7,7 +7,7 @@ import grails.converters.JSON;
 import grails.plugin.springsecurity.annotation.Secured
 
 class RatingController extends RateableController {
-   
+
 	@Secured(['ROLE_USER'])
     def rate() {
         log.debug params;
@@ -41,7 +41,7 @@ class RatingController extends RateableController {
                         }
                     }
                 }
-            } 
+            }
         }
         def result = formatRatings(getRatings(id, type));
         render result as JSON
@@ -103,17 +103,17 @@ class RatingController extends RateableController {
 
     def evaluateRater() {
 		def evaluator = grailsApplication.config.grails.rateable.rater.evaluator
-		def rater 
+		def rater
 		if(evaluator instanceof Closure) {
 			evaluator.delegate = this
 			evaluator.resolveStrategy = Closure.DELEGATE_ONLY
 			rater = evaluator.call()
 		}
-		
+
 		if(rater && rater.id) {
 		    return rater
         } else {
-            
+
         }
 	}
 
