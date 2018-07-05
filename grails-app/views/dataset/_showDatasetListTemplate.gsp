@@ -29,7 +29,7 @@
 						<li class="thumbnail ${styleviewcheck ? 'addmargin':''}" style="width:100%;${!inGroupMap || inGroupMap[datasetInstance.id]?'':'background-color:transparent;'} ${styleviewcheck ? 'width:100%;':''}">
 					</g:else>
 
-                    <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':datasetInstance, showDetails:true, showTitleDetail:true, 'userLanguage':userLanguage]"/>
+                    <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':datasetInstance, showDetails:true, showTitleDetail:true, 'userLanguage':userLanguage, hideDatasetBody:true]"/>
 					</li>
 				</g:each>
 			</ul>			

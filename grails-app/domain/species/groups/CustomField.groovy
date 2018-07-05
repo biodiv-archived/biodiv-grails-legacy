@@ -182,4 +182,16 @@ class CustomField {
  
         this.dataType = dataType;
     }
+
+    boolean isValidValue(val) {
+        boolean isValid = false;
+        if(options) {            
+            options.split(',').each {
+                if(it.equalsIgnoreCase(val)) isValid = true
+            }
+            return isValid;
+        } else {
+            return true;
+        }
+    }
 }

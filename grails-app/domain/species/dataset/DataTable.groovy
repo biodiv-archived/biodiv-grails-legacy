@@ -161,7 +161,14 @@ class DataTable extends CollMetadata {
 
        switch(dataTableType) {
            case DataTableType.OBSERVATIONS: return getObservationData(id, params);
-           case DataTableType.SPECIES : return Species.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'id']);
+           case DataTableType.SPECIES : 
+           //return Species.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'id']);
+           def species = Species.executeQuery("select s from Species s inner join s.dataTables dataTable where s.isDeleted=:isDeleted and dataTable = :dataTable", [isDeleted:false, dataTable:this], [max:params.max, offset:params.offset, sort:'id']);
+           println species 
+           println  "#############"
+           println  "#############"
+           println  "#############"
+           return species;
            case DataTableType.FACTS : 
            //def facts = Fact.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'objectType,objectId,id']);
            def c = Fact.createCriteria()
@@ -200,7 +207,9 @@ println facts
    int getDataObjectsCount() {
        switch(dataTableType) {
            case DataTableType.OBSERVATIONS: return Observation.countByDataTableAndIsDeleted(this, false, [cache:true]);
-           case DataTableType.SPECIES : return Species.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           case DataTableType.SPECIES : //return 0;//Species.countByDataTableAndIsDeleted(this, false, [cache:true]);
+           def result = Species.executeQuery("select count(*) from Species s inner join s.dataTables dataTable  where s.isDeleted=:isDeleted and dataTable = :dataTable",  [isDeleted:false, dataTable:this]);
+           return result[0];
            case DataTableType.FACTS : return Fact.countByDataTableAndIsDeleted(this, false, [cache:true]);
            case DataTableType.TRAITS : return Trait.countByDataTableAndIsDeleted(this, false, [cache:true]);
            case DataTableType.DOCUMENTS : return Document.countByDataTableAndIsDeleted(this, false, [cache:true]);

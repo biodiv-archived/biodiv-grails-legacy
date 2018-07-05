@@ -180,5 +180,7 @@
         </div>
 
     </form>
+    <%def uploadLogParams = dataTableInstance?.uploadLog?.fetchMapFromText();%> 
+    <input type="hidden" id="xlsxFileUrl" value="${uploadLogParams?.xlsxFileUrl}">
 
 </div>

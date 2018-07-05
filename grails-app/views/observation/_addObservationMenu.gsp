@@ -20,7 +20,7 @@
                     <li class="divider-vertical"></li>
                     <li class="${params.controller == 'checklist'?'active':''}"><a
                         href="${uGroup.createLink(
-                        controller:'checklist', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+                        controller:'dataTable', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                         > <g:message code="link.add.list" /></a></li>
                 </ul>
                 </g:if>
