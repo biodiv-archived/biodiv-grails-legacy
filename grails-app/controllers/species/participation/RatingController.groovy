@@ -8,8 +8,11 @@ import grails.plugin.springsecurity.annotation.Secured
 
 class RatingController extends RateableController {
 
+<<<<<<< HEAD
 	def observationsSearchService;
 
+=======
+>>>>>>> dae9c9b87f3074b90f4048aa0442a4167f4ec12c
 	@Secured(['ROLE_USER'])
     def rate() {
         log.debug params;
@@ -88,6 +91,7 @@ class RatingController extends RateableController {
 				// obvs.add(obv);
 				// observationsSearchService.publishSearchIndex(obvs, true);
       }
+
 
     }
 

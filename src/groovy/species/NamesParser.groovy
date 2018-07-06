@@ -20,7 +20,7 @@ class NamesParser {
 	private static final log = LogFactory.getLog(this);
 	def config = grails.util.Holders.config
 	/**
-	 * max 5000 
+	 * max 5000
 	 * @param names
 	 * @return List of IName objects
 	 */
@@ -88,7 +88,7 @@ class NamesParser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param parsedNamesJson
 	 * @return
 	 */
@@ -119,7 +119,7 @@ class NamesParser {
 						//if(part.uninomial?.string) parsedName.uninomial = part.uninomial.string;
 						if(part.genus instanceof Map){
 							if(part.genus?.string && part.species?.string) parsedName.binomialForm = part.genus.string + " " + part.species.string;
-						}	
+						}
 						//if(part.infraGenus?.string) parsedName.infraGenus = part.infraGenus.string;
 						//if(part.infraSpecies?.string) parsedName.infraSpecies = part.infraSpecies.string;
 
@@ -133,13 +133,13 @@ class NamesParser {
 									parsedName.addToAuthor(author);
 								}
 							}
-	
+
 							if(part.species?.basionymAuthorTeam?.author) {
 								for( author in part.species.basionymAuthorTeam.author[0][0] ) {
 									parsedName.addToAuthor(author);
 								}
 							}
-	
+
 							//						if(part.infraSpecies?.combinationAuthorTeam?.author) {
 							//							for( author in part.infraSpecies.combinationAuthorTeam.author[0][0]) {
 							//								parsedName.addToAuthors(author);
@@ -151,7 +151,7 @@ class NamesParser {
 							//								parsedName.addToBasionymAuthors(author);
 							//							}
 							//						}
-	
+
 							if(part.species?.combinationAuthorTeam?.year)
 								parsedName.addToYear(part.species.combinationAuthorTeam.year[0][0].toString());
 							if(part.species?.basionymAuthorTeam?.year)
@@ -160,11 +160,11 @@ class NamesParser {
 							//							parsedName.addToYear(part.infraSpecies.combinationAuthorTeam.year[0][0]);
 							//						if(part.infraSpecies?.basionymAuthorTeam?.year)
 							//							parsedName.addToBasionymYear(part.infraSpecies.basionymAuthorTeam.year[0][0]);
-	
+
 							//ignoring rank;
 							//ignoring cultivar name type
 
-                            
+
 						}
 
 						if((part.infraspecies instanceof List) && part.infraspecies[0]){
