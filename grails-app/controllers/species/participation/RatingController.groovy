@@ -7,11 +7,13 @@ import grails.converters.JSON;
 import grails.plugin.springsecurity.annotation.Secured
 
 class RatingController extends RateableController {
-   
+
+	def observationsSearchService;
+
 	@Secured(['ROLE_USER'])
     def rate() {
         log.debug params;
-        def result =  rateIt(params.id.toLong(), params.type, params.rating, params.parent, params.parentId.toLong());
+        def result =  rateIt(params.id?.toLong(), params.type, params.rating, params.parent, params.parentId?.toLong());
         render result as JSON
     }
 
@@ -41,7 +43,7 @@ class RatingController extends RateableController {
                         }
                     }
                 }
-            } 
+            }
         }
         def result = formatRatings(getRatings(id, type));
         render result as JSON
@@ -78,9 +80,15 @@ class RatingController extends RateableController {
     }
 
     private def updateReprImage(String parent, Long parentId) {
+      if(parent && parentId){
         def obj = grailsApplication.domainClasses.find { it.clazz.simpleName == parent.capitalize() }.clazz.read(parentId);
         obj.updateReprImage();
         obj.save();
+				// List<Observation> obvs=new ArrayList<Observation>();
+				// obvs.add(obv);
+				// observationsSearchService.publishSearchIndex(obvs, true);
+      }
+
     }
 
     private def getRatings(long id, String type, rater=null) {
@@ -103,17 +111,17 @@ class RatingController extends RateableController {
 
     def evaluateRater() {
 		def evaluator = grailsApplication.config.grails.rateable.rater.evaluator
-		def rater 
+		def rater
 		if(evaluator instanceof Closure) {
 			evaluator.delegate = this
 			evaluator.resolveStrategy = Closure.DELEGATE_ONLY
 			rater = evaluator.call()
 		}
-		
+
 		if(rater && rater.id) {
 		    return rater
         } else {
-            
+
         }
 	}
 
