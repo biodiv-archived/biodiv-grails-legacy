@@ -11,7 +11,7 @@ class RatingController extends RateableController {
 	@Secured(['ROLE_USER'])
     def rate() {
         log.debug params;
-        def result =  rateIt(params.id.toLong(), params.type, params.rating, params.parent, params.parentId.toLong());
+        def result =  rateIt(params.id?.toLong(), params.type, params.rating, params.parent, params.parentId?.toLong());
         render result as JSON
     }
 
@@ -78,9 +78,11 @@ class RatingController extends RateableController {
     }
 
     private def updateReprImage(String parent, Long parentId) {
+      if(parent && parentId){
         def obj = grailsApplication.domainClasses.find { it.clazz.simpleName == parent.capitalize() }.clazz.read(parentId);
         obj.updateReprImage();
         obj.save();
+      }
     }
 
     private def getRatings(long id, String type, rater=null) {
