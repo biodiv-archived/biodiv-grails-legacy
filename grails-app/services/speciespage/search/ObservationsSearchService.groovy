@@ -90,7 +90,7 @@ class ObservationsSearchService extends AbstractSearchService {
         }
         List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
          dataToElastic=getJson(ids,customFieldMapToObjectId);
-println customFieldMapToObjectId
+         println customFieldMapToObjectId
          postToElastic(dataToElastic);
 //        return commitDocs(docs, commit);
     }
@@ -215,8 +215,39 @@ println customFieldMapToObjectId
 
 
           /*
+          Query for observation likes
+          */
+
+          String queryForObservationLike="""
+            select row.rating_ref as key,  '[' || string_agg(format('%s',to_json(row_to_json(row)) ), ',')  || ']' as values from (select  rl.rating_ref,r.rater_id ,su.name , case when su.icon is not null  then su.icon else coalesce(su.profile_pic,'') end as icon
+            from rating as r inner join suser  as su on r.rater_id=su.id inner join  rating_link as rl on r.id=rl.rating_id
+            where rl.rating_ref in ("""+sids+ """) and  rl.type='observation') row group by row.rating_ref""";
+
+            def queryForObservationLikeResult=sql.rows(queryForObservationLike);
+            Map<String,Object> observationLike =new HashMap<String,Object>();
+
+            queryForObservationLikeResult.each { row ->
+              def key;
+              def value;
+               row.each{ k,v->
+                 if(k.equalsIgnoreCase("key")){
+                    key=v.toString();
+                 }
+                 if(k.equalsIgnoreCase("values")){
+                  JSONArray array = new JSONArray(v.toString());
+                  observationLike.put(key,array);
+
+                 }
+              }
+              }
+
+
+
+
+          /*
           Query for path and classificationid
           */
+
           String queryForPathAndClassification="""select obv.id,tres.path,tres.classification_id as classificationid
                                                   from observation obv
                                                    left join recommendation r on obv.max_voted_reco_id=r.id
@@ -225,11 +256,11 @@ println customFieldMapToObjectId
                                                     where (tres.classification_id=265799 or tres.classification_id=null)
                                                     and obv.id in ( """+sids+""" )""";
 
-                                                    println  queryForPathAndClassification;
 
           def queryForPathAndClassificationResult=sql.rows(queryForPathAndClassification);
 
           Map<String,Map<String,String>> pathClassification=new HashMap<String,Map<String,String>>();
+
 
 
           queryForPathAndClassificationResult.each { row ->
@@ -303,17 +334,23 @@ println customFieldMapToObjectId
               }
 
 def fromdate=obvRow.get("fromdate");
+
 def geoPrivacyAdjust = Utils.getRandomFloat()
 def longitude = obvRow.get("longitude") + geoPrivacyAdjust
 def latitude = obvRow.get("latitude") + geoPrivacyAdjust
+
 List<Double> location=new ArrayList<Double>();
+
 location.add(longitude);
 location.add(latitude);
+
 eData.put("location",location);
 eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));
 eData.put("checklistannotations",null);
 
 def id=obvRow.get("id");
+
+eData.put("observationlikes",observationLike.get(id.toString()));
 
 /**
 Observation classificationid and path related data
@@ -358,6 +395,9 @@ Map<String, Object> custom_fields=new HashMap<String,Object>();
 /**
 query for custom fields if exists for a particular userGroup
 */
+
+
+
  Map<String,Object> customFieldMap=customFieldMapToObjectId.get(id.toString())
  customFieldMap.each{ k,v ->
    Map<String, Object> keyValues=new HashMap<String,Object>();
