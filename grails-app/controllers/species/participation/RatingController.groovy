@@ -8,11 +8,9 @@ import grails.plugin.springsecurity.annotation.Secured
 
 class RatingController extends RateableController {
 
-<<<<<<< HEAD
 	def observationsSearchService;
+	def utilsService;
 
-=======
->>>>>>> dae9c9b87f3074b90f4048aa0442a4167f4ec12c
 	@Secured(['ROLE_USER'])
     def rate() {
         log.debug params;
@@ -27,9 +25,9 @@ class RatingController extends RateableController {
 
         def id = params.id.toLong();
         String type = params.type
+				def flag = false;
 
         if(id && type && rater) {
-
             Rating.withTransaction {
                 def ratingLinks = RatingLink.withCriteria {
                        createAlias("rating", "r")
@@ -39,15 +37,21 @@ class RatingController extends RateableController {
                     }
 
                 if(ratingLinks){
+									flag=true;
                     ratingLinks.each { rl ->
                         def rating = rl.rating
                         if(rl.delete() && rating.delete()) {
-                            updateReprImage(params.parent, params.parentId.toLong());
+													println("insdie unrate");
                         }
                     }
                 }
             }
         }
+				utilsService.cleanUpGorm(true)
+				if(flag==true){
+					updateReprImage(params.parent, params.parentId?.toLong(),id,type);
+				}
+
         def result = formatRatings(getRatings(id, type));
         render result as JSON
     }
@@ -60,13 +64,17 @@ class RatingController extends RateableController {
 
     private def rateIt(long id, String type, String rate, String parent, Long parentId) {
         def rater = evaluateRater()
+				def flag = false;
         Rating.withTransaction {
             // for an existing rating, update it
             def rating = getRatings(id, type, rater);
             if (rating && rate) {
                 rating[0].stars = rate.toDouble()
-                if(rating[0].save()) {
-                    updateReprImage(parent, parentId);
+                if(rating[0].save(flush:  true)) {
+									flag = true;
+										//utilsService.cleanUpGorm(true)
+										//sleep(3000);
+
                 }
             }
             // create a new one otherwise
@@ -74,15 +82,20 @@ class RatingController extends RateableController {
                 // create Rating
                 rating = new Rating(stars: rate, raterId: rater.id, raterClass: rater.class.name)
                 def link = new RatingLink(rating: rating, ratingRef: id, type: type)
-                if(rating.save() && link.save()) {
-                    updateReprImage(parent, parentId);
+                if(rating.save(flush: true) && link.save(flush: true)) {
+										flag = true;
+                    //updateReprImage(parent, parentId,id,type);
                 }
             }
         }
+				utilsService.cleanUpGorm(true)
+				if(flag==true){
+					updateReprImage(parent, parentId,id,type);
+				}
         return formatRatings(getRatings(id, type));
     }
 
-    private def updateReprImage(String parent, Long parentId) {
+    private def updateReprImage(String parent, Long parentId,Long id,String type) {
       if(parent && parentId){
         def obj = grailsApplication.domainClasses.find { it.clazz.simpleName == parent.capitalize() }.clazz.read(parentId);
         obj.updateReprImage();
@@ -90,7 +103,14 @@ class RatingController extends RateableController {
 				// List<Observation> obvs=new ArrayList<Observation>();
 				// obvs.add(obv);
 				// observationsSearchService.publishSearchIndex(obvs, true);
-      }
+      }else{
+				if(type=="observation"){
+					Observation obv = Observation.get(Long.parseLong(params.id));
+					 List<Observation> obvs=new ArrayList<Observation>();
+					 obvs.add(obv);
+					 observationsSearchService.publishSearchIndex(obvs, true);
+				}
+			}
 
 
     }
