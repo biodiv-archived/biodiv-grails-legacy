@@ -224,6 +224,8 @@ class ObservationsSearchService extends AbstractSearchService {
             where rl.rating_ref in ("""+sids+ """) and  rl.type='observation') row group by row.rating_ref""";
 
           //  def queryForObservationLikeResult=sql.rows(queryForObservationLike);
+
+
             Map<String,Object> observationLike =new HashMap<String,Object>();
 
             queryForObservationLikeResult.each { row ->
