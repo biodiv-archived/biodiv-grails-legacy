@@ -174,12 +174,6 @@ class CustomField {
 	}
 
     public void setDataType(dataType) {
-        println "dataType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.dataType = dataType;
     }
 
