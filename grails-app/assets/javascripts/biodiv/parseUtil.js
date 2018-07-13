@@ -65,7 +65,7 @@ function parseCSVData(data, options) {
     var headerCount = 0;
     var error = '';
     var foundHeader = false;
-    var rowLimit = 1000;
+    var rowLimit = 5000;
     if(options.res === "species") {
         rowLimit = 500;
     }
