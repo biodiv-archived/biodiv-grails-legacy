@@ -43,6 +43,7 @@
                  <div class="prop">
                  <span class="name"><i class="icon-user"></i><g:message code="default.sex.label" /></span>
                   <div class="value">
+                  ${userInstance.sexType}--------------------------
                   <g:if test="${userInstance.sexType}">
                                    ${userInstance.sexType}  
                                    </g:if>
