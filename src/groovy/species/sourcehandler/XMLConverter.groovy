@@ -152,7 +152,6 @@ class XMLConverter extends SourceConverter {
 	
 	private updateNode(Node node, Map completeMap, String k){
 		def m = completeMap.get(k)
-		
 		new Node(node, "matchStatus", m['status']);
 		new Node(node, "rank", m['rank']);
 				
@@ -191,11 +190,10 @@ class XMLConverter extends SourceConverter {
 		
 		String speciesName = getNodeDataFromSubCategory(species, fieldsConfig.SCIENTIFIC_NAME);
 		int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
-		
 		NameInfo n = new NameInfo(speciesName, rank, index)
 		//getting hir
 		List taxonNodes = getNodesFromCategory(species.children(), fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-		//println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
+		println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
 		taxonNodes.each { tn ->
 			rank = getTaxonRank(tn.subcategory.text())
 			def hirNodeData = getData((tn && tn.data)?tn.data[0]:null)
@@ -815,6 +813,7 @@ class XMLConverter extends SourceConverter {
         if(!dataNode) return "";
         //sanitize the html text
         return dataNode.localText().size() > 0 ? dataNode.localText()[0]:"";
+        //return dataNode.value()?:"";
     }
 
     /**
@@ -1112,8 +1111,6 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
-        println ";;;;;;;;;;;;;;;::::"
-        println imageNode
         File tempFile = getImageFile(imageNode, relImagesFolder);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
         def absUrl = imageNode.url?.text() ? imageNode.url?.text() : "";
@@ -1159,10 +1156,8 @@ class XMLConverter extends SourceConverter {
                 res.url = absUrl?:sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
-                    println con
                     res.addToContributors(con);
                 }
-                println "-----------------------"
                 for(Contributor con : getAttributions(imageNode, true)) {
                     res.addToAttributors(con);
                 }
@@ -1181,9 +1176,7 @@ class XMLConverter extends SourceConverter {
                 res.license = null;//?.clear()
                 res.contributors?.clear()
                 res.attributors?.clear();
-                println "-----------------------"
                 for(Contributor  con : getContributors(imageNode, true)) {
-                    println con
                     res.addToContributors(con);
                 }
                 for(Contributor con : getAttributions(imageNode, true)) {
@@ -2497,10 +2490,6 @@ class XMLConverter extends SourceConverter {
         //          species.attach();
         //      }
         }
-        println "***********************************";
-        println s.guid;
-        println "***********************************";
-        println species;
         if(species)
             return species[0]
     }

@@ -163,7 +163,7 @@ abstract class AbstractObjectController {
         return getTargetInstance(clazz, id).userGroups; 
     }
 
-    def userGroups() {
+    public def userGroups() {
         def result = [];
         switch(params.controller.toLowerCase()) {
             case 'observation' : result = getUserGroups(Observation.class, params.id);

@@ -314,8 +314,16 @@ class ObservationController extends AbstractObjectController {
     private saveAndRender(params, sendMail=true){
 
         println "saveAndRender==============="+params
+
         params.locale_language = utilsService.getCurrentLanguage(request);
-        def result = observationService.saveObservation(params, sendMail)
+        def result;
+        Observation.withSession { session ->
+          result = observationService.saveObservation(params, sendMail)
+          session.flush();
+          session.clear();
+        }
+
+        // result.instance.save(flush:true);
         if(result.success){
             //if(params.format?.equalsIgnoreCase("json") || params.format?.equalsIgnoreCase("xml") )
             //    params.isMobileApp = true;
@@ -676,7 +684,7 @@ class ObservationController extends AbstractObjectController {
                                 def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                                 //context specific baseUrl for location picker script to work
                                 def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
-                                thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
+                                thumbnail = res.thumbnailUrl(null, null, ImageType.LARGE);
                                 type = ResourceType.IMAGE
 
                         }else if(resourcetype == resourceTypeAudio){

@@ -202,7 +202,7 @@ speciesPortal {
     resources {
         rootDir = "${app.rootDir}/img"
         serverURL = "http://hybrid.indiabiodiversity.org/${appName}/img"
-        filesutraURL = "http://fileops.pamba.strandls.com"
+        filesutraURL = "http://fileops.hybrid.indiabiodiversity.org"
         images {
             defaultType = "jpg"
             thumbnail {
@@ -623,8 +623,9 @@ environments {
             fatal   'jdbc.resultsettable'
             //            debug 'org.hibernate.SQL'
             //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            /*
             debug 'org.springframework.security.acls'
+            debug 'grails.plugin.springsecurity.acl'
+            /*
             debug 'org.hibernate.jdbc'
             debug 'org.hibernate.persister.entity'
             debug 'org.hibernate.action.EntityUpdateAction'

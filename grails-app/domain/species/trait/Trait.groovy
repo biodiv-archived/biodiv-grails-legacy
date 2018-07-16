@@ -327,22 +327,10 @@ class Trait {
     }
 
     public void setDataTypes(dataTypes) {
-        println "dataTypes##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.dataTypes = dataTypes;
     }
 
     public void setTraitTypes(traitTypes) {
-        println "traitTypes##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.traitTypes = traitTypes;
     }
 }

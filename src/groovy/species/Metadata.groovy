@@ -28,14 +28,14 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @JsonIgnoreProperties([])
 abstract class Metadata {
-	
+
 	public enum LocationScale {
 		APPROXIMATE ("Approximate"),
 		ACCURATE ("Accurate"),
 		LOCAL ("Local"),
 		REGION ("Region"),
 		COUNTRY ("Country")
-		
+
 		private String value;
 
 		LocationScale(String value) {
@@ -45,13 +45,13 @@ abstract class Metadata {
 		String value() {
 			return this.value;
 		}
-		
+
 		static LocationScale getEnum(value){
 			if(!value) return null
-			
+
 			if(value instanceof LocationScale)
 				return value
-			
+
 			value = value.toUpperCase().trim()
             println value
 			switch(value){
@@ -66,16 +66,16 @@ abstract class Metadata {
 				case 'COUNTRY':
 					return LocationScale.COUNTRY
 				default:
-					return null	
+					return null
 			}
 		}
 	}
-	
+
 	public enum DateAccuracy {
 		ACCURATE ("Accurate"),
 		APPROXIMATE ("Approximate"),
 		UNKNOWN ("Unknown")
-		
+
 		private String value;
 
 		DateAccuracy(String value) {
@@ -92,10 +92,10 @@ abstract class Metadata {
 
 		static DateAccuracy getEnum(value){
 			if(!value) return null
-			
+
 			if(value instanceof DateAccuracy)
 				return value
-			
+
 			value = value.toUpperCase().trim()
             println value
 			switch(value){
@@ -106,7 +106,7 @@ abstract class Metadata {
 				case 'UNKNOWN':
 					return DateAccuracy.UNKNOWN
 				default:
-					return null	
+					return null
 			}
 		}
 	}
@@ -114,17 +114,17 @@ abstract class Metadata {
 	//Geographic Coverage
 	String placeName;
 	String reverseGeocodedName
-	
+
 	boolean geoPrivacy = false;
 	//XXX to be removed after locationScale migration
 	String locationAccuracy;
 	LocationScale locationScale;
 
     @JsonIgnore
-    Geometry topology; 
+    Geometry topology;
 	double latitude;
 	double longitude;
-	
+
     //Taxonomic Coverage
     SpeciesGroup group;
 	Habitat habitat;
@@ -176,7 +176,7 @@ abstract class Metadata {
         fromDate nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
-			} 
+			}
 			return val < new Date()
 		}
 		toDate nullable:true, validator : {val, obj ->
@@ -197,17 +197,17 @@ abstract class Metadata {
         lastInterpreted nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
-			} 
+			}
 			return val < new Date()
 		}
         lastCrawled nullable:true, validator : {val, obj ->
 			if(!val){
 				return true
-			} 
+			}
 			return val < new Date()
 		}
     }
-	
+
     static mapping = {
         columns {
 //            topology (type:org.hibernatespatial.GeometryUserType, class:com.vividsolutions.jts.geom.Geometry)
@@ -235,16 +235,16 @@ abstract class Metadata {
 	def onAddComment(comment){
 		//updateTimeStamp()
 	}
-	
+
 	def onAddActivity(af, flushImmidiatly=true){
 		updateTimeStamp(flushImmidiatly)
 	}
-	
+
 	private updateTimeStamp(flushImmidiatly=true){
 		lastRevised = new Date();
 		saveConcurrently(null, flushImmidiatly);
 	}
-	
+
 	def updateLatLong(){
 		if(!topology){
 			return
@@ -253,7 +253,7 @@ abstract class Metadata {
 		latitude = (float) centroid.getY()
 		longitude = (float) centroid.getX()
 	}
-	
+
 	private saveConcurrently(f = {}, flushImmidiatly=true){
 		try{
 			if(f) f()
@@ -270,9 +270,9 @@ abstract class Metadata {
 	}
 
 	SpeciesGroup fetchSpeciesGroup() {
-		return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS); 
+		return this.group?:SpeciesGroup.findByName(grailsApplication.config.speciesPortal.group.OTHERS);
 	}
-	
+
 	def fetchGeoPrivacyAdjustment(SUser reqUser=null){
 		if(!geoPrivacy || utilsService.ifOwns(author)){
 			return 0
@@ -302,10 +302,11 @@ abstract class Metadata {
             } else if(fact.value) {
                 traitFactMap[fact.traitInstance.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
                 queryParams['trait'][fact.traitInstance.id] += fact.value+(fact.toValue?":"+fact.toValue:'') +','
-            } 
+            }
             if(fact.fromDate && fact.toDate) {
-                traitFactMap[fact.traitInstance.id] << fact.fromDate+";"+fact.toDate
-                queryParams['trait'][fact.traitInstance.id] += fact.fromDate+";"+fact.toDate+',';
+			  String dateStr = fact.fromDate.format('dd/MM/YYYY')+";"+fact.toDate.format('dd/MM/YYYY')
+              traitFactMap[fact.traitInstance.id] << dateStr;//fact.fromDate.format('dd-MM-yyyy')+";"+fact.toDate.format('dd-MM-yyyy')
+              queryParams['trait'][fact.traitInstance.id] += dateStr;//fact.fromDate+";"+fact.toDate+',';
             }
 
             traitFactMap['fact'] << fact.id
@@ -324,14 +325,14 @@ abstract class Metadata {
     @JsonIgnore
     Map getTraits(Boolean isObservationTrait=false, Boolean isParticipatory = true, Boolean showInObservation=false) {
         Map queryParams = ['sGroup':this.group.id];
-        
+
         if(isObservationTrait != null) queryParams['isObservationTrait'] = isObservationTrait;
         if(isParticipatory != null) queryParams['isParticipatory'] = isParticipatory;
         if(!showInObservation != null) queryParams['showInObservation'] = showInObservation;
-        
+
         def traitList = traitService.getFilteredList(queryParams, -1, -1).instanceList;
         def r = getTraitFacts();
-        r['traitList'] = traitList; 
+        r['traitList'] = traitList;
 
         return r;
     }
@@ -343,7 +344,7 @@ abstract class Metadata {
         println "##########################"
         println "##########################"
         println "##########################"
- 
+
         this.locationScale = locationScale;
     }
 
@@ -353,7 +354,7 @@ abstract class Metadata {
         println "##########################"
         println "##########################"
         println "##########################"
- 
+
         this.dateAccuracy = dateAccuracy;
     }
 }

@@ -50,7 +50,7 @@
                             <sUser:ifOwnsDataset model="['dataset':datasetInstance]">
 
                             <a class="btn btn-primary pull-right" style="margin-right: 5px;"
-                                href="${uGroup.createLink(controller:'dataTable', action:'create', dataset:datasetInstance.id)}"
+                                href="${uGroup.createLink(controller:'dataTable', action:'create', dataset:datasetInstance.id, 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                 ><i class="icon-plus"></i><g:message code="button.create.dataTable" /></a>
 
 
@@ -85,7 +85,7 @@
                             <ul class="list_view obvListWrapper" style="list-style:none;margin-left:0px;">
                                 <g:each in="${DataTable.findAllByDatasetAndIsDeleted(datasetInstance, false, [sort:'createdOn', order:'desc'])}" var="dataTableInstance">
                                 <li id="dataTable_${dataTableInstance.id}" style="margin-top:10px;overflow:auto;">
-                                <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage, showTitleDetail:true, hideBody:true]"/>
+                                <g:render template="/dataTable/showDataTableStoryTemplate" model="['dataTableInstance':dataTableInstance, showDetails:true,'userLanguage':userLanguage, showTitleDetail:true, hideBody:true, hideDatasetBody:false]"/>
                                 </li>
                                 </g:each>
                             </ul>			

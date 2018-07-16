@@ -89,7 +89,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         //String[] metaFields = new String[metaXML.core.field.size()];
         Map metaFields = [:]//new String[metaXML.core.field.size()];
         metaXML.core.field.each {
-            metaFields[it.attribute('term')] = ['index':Integer.parseInt(it.attribute('index'))];
+            if(!metaFields[it.attribute('term')]) {
+                metaFields[it.attribute('term')] = [];
+            }
+            metaFields[it.attribute('term')] << ['index':Integer.parseInt(it.attribute('index'))];
         }
 
         log.debug "Read headers mapping from meta ${metaFields}"
@@ -97,7 +100,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         //String[] multiMediaMetaFields = new String[metaXML.extension.files.location.findAll{it.text() == 'multimedia.txt'}[0].parent().parent().field.size()];
         Map multimediaMetaFields = [:];
         metaXML.extension.files.location.findAll{it.text() == 'multimedia.txt'}[0].parent().parent().field.each {
-            multimediaMetaFields[it.attribute('term')] = ['index':Integer.parseInt(it.attribute('index'))];
+            if(!multimediaMetaFields[it.attribute('term')]) {
+                multimediaMetaFields[it.attribute('term')] = [];
+            }
+            multimediaMetaFields[it.attribute('term')] << ['index':Integer.parseInt(it.attribute('index'))];
         }
 
         log.debug "Read multimedia headers mapping from meta ${multimediaMetaFields}"
@@ -113,7 +119,11 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         String[] row = mappingFileReader.readNext();
         while(row) {
             println row;
-            metaFields[row[0]] = ['columnName':row[1]];
+            if(!metaFields[row[0]]) {
+                metaFields[row[0]] =[];
+            }
+            metaFields[row[0]] << ['columnName':row[1]];
+            
             row = mappingFileReader.readNext();
         }
 
@@ -124,7 +134,10 @@ abstract class AbstractObservationImporter extends AbstractImporter {
             def multimediaMappingFileReader = getCSVReader(multimediaMappingFile);
             row = multimediaMappingFileReader.readNext()
             while(row) {
-                multimediaMetaFields[row[0]] = ['columnName':row[1]];
+                if(!multimediaMetaFields[row[0]]) {
+                    multimediaMetaFields[row[0]] = [];
+                }
+                multimediaMetaFields[row[0]] << ['columnName':row[1]];
                 row = multimediaMappingFileReader.readNext();
             }
 
@@ -180,10 +193,19 @@ abstract class AbstractObservationImporter extends AbstractImporter {
         println columnName+"   "+index
         List mappedCol = [];
         metaFields.each { key, value ->
-            f = null;
-            if(value.columnName == columnName) f = key;
-            else if(value.index == index) f = key;
-            if(f) mappedCol << f
+            println key
+            println value
+            value.each { val ->
+                f = null;
+                println val
+                if(val.columnName == columnName) f = key;
+                else if(val.index == index) f = key;
+                if(f) {
+                    println "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxX"
+                    mappedCol << f
+                }
+println "111"
+            }
         }
         if(!mappedCol) mappedCol << null;
         println mappedCol;
@@ -421,7 +443,11 @@ abstract class AbstractObservationImporter extends AbstractImporter {
                             m[TRAIT_HEADER][header.url.replace("http://ibp.org/terms/trait/","")] = value;  
                         }
                         else if(header.url && header.url.startsWith("http://ibp.org/terms/customfield") && row[header.column]) {
-                            m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")] = value;  
+                            if(!m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")]) {
+                                m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")] = [];
+                            } 
+                            m[CUSTOMFIELD_HEADER][header.url.replace("http://ibp.org/terms/customfield/","")] << value;  
+                            
                         }
                         else if(header.url && header.url.startsWith("http://ibp.org/terms/observation/") && row[header.column]) {
                             m[header.url.replace("http://ibp.org/terms/observation/","")] = value;  

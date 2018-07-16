@@ -1437,6 +1437,36 @@ def dataSource;
    */
    @Secured(['ROLE_USER'])
    def addUserToGroup() {
+/* Use following for bulk acl permissions.
+create table acl_tmp(user_id bigint, name varchar(255));
+copy acl_tmp from '/tmp/abp_users21may.tsv' WITH (FORMAT csv);
+
+#creating sids
+insert into acl_sid select nextval('hibernate_sequence'), 't', email from (select id,email from suser u, acl_tmp at where u.id=at.user_id) suser_acl_tmp left join acl_sid on acl_sid.sid=suser_acl_tmp.email where acl_sid.sid is null; 
+
+#assam acl_entries
+select * from acl_entry where acl_object_identity=4087142;
+CREATE SEQUENCE ace_order_sql_tmp START 1;
+SELECT setval('ace_order_sql_tmp', max(x.ace_order)) from (select * from acl_entry where acl_object_identity=4087142) x;
+
+#users who already have role in this group
+select * from user_group_member_role ugmr, acl_tmp where ugmr.s_user_id=acl_tmp.user_id and ugmr.user_group_id=4087136;
+
+# users who do not have any role in the usergroup 
+select * from acl_tmp left join user_group_member_role ugmr on ugmr.s_user_id=acl_tmp.user_id and ugmr.user_group_id=4087136 where ugmr.s_user_id is null;
+
+#insert users with member role
+insert into user_group_member_role (user_group_id, role_id, s_user_id) select 4087136, 267837, x.user_id from (select acl_tmp.user_id from acl_tmp left join user_group_member_role ugmr on ugmr.s_user_id=acl_tmp.user_id and ugmr.user_group_id=4087136, suser  where suser.id=acl_tmp.user_id and ugmr.s_user_id is null) x;
+
+#granting acl permissions 
+insert into acl_entry select nextval('hibernate_sequence'), nextval('ace_order_sql_tmp'), 4087142, 'f', 'f', 't', 2, x.id from (select acl_sid.id from acl_tmp join suser on user_id=suser.id join acl_sid on acl_sid.sid=suser.email left join acl_entry on acl_entry.acl_object_identity=4087142 and acl_sid.id=acl_entry.sid where acl_entry.id is null) x;
+
+drop sequence ace_order_sql_tmp;
+drop table acl_tmp;
+
+
+*/
+
 	   log.debug params
 	   UserGroup ug = UserGroup.read(params.groupId.toLong())
 	   boolean sendMail = (params.sendMail ? params.sendMail.toBoolean() : false)
@@ -1447,22 +1477,32 @@ def dataSource;
 	   def newUsers = res[1]
 //       int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
 //       dataSource.setUnreturnedConnectionTimeout(100000);
-
+       int i=0;
        SUser.withTransaction() { 
-           newUsers.each { user ->
-               log.debug "adding new uesr " + user
-               ug.addMember(user);
-               if(sendMail) { 
-                   sendNotificationMail(user, request, params, true, ug)
+           //UserGroup.withSession { session ->
+               newUsers.each { user ->
+                   i++;
+                   println "adding new uesr " + user
+                   ug.addMember(user);
+                   if(sendMail) { 
+                       sendNotificationMail(user, request, params, true, ug)
+                   }
+                   if(i%10 == 0) 
+                       utilsService.cleanUpGorm(false);
                }
-           }
-           oldUsers.each { user ->
-               log.debug "======== adding old user " + user
-               ug.addMember(user);
-               if(sendMail){
-                   sendNotificationMail(user, request, params, false, ug)
+               i=0;
+               oldUsers.each { user ->
+                   i++;
+                   println "======== adding old user " + user
+                   ug.addMember(user);
+                   if(sendMail){
+                       sendNotificationMail(user, request, params, false, ug)
+                   }
+                   if(i%10 == 0) 
+                       utilsService.cleanUpGorm(false);
                }
-           } 
+               utilsService.cleanUpGorm(false);
+           //}
        }
 
        SUser.withTransaction(){
@@ -1474,7 +1514,7 @@ def dataSource;
        }
 //       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
 //       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
-
+        println "addUserToGroup done"
 	   render "== done"
    }
    

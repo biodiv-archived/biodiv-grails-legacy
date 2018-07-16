@@ -415,62 +415,56 @@ class SUser  implements Serializable {
 
 		return true;
 	}
+/*
+    public String getSexType() {
+        return this.sexType?.value();
+    }
 
     public void setSexType(String sexType) {
+        if(sexType) {
         SexType.toList().each {
             if(it.value().equalsIgnoreCase(sexType))
-                this.sexType = it;
+                this.setSexType(it);
         }
+        }
+    }
+
+    public String getOccupationType() {
+        return this.occupationType?.value();
     }
 
     public void setOccupationType(String occupationType) {
+        if(occupationType) {
         OccupationType.toList().each {
             if(it.value().equalsIgnoreCase(occupationType))
-                this.occupationType = it;
+                this.setOccupationType(it);
+        }
         }
     }
+
+    public String getInstitutionType() {
+        return this.institutionType?.value();
+    }
+
 
     public void setInstitutionType(String institutionType) {
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        if(institutionType) {
         InstitutionType.toList().each {
             if(it.value().equalsIgnoreCase(institutionType))
-                this.institutionType = it;
+                this.setInstitutionType(it);
+        }
         }
     }
-
+*/
     public void setSexType(sexType) {
-        println "sexType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.sexType = sexType;
     }
 
     public void setOccupationType(occupationType) {
-        println "occupationType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.occupationType = occupationType;
     }
 
     public void setInstitutionType( institutionType) {
-        println "institutionType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
         this.institutionType = institutionType;
     }
 }

@@ -59,7 +59,7 @@
         <g:message
         code="observation.topology.label" default="${g.message(code:'default.label.at')}" /> <span class="req">*</span>
         <g:if test="${obvInfoFeeder && obvInfoFeeder.topology}">
-        <small class="lastTopology btn-link" style="display:block" data-lasttopology="${obvInfoFeeder && obvInfoFeeder.topology ? Utils.GeometryAsWKT(obvInfoFeeder.topology) : ''}" data-lastplacename="${obvInfoFeeder ? obvInfoFeeder.placeName : ''}">Last used location</small>
+        <small class="lastTopology btn-link" data-lasttopology="${obvInfoFeeder && obvInfoFeeder.topology ? Utils.GeometryAsWKT(obvInfoFeeder.topology) : ''}" data-lastplacename="${obvInfoFeeder ? obvInfoFeeder.placeName : ''}">Last used location</small>
         </g:if>
     </label>
     <div class="controls ">
@@ -77,7 +77,7 @@
                 </div>
                 <div class="wrapperParent"  style="text-align:center;width:100%">
                     <div class="address input-append control-group ${hasErrors(bean: sourceInstance, field:placeNameField, 'error')} ${hasErrors(bean: sourceInstance, field: topologyNameField, 'error')} " style="z-index:2;margin-bottom:0px;">
-                        <input class="placeName" name="placeName" type="text" title="${g.message(code:'showmapinput.find.place')}"  class="input-block-level" style="width:94%;"
+                        <input class="placeName input-block-level" name="placeName" type="text" title="${g.message(code:'showmapinput.find.place')}"  class="input-block-level" style="width:94%;"
                         class="section-item" value="${lastPlaceName}" rel="${g.message(code:'default.search')}" />
 
                         <span class="add-on" style="vertical-align:middle;"><i class="icon-chevron-down"></i></span>

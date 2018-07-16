@@ -38,7 +38,6 @@ class Species implements Rateable, Serializable {
 	StringBuilder sLog;
     boolean hasMedia = false;
 	boolean isDeleted = false;
-    DataTable dataTable;
 	
 	def grailsApplication; 
 	def springSecurityService;
@@ -63,10 +62,11 @@ class Species implements Rateable, Serializable {
 		indianEndemicityEntities:GeographicEntity, 
 		//taxonomyRegistry:TaxonomyRegistry, 
 		resources:Resource,
-		userGroups:UserGroup];
+		userGroups:UserGroup,
+        dataTables : DataTable];
  
 
-	static belongsTo = [UserGroup]
+	static belongsTo = [UserGroup, DataTable]
 
 	static constraints = {
 		guid(blank: false, unique: true);
@@ -76,7 +76,7 @@ class Species implements Rateable, Serializable {
         featureCount nullable:false;
         habitat nullable:true;
 		isDeleted nullable:false;
-		dataTable nullable:true;
+		//dataTable nullable:true;
 	}
 
 	static mapping = {

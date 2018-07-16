@@ -1358,7 +1358,7 @@ class UserGroupService {
                                     log.debug "${submitType}ing datatable ${dataTable} ${obvs.size()} ${dataTable.dataTableType} into usergroups ${dataTable.userGroups}"
                                     functionString = (submitType == 'post')? 'addTo'+dataTable.dataTableType : 'removeFrom'+dataTable.dataTableType
                                     def uGs = (submitType == 'post')? dataTable.userGroups : allGroups
-                                    println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, dataTable.dataTableType.value().toLowerCase(), getGroupResId(DataTable.class.getCanonicalName()), functionString, sendMail, doFlush);
+                                    println new ResourceUpdate().updateResourceOnGroup([pullType:'bulk', 'submitType':submitType], uGs, obvs, dataTable.dataTableType.value().toLowerCase(), getDataTableGroupResId(dataTable.dataTableType), functionString, sendMail, doFlush);
                                     offset += max;
                                 }
                             }
@@ -1401,6 +1401,32 @@ class UserGroupService {
 				default:
 					break
 			}
+        return groupResId;
+    }
+    
+    private String getDataTableGroupResId(DataTableType objectType) {
+        String groupResId = '';
+        println objectType;
+        switch (objectType) {
+				case DataTableType.OBSERVATIONS:
+					groupResId += 'observation_id'
+					break
+				case DataTableType.SPECIES:
+					groupResId += 'species_id'
+					break
+				case DataTableType.DOCUMENTS:
+					groupResId += 'document_id'
+					break
+				case DataTableType.TRAITS:
+					groupResId += 'trait_id'
+					break
+				case DataTableType.FACTS:
+					groupResId += 'fact_id'
+					break
+				default:
+					break
+			}
+        println groupResId
         return groupResId;
     }
 

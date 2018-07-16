@@ -138,7 +138,7 @@ class SpeciesUploadService {
         //SpeciesBulkUpload.create(springSecurityService.currentUser, startDate, endDate, filePath, imagesDir, notes, uploadType, params);
 		
 		
-		if(!validateUserSheetForName(sBulkUploadEntry)){
+		if(!validateUserSheetForName(sBulkUploadEntry, params.dataTable)){
 			return  ['msg': 'Name validation failed. Please visit your profile page to view status.!!!', 'sBulkUploadEntry': sBulkUploadEntry ]
 		}
 		
@@ -146,8 +146,8 @@ class SpeciesUploadService {
 		
 	}
 	
-	boolean validateUserSheetForName(SpeciesBulkUpload sbu){
-		return MappedSpreadsheetConverter.validateUserSheetForName(sbu)
+	boolean validateUserSheetForName(SpeciesBulkUpload sbu, DataTable dataTable = null){
+		return MappedSpreadsheetConverter.validateUserSheetForName(sbu, dataTable)
 	}
 	
 	Map upload(SpeciesBulkUpload sBulkUploadEntry){
@@ -358,6 +358,19 @@ class SpeciesUploadService {
 		int noOfSpecies = content.size();
 		
 		writeLog(" CONTENT SIZE " + noOfSpecies);
+
+        def paramsToPropagate = null;
+        DataTable dataTable = null;
+        if(sBulkUploadEntry) {
+           paramsToPropagate = sBulkUploadEntry.fetchMapFromText();
+        }
+
+
+        if(paramsToPropagate['dataTable']) {
+            println "Setting datatable entry"
+            dataTable = DataTable.read(Long.parseLong(paramsToPropagate['dataTable']+''));
+        }
+ 
 		int processNameCount = 0
 		boolean isAborted = false
 		List contentSubLists = content.collate(BATCH_SIZE)
@@ -369,7 +382,8 @@ class SpeciesUploadService {
 			
 			if(!isAborted){
 				contentSubList.each { speciesContent ->
-					Node speciesElement = converter.createSpeciesXML(speciesContent, imagesDir);
+
+					Node speciesElement = converter.createSpeciesXML(speciesContent, imagesDir, dataTable);
 					if(speciesElement){
 						speciesElements.add(speciesElement);
 					}
@@ -627,12 +641,15 @@ class SpeciesUploadService {
 				externalLinksService.updateExternalLinks(s.taxonConcept)
                 });
 
-                if(s.dataTable) {
+                if(s.dataTables) {
                     log.debug "Posting species to all user groups that data table is part of"
                     HashSet uGs = new HashSet();
-                    uGs.addAll(s.dataTable.userGroups);
-                    if(s.dataTable.dataset) {
-                        uGs.addAll(s.dataTable.dataset.userGroups);
+                    s.dataTables.each {
+                        uGs.addAll(it.userGroups);
+
+                        if(it.dataset) {
+                            uGs.addAll(it.dataset.userGroups);
+                        }
                     }
 			        userGroupService.addResourceOnGroups(s, uGs.collect{it.id}, false);
                 }
@@ -1124,7 +1141,8 @@ class SpeciesUploadService {
     private void inheritParams(species, Map paramsToPropagate) {
         if(paramsToPropagate['dataTable']) {
             println "Setting datatable entry"
-            species.dataTable = DataTable.read(Long.parseLong(paramsToPropagate['dataTable']+''));
+            def dataTable = DataTable.read(Long.parseLong(paramsToPropagate['dataTable']+''));
+            species.addToDataTables(dataTable);
         }
     }
 }

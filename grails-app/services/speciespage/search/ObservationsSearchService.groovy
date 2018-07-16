@@ -37,6 +37,7 @@ class ObservationsSearchService extends AbstractSearchService {
 
     static transactional = false
     def dataSource
+    def customFieldService
 
     def publishSearchIndex() {
         log.info "Initializing publishing to observations search index"
@@ -78,14 +79,18 @@ class ObservationsSearchService extends AbstractSearchService {
         Map names = [:];
         Map docsMap = [:]
         List<Long> ids=new ArrayList<Long>();
+        Map<String,Map<String,Object>> customFieldMapToObjectId=new HashMap<String,Map<String,Object>>();
 
         obvs.each { obv ->
             log.debug "Reading Observation : "+obv.id;
             ids.push(obv.id);
+            Map cf=customFieldService.fetchAllCustomFields(obv);
+            println  cf
+            customFieldMapToObjectId.put(obv.id.toString(),cf);
         }
         List<Map<String,Object>> dataToElastic=new ArrayList<Map<String,Object>>();
-         dataToElastic=getJson(ids);
-
+         dataToElastic=getJson(ids,customFieldMapToObjectId);
+         println customFieldMapToObjectId
          postToElastic(dataToElastic);
 //        return commitDocs(docs, commit);
     }
@@ -94,7 +99,7 @@ class ObservationsSearchService extends AbstractSearchService {
         super.delete("observation",id.toString());
     }
 
-    def getJson(List<Long> ids) {
+    def getJson(List<Long> ids,Map<String,Map<String,String>> customFieldMapToObjectId) {
         def sql =  Sql.newInstance(dataSource);
           def sids=ids.join(",")
         String query = """
@@ -210,8 +215,41 @@ class ObservationsSearchService extends AbstractSearchService {
 
 
           /*
+          Query for observation likes
+          */
+
+          String queryForObservationLike="""
+            select row.rating_ref as key,  '[' || string_agg(format('%s',to_json(row_to_json(row)) ), ',')  || ']' as values from (select  rl.rating_ref,r.rater_id ,su.name , case when su.icon is not null  then su.icon else coalesce(su.profile_pic,'') end as icon
+            from rating as r inner join suser  as su on r.rater_id=su.id inner join  rating_link as rl on r.id=rl.rating_id
+            where rl.rating_ref in ("""+sids+ """) and  rl.type='observation') row group by row.rating_ref""";
+
+          //  def queryForObservationLikeResult=sql.rows(queryForObservationLike);
+
+
+            Map<String,Object> observationLike =new HashMap<String,Object>();
+
+            queryForObservationLikeResult.each { row ->
+              def key;
+              def value;
+               row.each{ k,v->
+                 if(k.equalsIgnoreCase("key")){
+                    key=v.toString();
+                 }
+                 if(k.equalsIgnoreCase("values")){
+                  JSONArray array = new JSONArray(v.toString());
+                  observationLike.put(key,array);
+
+                 }
+              }
+              }
+
+
+
+
+          /*
           Query for path and classificationid
           */
+
           String queryForPathAndClassification="""select obv.id,tres.path,tres.classification_id as classificationid
                                                   from observation obv
                                                    left join recommendation r on obv.max_voted_reco_id=r.id
@@ -220,11 +258,11 @@ class ObservationsSearchService extends AbstractSearchService {
                                                     where (tres.classification_id=265799 or tres.classification_id=null)
                                                     and obv.id in ( """+sids+""" )""";
 
-                                                    println  queryForPathAndClassification;
 
           def queryForPathAndClassificationResult=sql.rows(queryForPathAndClassification);
 
           Map<String,Map<String,String>> pathClassification=new HashMap<String,Map<String,String>>();
+
 
 
           queryForPathAndClassificationResult.each { row ->
@@ -298,17 +336,23 @@ class ObservationsSearchService extends AbstractSearchService {
               }
 
 def fromdate=obvRow.get("fromdate");
+
 def geoPrivacyAdjust = Utils.getRandomFloat()
 def longitude = obvRow.get("longitude") + geoPrivacyAdjust
 def latitude = obvRow.get("latitude") + geoPrivacyAdjust
+
 List<Double> location=new ArrayList<Double>();
+
 location.add(longitude);
 location.add(latitude);
+
 eData.put("location",location);
 eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));
 eData.put("checklistannotations",null);
 
 def id=obvRow.get("id");
+
+eData.put("observationlikes",observationLike.get(id.toString()));
 
 /**
 Observation classificationid and path related data
@@ -325,29 +369,78 @@ else{
 }
 
 
+
+/*
+NO media filter
+*/
+def noofimages=eData.get("noofimages")
+def noofvideos=eData.get("noofvideos")
+def noofaudio=eData.get("noofaudio")
+if(noofaudio.equalsIgnoreCase("0") && noofimages.equalsIgnoreCase("0") && noofvideos.equalsIgnoreCase("0")){
+  eData.put("nomedia","1");
+}
+else{
+  eData.put("nomedia","0");
+}
+//no media thing finishes here
+
+/*
+varibale declaration for traits and custom fields
+*/
+
 Map<String, Object> traits=new HashMap<String,Object>();
 Map<String, Object> traits_json=new HashMap<String,Object>();
 Map<String, Object> traits_season=new HashMap<String,Object>();
 Map<String, Object> custom_fields=new HashMap<String,Object>();
 
-// def userGroupId=eData.get("usergroupid")
-// for(int i=0;i<userGroupId.length;i++){
-//   if(userGroupId[i].toString() in customFieldUserGroupArray){
-//
-//       String custFieldQuery="""select * from custom_fields_group_"""+userGroupId+""" where observation_id="""+id;
-//       def customFieldValues = sql.rows(custFieldQuery);
-//       customFieldValues.each{ row ->
-//           row.each { k,v ->
-//           custom_fields.put(k,v);
-//
-//       }
-//
-//   }
-// }
-// }
+
+/**
+query for custom fields if exists for a particular userGroup
+*/
 
 
 
+ Map<String,Object> customFieldMap=customFieldMapToObjectId.get(id.toString())
+ customFieldMap.each{ k,v ->
+   Map<String, Object> keyValues=new HashMap<String,Object>();
+  def customid=v.get("id")
+  def values;
+  def key=v.get("key")
+  def allowedMultiple=v.get("allowedMultiple");
+  def options=v.get("options")
+  def dataType=v.get("dataType").toString()
+  def valueDate=v.get("valueDate");
+  if(allowedMultiple && options!=null){
+    if(v.get("value")!="" && v.get("value")!=null){
+      keyValues.put("value",v.get("value").split(","));
+      keyValues.put("key",key);
+      custom_fields.put(customid.toString(),keyValues);
+    }
+  }
+  else{
+    if(valueDate!=null){
+        keyValues.put("value",valueDate);
+        keyValues.put("key",key);
+        custom_fields.put(customid.toString(),keyValues);
+    }
+    else{
+      if(v.get("value")!="" && v.get("value")!=null){
+        keyValues.put("value",v.get("value"));
+        keyValues.put("key",key);
+        custom_fields.put(customid.toString(),keyValues);
+
+      }
+    }
+  }
+
+}
+
+
+
+
+/*
+for key value type of traits
+*/
 
 
 String traitKeyValueQuery =
@@ -506,14 +599,18 @@ For Numeric Range Query
 
       }
 
-/*
-Queries for Getting custom fields for particular observation id
-
+/**
+put traits and custom field data in elstic seacrh
 */
-
 eData.put("traits",traits);
 eData.put("traits_json",traits_json);
 eData.put("traits_season",traits_season);
+eData.put("custom_fields",custom_fields);
+
+
+/*
+put data in list of map for elasticseacrh
+*/
 dataToElastic.add(eData);
 }
 

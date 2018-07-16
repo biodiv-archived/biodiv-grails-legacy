@@ -163,6 +163,10 @@ class BootStrap {
 	def initEmailConfirmationService() {
 		emailConfirmationService.onConfirmation = { email, uid, confirmationToken ->
 			log.info("User with id $uid has confirmed their email address $email")
+			println "User with id $uid has confirmed their email address $email"
+            println email
+            println uid
+            println confirmationToken
             def userToken = UserToken.findByToken(uid);
 			if(userToken) {
                 Map p = new HashMap(userToken.params);
@@ -180,10 +184,11 @@ class BootStrap {
                     url = userGroupService.userGroupBasedLink(controller:userToken.controller, action:userToken.action, userGroup:userGroup, params:p)
 
                 }
-
+                println url
                 return [url: url]
 			} else {
 				//TODO
+                println "TODO"
 			}
 		  }
 		  emailConfirmationService.onInvalid = { uid ->

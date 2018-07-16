@@ -125,12 +125,6 @@ class License  implements Serializable {
     } 
 
     public void setName(name) {
-        println "licenseType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.name = name;
     }
 }

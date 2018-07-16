@@ -255,22 +255,10 @@ class Resource extends Sourcedata implements Rateable, Serializable {
     }
 
     public void setType(type) {
-        println "resourceType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.type = type;
     }
 
     public void setContext(context) {
-        println "context##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.context = context;
     }
 }

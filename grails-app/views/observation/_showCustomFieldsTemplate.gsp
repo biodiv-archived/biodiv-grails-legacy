@@ -13,15 +13,16 @@
 								${e.value.value}
 							</div>
 							<div class="cfInlineEdit" style="display:none;">
-								<g:if test='${e.key.allowedParticipation}'>
+
+                                <obv:hasPermissionForCustomField model="[observationInstance:observationInstance, customFieldInstance:e.key]">
 									<g:render template="customFieldTemplate" model="['observationInstance':observationInstance, 'customFieldInstance':e.key, hideLabel:true]"/>
-								</g:if>	
+                                </obv:hasPermissionForCustomField>
 							</div>	
 						</td>
 						<td style="width:50px;">	
-							<g:if test='${e.key.allowedParticipation}'>
+                            <obv:hasPermissionForCustomField model="[observationInstance:observationInstance, customFieldInstance:e.key]">
 								<div class="editCustomField btn btn-small btn-primary" onclick="customFieldInlineEdit($(this),  '${createLink(controller:'observation', action:'updateCustomField')}', '${e.key.id}', ${observationInstance.id}); return false;">Edit</div>
-							</g:if>	
+						    </obv:hasPermissionForCustomField>	
 						</td>
 					</tr>
 				</g:each>

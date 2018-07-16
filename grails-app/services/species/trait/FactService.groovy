@@ -380,7 +380,7 @@ update observation set traits_json = g.item from (
 
     private def getTraitValue(Trait traitInstance, String value) {
         if(!value) return;
-        if(!(traitInstance.traitTypes == TraitTypes.RANGE || traitInstance.dataTypes == DataTypes.COLOR)) { 
+        if(!(traitInstance.traitTypes == TraitTypes.RANGE || traitInstance.dataTypes == DataTypes.COLOR)) {
             return TraitValue.findByTraitInstanceAndValueIlike(traitInstance, value.trim());
         } else {
             return value.trim();
@@ -389,7 +389,7 @@ update observation set traits_json = g.item from (
 
     private void setTraitValue(Fact fact, value) {
         switch(fact.traitInstance.traitTypes) {
-            case Trait.TraitTypes.RANGE : 
+            case Trait.TraitTypes.RANGE :
             setTraitRange(fact, value);
             break;
             default:

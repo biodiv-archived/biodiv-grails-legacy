@@ -55,7 +55,12 @@
                             <div class="controls" style="">
                                 <g:render template='/UFile/docUpload'
                                 model="['name': 'imagesPath', 'inputName': 'imagesFile', 'path': dataTableInstance?.imagesFile?.path, 'size':dataTableInstance?.imagesFile?.size,'fileParams':fileParams, uploadCallBack:'if(!responseJSON.success) {alert(responseJSON.msg);} else {}', 'allowedExtensions':iconsAllowedExtensions, retainOriginalFileName:true]" />
+                                <sUser:isAdmin>
+ or
+                                <input type="text" name="imagesFilePath" placeholder="Specify absolute path on server" val="${dataTableInstance?.imagesFile?.path}"/>
+                                </sUser:isAdmin>
  
+
                             </div>
                         </div>
 
@@ -114,5 +119,7 @@
         </div>
 
     </form>
+    <%def uploadLogParams = dataTableInstance?.uploadLog?.fetchMapFromText();%> 
+    <input type="hidden" id="xlsxFileUrl" value="${uploadLogParams?.xlsxFileUrl}">
 
 </div>

@@ -29,7 +29,7 @@ int instanceCount = datasetInstance.countByDataTable();
                 <span class="name"><i class="icon-list"></i><g:message code="dataset.name.label" /></span>
 
                 <div class="value">
-                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id)}"><b>${datasetInstance.title} </b></a>
+                        <a href="${uGroup.createLink(controller:'dataset', action: 'show', id:datasetInstance.id, 'userGroupWebaddress':params.webaddress)}"><b>${datasetInstance.title} </b></a>
                 </div>
             </div>
         </g:if>
@@ -175,7 +175,7 @@ int instanceCount = datasetInstance.countByDataTable();
         </g:if>
 
 
-         <g:if test="${datasetInstance.description}">
+         <g:if test="${datasetInstance.description && !hideDatasetBody}">
                 <div class="prop">
                     <g:if test="${showDetails}">
                     <span class="name"><i class="icon-info-sign"></i><g:message code="default.description.label" /></span>

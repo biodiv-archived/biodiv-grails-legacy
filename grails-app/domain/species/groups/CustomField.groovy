@@ -174,12 +174,18 @@ class CustomField {
 	}
 
     public void setDataType(dataType) {
-        println "dataType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.dataType = dataType;
+    }
+
+    boolean isValidValue(val) {
+        boolean isValid = false;
+        if(options) {            
+            options.split(',').each {
+                if(it.equalsIgnoreCase(val)) isValid = true
+            }
+            return isValid;
+        } else {
+            return true;
+        }
     }
 }

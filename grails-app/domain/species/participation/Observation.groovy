@@ -906,22 +906,10 @@ println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
     }
 
     public void setBasisOfRecord(basisOfRecord) {
-        println "basisOfRecord##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.basisOfRecord = basisOfRecord;
     }
 
     public void setProtocol(protocol) {
-        println "protocol##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.protocol = protocol;
     }
 
