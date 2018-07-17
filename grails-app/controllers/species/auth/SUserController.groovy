@@ -339,6 +339,7 @@ class SUserController extends UserController {
 
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
+            def sql = new Sql(dataSource)
 			List obvToUpdate = [];
 			lookupUserClass().withTransaction { status ->
 
