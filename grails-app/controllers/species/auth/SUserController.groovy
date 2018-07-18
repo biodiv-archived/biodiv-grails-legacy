@@ -339,10 +339,11 @@ class SUserController extends UserController {
 
 		String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
 		try {
+            def sql = new Sql(dataSource)
 			List obvToUpdate = [];
 			lookupUserClass().withTransaction { status ->
 
-                executeUpdate 'DELETE FROM Token WHERE user=:user', [user: user];
+                sql.execute('DELETE FROM token WHERE user_id=:user', [user: user.id]);
 
 				user.recoVotes.each { vote ->
 					if(vote.observation.author.id != user.id) {

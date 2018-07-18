@@ -684,7 +684,7 @@ class ObservationController extends AbstractObjectController {
                                 def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                                 //context specific baseUrl for location picker script to work
                                 def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
-                                thumbnail = res.thumbnailUrl(null, null, ImageType.LARGE);
+                                thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
                                 type = ResourceType.IMAGE
 
                         }else if(resourcetype == resourceTypeAudio){
