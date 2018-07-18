@@ -356,9 +356,8 @@ class SUserController extends UserController {
                 Follow.deleteAll user;
                 SpeciesPermission.removeAll user;
 
-				user.delete(failOnError:true);
-				SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
-
+				user.delete(failOnError:true, flush:true);
+				//SUserService.sendNotificationMail(SUserService.USER_DELETED, user, request, "");
 			}
 			//updating SpeciesName
 			obvToUpdate.each { obv ->
