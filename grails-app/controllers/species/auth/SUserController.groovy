@@ -343,7 +343,7 @@ class SUserController extends UserController {
 			List obvToUpdate = [];
 			lookupUserClass().withTransaction { status ->
 
-                sql.executeUpdate('DELETE FROM Token WHERE user=:user', [user: user]);
+                sql.execute('DELETE FROM token WHERE user_id=:user', [user: user.id]);
 
 				user.recoVotes.each { vote ->
 					if(vote.observation.author.id != user.id) {
