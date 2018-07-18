@@ -301,17 +301,9 @@ class Document extends DataObject implements Comparable {
 
     static long countDocuments() {
         def c = Document.createCriteria();
-println "countDocuments%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-
-
         def count = c.count {
-            cache true;
+            //cache true;
         }
-println "countDocuments%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-
-
         return count;
     }
 

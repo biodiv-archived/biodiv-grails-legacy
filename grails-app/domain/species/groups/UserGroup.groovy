@@ -102,7 +102,7 @@ class UserGroup implements Taggable {
 		description type:'text';
 		//aboutUs type:'text';
 		sort name:"asc"
-        cache usage: 'nonstrict-read-write', include: 'non-lazy'
+        //cache usage: 'nonstrict-read-write', include: 'non-lazy'
 		filterRule type:'text';
 	}
 
