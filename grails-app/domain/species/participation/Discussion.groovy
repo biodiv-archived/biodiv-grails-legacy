@@ -136,17 +136,9 @@ class Discussion implements Taggable, Rateable,  Serializable {
 	
     static long countDiscussions() {
         def c = Discussion.createCriteria();
-println "countDIscussions%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-
-
         def count = c.count {
             cache true;
         }
-println "countDIscussions%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-
-
         return count;
     }
 }
