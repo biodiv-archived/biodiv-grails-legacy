@@ -222,7 +222,7 @@ class SUser  implements Serializable {
 		password column: '`password`'
 		aboutMe type:"text";
 		autoTimestamp false;
-        cache usage: 'nonstrict-read-write', include: 'non-lazy'
+        //cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 
     @JsonIgnore
