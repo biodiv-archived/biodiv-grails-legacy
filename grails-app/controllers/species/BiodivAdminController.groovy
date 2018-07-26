@@ -463,7 +463,7 @@ private List geUserResoruceId(){
     return result
 }
 
-private void _doCrop(resourceList, relativePath, sql, dataSoruce){
+private void _doCrop(resourceList, relativePath, sql, dataSource){
     def resSize = resourceList.size()
     def counter = 0;
     def missingCount = 0; 
@@ -547,10 +547,10 @@ private Set getResoruceId(query, sql){
 def doCrop(){
     Date startDate = new Date();
 
-    //def dataSoruce = ctx.getBean("dataSource");
+    //def dataSource = ctx.getBean("dataSource");
     //def grailsApplication = ctx.getBean("grailsApplication");
 
-    def sql =  Sql.newInstance(dataSoruce);
+    def sql =  Sql.newInstance(dataSource);
     def query, result
 
     //gettting all resource for species
@@ -558,7 +558,7 @@ def doCrop(){
     result = getResoruceId(query, sql)
     query = "select distinct(resource_id) as id from species_field_resources order by resource_id";
     result.addAll(getResoruceId(query, sql))
-    _doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir, sql, dataSoruce)
+    _doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir, sql, dataSource)
 
     println "----------------DONE SPECIES-------------------------------------------------- "
 
@@ -566,13 +566,13 @@ def doCrop(){
     //query = "select distinct(resource_id) as id from observation_resource  where resource_id > 291108 order by resource_id ";
     query = "select distinct(resource_id) as id from observation_resource order by resource_id ";
     result = getResoruceId(query, sql)
-    _doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
+    _doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir, sql, dataSource)
 
     println "----------------DONE OBSERVATION-------------------------------------------------- "
 
     //getting all resources for users
     //result = geUserResoruceId()
-    //_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir)
+    //_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir, sql, dataSource)
 
     //println "----------------DONE USERS-------------------------------------------------- "
 
