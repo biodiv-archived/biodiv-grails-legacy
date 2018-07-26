@@ -73,6 +73,25 @@ class ImageUtils {
             }
 
         } 
+		
+        ////////////////////////////////////////////////
+        log.debug "Creating thumbnail 2 image";
+        extension = (defaultFileType)?config.thumbnail_2.suffix.replaceAll('.'+config.defaultType,originalFileExt):config.thumbnail_2.suffix
+        try {
+            doResize(imageFile1, new File(dir, name+extension), config.thumbnail_2.width, config.thumbnail_2.height);
+        } catch (Exception e) {
+            log.debug "Error while resizing image probably due to unsupported type so using _gall_th.jpg image for _th1.jpg image $imageFile"
+            def jpgGall_extension = config.gallery.suffix
+
+            try{
+                doResize(new File(dir, name+jpgGall_extension), new File(dir, name+extension), config.thumbnail_2.width, config.thumbnail_2.height);
+            }
+            catch (Exception e1){
+                log.error "Error even on using _gall_th.jpg image for this file " + dir +"/" + name+jpgGall_extension +" target file " + name+extension;
+                log.error e1.message
+            }
+
+        } 
 				
 	}
 

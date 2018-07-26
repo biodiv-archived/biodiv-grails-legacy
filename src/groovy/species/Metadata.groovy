@@ -339,22 +339,10 @@ abstract class Metadata {
 
 
     public void setLocationScale(locationScale) {
-        println "locationScale##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-
         this.locationScale = locationScale;
     }
 
     public void setDateAccuracy(dateAccuracy) {
-        println "dateAccuracy##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-
         this.dateAccuracy = dateAccuracy;
     }
 }

@@ -1009,21 +1009,17 @@ alter table fact rename trait_id to trait_instance_id;
 #replace ConfigurationHolder & ApplicationHolder with grails.util.Holders
 #correct RedirectAction import path
 #replace BaseOAuthClient to OAuth20Client
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+scp /root/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy biodiv@172.30.16.133:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/controllers/grails/plugin/springsecurity/rest/RestOauthController.groovy
+scp /root/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy biodiv@172.30.16.133:~/.grails/2.4.3/projects/biodiv/plugins/spring-security-rest-1.5.4/grails-app/services/grails/plugin/springsecurity/rest/RestOauthService.groovy
+scp /root/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy biodiv@172.30.16.133:~/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
 
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
 
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
+scp /root/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy biodiv@172.30.16.133:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
 
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/email-confirmation-2.0.8/grails-app/services/com/grailsrocks/emailconfirmation/EmailConfirmationService.groovy
 
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/ajax-uploader-1.1/grails-app/controllers/uk/co/desirableobjects/ajaxuploader/AjaxUploadController.groovy
+scp /root/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy biodiv@172.30.16.133:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy
 
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/Tag.groovy
-
-scp /home/sravanthi/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy biodiv@kk:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy
+scp /root/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy biodiv@172.30.16.133:~/.grails/2.4.3/projects/biodiv/plugins/taggable-1.0.1/grails-app/domain/org/grails/taggable/TagLink.groovy
 
 #17th May 2018
  insert into species_data_table (select id, data_table_id from species where data_table_id is not null);

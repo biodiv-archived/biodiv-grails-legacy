@@ -1,5 +1,7 @@
 package species
 
+import species.participation.Recommendation;
+
 class AcceptedSynonym {
 
     TaxonomyDefinition accepted;
@@ -49,6 +51,21 @@ class AcceptedSynonym {
                 try {
                     println "deleting"
                     if(!ent.delete(flush:true,failOnError:true)){
+                        ent.errors.allErrors.each { log.error it }
+                    }
+                }catch (Exception e) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        Recommendation.withNewSession {
+            def ent = Recommendation.findWhere(taxonConcept: synonym, acceptedName:accepted)
+            if(ent) {
+                try {
+                    println "updating reco"
+                    ent.taxonConcept = null;
+                    ent.acceptedName = null;
+                    if(!ent.save(flush:true,failOnError:true)){
                         ent.errors.allErrors.each { log.error it }
                     }
                 }catch (Exception e) {
