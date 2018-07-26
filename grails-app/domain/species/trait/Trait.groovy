@@ -260,6 +260,11 @@ class Trait {
     }
 
     static boolean isValidTrait(Trait traitInstance, TaxonomyDefinition taxonConcept) {
+        //root level trait is always valid
+        println traitInstance.taxon
+        if(traitInstance.taxon.size() == 0) 
+            return true;
+
         boolean isValid = false;
         String ibpClassificationName = Holders.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY;
         def classification = Classification.findByName(ibpClassificationName);
@@ -317,12 +322,6 @@ class Trait {
     }
 
     public void setUnits(units) {
-        println "units##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.units = units;
     }
 

@@ -47,7 +47,7 @@ def _doCrop(resourceList, relativePath, sql, dataSoruce){
             }
 		}
 
-		String outName = inName + "_th1" + ext;
+		String outName = inName + "_th2" + ext;
 	    if(!file.exists()) return;	
         //println file;
 		File dir = new File(parent);
@@ -63,24 +63,25 @@ def _doCrop(resourceList, relativePath, sql, dataSoruce){
         //println "========NOT FOUND TH1 -- CREATING ====="
         //println "======THIS IMAGE ==== " + outImg
 		try{
-			ImageUtils.doResize(file, outImg, 200, 200);
+			ImageUtils.doResize(file, outImg, 320, 320);
 		}catch (Exception e) {
             fails += 1;
 			//println "==============RahulImageException===== " + e.getMessage()
 		    resIds.add(res.id.toLong());
-            println "===DELETING THIS FILE === " + file +"======RES ID==== " + res.id
+            /*println "===DELETING THIS FILE === " + file +"======RES ID==== " + res.id
             sql.executeUpdate('DELETE from species_resource where resource_id = ?', [res.id.toLong()]);
             sql.executeUpdate('DELETE from species_field_resources where resource_id = ?', [res.id.toLong()]);
             sql.executeUpdate('DELETE from resource_license where resource_licenses_id = ?', [res.id.toLong()]);
             sql.executeUpdate('DELETE from resource_contributor where resource_contributors_id = ? or resource_attributors_id = ?', [res.id.toLong(), res.id.toLong()]);
             sql.executeUpdate('DELETE from observation_resource where resource_id = ?', [res.id.toLong()]);
             sql.executeUpdate('DELETE from resource where id = ?', [res.id.toLong()]);
-            file.delete();            
+            file.delete();           
+            */
 		}
 	}
     println "=============MISSING COUNT ============= " + missingCount
     println "=============FAILS ============= " + fails
-    //println "==========RES IDS ===== " + resIds
+    println "==========RES IDS ===== " + resIds
 }
 
 def getResoruceId(query, sql){
@@ -115,11 +116,11 @@ def doCrop(){
 
     //getting all resources for observations 
 	//query = "select distinct(resource_id) as id from observation_resource  where resource_id > 291108 order by resource_id ";
-	//query = "select distinct(resource_id) as id from observation_resource order by resource_id ";
-	//result = getResoruceId(query, sql)
-	//_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
+	query = "select distinct(resource_id) as id from observation_resource order by resource_id ";
+	result = getResoruceId(query, sql)
+	_doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir)
 
-	//println "----------------DONE OBSERVATION-------------------------------------------------- "
+	println "----------------DONE OBSERVATION-------------------------------------------------- "
 	
     //getting all resources for users
     //result = geUserResoruceId()

@@ -40,10 +40,15 @@ function getNextRelatedObvImages(speciesId, url, resourceListType, context){
                 $(context).replaceWith('<a class="btn disabled" style="margin-right: 5px;">No More</a>');
                 $(context).remove();
                 return;
-            } 
-            imagesListWrapper.find(".uploaded_files_list" ).append(addPhotoHtmlData);
+            }
+            var $appendContext = imagesListWrapper.find(".uploaded_files_list" );
+            if($appendContext.length == 0) {
+                $appendContext =  imagesListWrapper.find(".imagesList" );
+            }
+            $appendContext.append(addPhotoHtmlData);
             imagesListWrapper.find(".relatedImagesOffset").val(parseInt(offset) + parseInt(data.relatedObvCount));
             imagesListWrapper.append($(context));
+            
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         }

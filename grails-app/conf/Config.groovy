@@ -214,10 +214,17 @@ speciesPortal {
                 height = 300
 
             }
+
             galleryThumbnail {
                 suffix = "_gall_th"+".${defaultType}"
                 width = 50
                 height = 50
+            }
+            
+            thumbnail_2 {
+                suffix = "_th2"+".${defaultType}"
+                width = 320
+                height = 320
             }
         }
     }
