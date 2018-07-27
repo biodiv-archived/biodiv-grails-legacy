@@ -32,7 +32,7 @@ class Language  implements Serializable {
 	static mapping = { 
 		version false;
 		sort 'name';
-        cache usage: 'nonstrict-read-write', include: 'non-lazy'
+        //cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
 	public static Language getLanguage(String languageName){

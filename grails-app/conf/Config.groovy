@@ -214,10 +214,17 @@ speciesPortal {
                 height = 300
 
             }
+
             galleryThumbnail {
                 suffix = "_gall_th"+".${defaultType}"
                 width = 50
                 height = 50
+            }
+            
+            thumbnail_2 {
+                suffix = "_th2"+".${defaultType}"
+                width = 320
+                height = 320
             }
         }
     }
@@ -620,8 +627,9 @@ environments {
             fatal   'jdbc.resultsettable'
             //            debug 'org.hibernate.SQL'
             //            trace 'org.hibernate.type.descriptor.sql.BasicBinder'
-            /*
             debug 'org.springframework.security.acls'
+            debug 'grails.plugin.springsecurity.acl'
+            /*
             debug 'org.hibernate.jdbc'
             debug 'org.hibernate.persister.entity'
             debug 'org.hibernate.action.EntityUpdateAction'

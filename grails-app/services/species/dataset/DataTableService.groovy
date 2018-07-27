@@ -163,7 +163,7 @@ println instance.imagesFile?.path;
                     File imagesFile;
                     if(params.imagesFilePath) {
                         imagesFile = new File(params.imagesFilePath);
-                    } else if(params.imagesFile.path) {
+                    } else if(params.imagesFile?.path) {
                         imagesFile = new File(contentRootDir, params.imagesFile.path);
                     }
 

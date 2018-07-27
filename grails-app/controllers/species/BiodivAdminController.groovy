@@ -15,6 +15,16 @@ import species.auth.SUser;
 import grails.plugin.springsecurity.annotation.Secured;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
+import species.Resource;
+import species.auth.SUser;
+import groovy.sql.Sql;
+
+import java.util.Date;
+import species.utils.ImageUtils;
+import java.util.*;
+import java.io.*;
+
+
 @Secured(['ROLE_ADMIN'])
 class BiodivAdminController {
 
@@ -42,6 +52,10 @@ class BiodivAdminController {
     def utilsService;
     def banner;
     Map bannerMessageMap;
+
+    def dataSource;
+    def grailsApplication;
+
     /**
      *
      */
@@ -458,4 +472,129 @@ def getMessage(){
 def clearCache() {
     render utilsService.clearCache(params.name);
 }
+
+private List geUserResoruceId(){
+    def result = []
+    SUser.findAllByIconIsNotNull().each { user ->
+        result << [id:user.id, fileName:user.icon]
+    }
+    return result
+}
+
+private void _doCrop(resourceList, relativePath, sql, dataSource){
+    def resSize = resourceList.size()
+    def counter = 0;
+    def missingCount = 0; 
+    def fails = 0;
+    def resIds = []
+    println "==============Resource List Size==================" + resSize
+    //HashMap hm = new HashMap();
+    resourceList.each { res->
+        counter = counter + 1
+        if((counter%100) == 0) {
+            //println "=======COUNTER==== " + counter
+        }
+        //println "------------------------------------------------------------------ " + res.id
+        String fileName = relativePath + "/" + res.fileName;
+        File file = new File(fileName);
+
+        String name = file.getName();
+        String parent = file.getParent();
+        String inName = name;
+        String ext = ".jpg"
+        int lastIndex = name.lastIndexOf('.');
+        if(lastIndex != -1) {
+            inName = name.substring(0, lastIndex);
+            ext = name.substring(lastIndex, name.size());
+            if(ext == '.tif' || ext == '.tiff') {
+                println "=======TIF FILES===== " + file
+                println "------------------------------------------------------------------ " + res.id
+                ext = '.jpg'
+            }
+        }
+
+        String outName = inName + "_th2" + ext;
+        if(!file.exists()) return;	
+        //println file;
+        File dir = new File(parent);
+        File outImg = new File(dir,outName);
+        //println outImg;
+
+        //_th1 image already exists so return;
+        if(outImg.exists()) {
+            //println "=======TH1 exists======"
+            return;
+        }
+        missingCount = missingCount + 1;
+        //println "========NOT FOUND TH1 -- CREATING ====="
+        //println "======THIS IMAGE ==== " + outImg
+        try{
+            ImageUtils.doResize(file, outImg, 320, 320);
+        }catch (Exception e) {
+            fails += 1;
+            //println "==============RahulImageException===== " + e.getMessage()
+            resIds.add(res.id.toLong());
+            /*println "===DELETING THIS FILE === " + file +"======RES ID==== " + res.id
+            sql.executeUpdate('DELETE from species_resource where resource_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from species_field_resources where resource_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from resource_license where resource_licenses_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from resource_contributor where resource_contributors_id = ? or resource_attributors_id = ?', [res.id.toLong(), res.id.toLong()]);
+            sql.executeUpdate('DELETE from observation_resource where resource_id = ?', [res.id.toLong()]);
+            sql.executeUpdate('DELETE from resource where id = ?', [res.id.toLong()]);
+            file.delete();           
+             */
+        }
+    }
+    println "=============MISSING COUNT ============= " + missingCount
+    println "=============FAILS ============= " + fails
+    println "==========RES IDS ===== " + resIds
+}
+
+private Set getResoruceId(query, sql){
+    def result = [] as Set
+    sql.rows(query).each{
+        def res = Resource.read(it.getProperty("id"));
+        if(res.type == Resource.ResourceType.IMAGE){
+            result << res
+        }
+    }
+    return result
+}
+
+
+def doCrop(){
+    Date startDate = new Date();
+
+    //def dataSource = ctx.getBean("dataSource");
+    //def grailsApplication = ctx.getBean("grailsApplication");
+
+    def sql =  Sql.newInstance(dataSource);
+    def query, result
+
+    //gettting all resource for species
+    query = "select distinct(resource_id) as id from species_resource order by resource_id";
+    result = getResoruceId(query, sql)
+    query = "select distinct(resource_id) as id from species_field_resources order by resource_id";
+    result.addAll(getResoruceId(query, sql))
+    _doCrop(result, grailsApplication.config.speciesPortal.resources.rootDir, sql, dataSource)
+
+    println "----------------DONE SPECIES-------------------------------------------------- "
+
+    //getting all resources for observations 
+    //query = "select distinct(resource_id) as id from observation_resource  where resource_id > 291108 order by resource_id ";
+    query = "select distinct(resource_id) as id from observation_resource order by resource_id ";
+    result = getResoruceId(query, sql)
+    _doCrop(result, grailsApplication.config.speciesPortal.observations.rootDir, sql, dataSource)
+
+    println "----------------DONE OBSERVATION-------------------------------------------------- "
+
+    //getting all resources for users
+    //result = geUserResoruceId()
+    //_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir, sql, dataSource)
+
+    //println "----------------DONE USERS-------------------------------------------------- "
+
+    println "============= Start  Time " + startDate  + "          end time " + new Date()
+}
+
 }

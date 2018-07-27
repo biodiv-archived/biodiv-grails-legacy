@@ -807,17 +807,12 @@ class Observation extends DataObject  implements Serializable {
 
     static long countObservations() {
         def c = Observation.createCriteria();
-println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-
         def observationCount = c.count {
             eq ('isDeleted', false);
             //eq ('isShowable', true);
             eq ('isChecklist', false);
             cache true;
         }
-        println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-        println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         return observationCount;
     }
 
@@ -906,22 +901,10 @@ println "countObservations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
     }
 
     public void setBasisOfRecord(basisOfRecord) {
-        println "basisOfRecord##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.basisOfRecord = basisOfRecord;
     }
 
     public void setProtocol(protocol) {
-        println "protocol##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.protocol = protocol;
     }
 

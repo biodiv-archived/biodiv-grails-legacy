@@ -90,7 +90,7 @@ class CustomField {
 		version : false
 		notes type:'text'
 		options type:'text'
-        cache usage: 'nonstrict-read-write', include: 'non-lazy'
+        //cache usage: 'nonstrict-read-write', include: 'non-lazy'
 	}
 	
 	def List fetchOptions(){
@@ -174,12 +174,6 @@ class CustomField {
 	}
 
     public void setDataType(dataType) {
-        println "dataType##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
-        println "##########################"
- 
         this.dataType = dataType;
     }
 

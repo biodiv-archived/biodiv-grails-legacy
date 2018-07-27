@@ -164,10 +164,6 @@ class DataTable extends CollMetadata {
            case DataTableType.SPECIES : 
            //return Species.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'id']);
            def species = Species.executeQuery("select s from Species s inner join s.dataTables dataTable where s.isDeleted=:isDeleted and dataTable = :dataTable", [isDeleted:false, dataTable:this], [max:params.max, offset:params.offset, sort:'id']);
-           println species 
-           println  "#############"
-           println  "#############"
-           println  "#############"
            return species;
            case DataTableType.FACTS : 
            //def facts = Fact.findAllByDataTableAndIsDeleted(this, false, [max:params.max, offset:params.offset, sort:'objectType,objectId,id']);
