@@ -8,6 +8,7 @@ import species.utils.ImageType;
 import species.utils.ImageUtils
 import species.utils.Utils;
 import grails.util.Environment;
+import species.participation.Observation;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import species.auth.SUser;
 
@@ -316,6 +317,23 @@ class BiodivAdminController {
             flash.message = e.getMessage()
         }
         redirect(action: "index")
+    }
+
+    def reloadObservationsList = {
+      try {
+          log.debug "Syncing observations from db into es"
+          List observations = [];
+          params.ids?.split(',').each {
+              def s = Observation.read(Integer.parseInt(it.trim()));
+              if(s) observations << s;
+          }
+          observationsSearchService.publishSearchIndex(observations, true);
+      } catch(e) {
+          e.printStackTrace();
+          flash.message = e.getMessage()
+      }
+
+      redirect(action: "index")
     }
 
     /*
