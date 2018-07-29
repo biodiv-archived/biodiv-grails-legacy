@@ -1,7 +1,23 @@
 <%@page import="species.utils.Utils"%>
 <div id="ibp-footer" class="gradient-bg-reverse navbar">
+<g:set var="userGroupService" bean="userGroupService"/>
+<%
+userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstance : null;
+	def newsletters = userGroupService.getNewsLetters(userGroupInstance, -1, 0, "displayOrder", "asc", null, ['showInFooter':true]);
+    def pages = [:];
+    def pagesWithNoParent = [:];
+    newsletters.each {
+        if(it.parentId) {
+            if(!pages[it.parentId]) pages[it.parentId] = [];
+            pages[it.parentId] << it;
+        } else {
+            pagesWithNoParent[(int)it.id] = it;
+        }
+    }
+%>
+<div id="ibp-footer" class="gradient-bg-reverse navbar">
     <div class="container outer-wrapper" style="width:940px">
-        <div class="links_box_column">
+        <!--div class="links_box_column">
             <ul>
                 <li
                     class=" nav-header bold${(params.controller == 'species')?' active':''}"><a
@@ -14,15 +30,21 @@
                 <li
                     class=" nav-header bold${(params.controller == 'checklist')?' active':''}" style="width:200px;"><a
                     href="${uGroup.createLink(controller:'checklist', action:'list')}" title="Checklists">All Checklists</a></li>
-                <!-- li
-                    class="nav-header bold ${(params.controller == 'userGroup' && params.action== 'list')?' active':''}"><a
-                    href="${ uGroup.createLink(controller:"userGroup", "action":"list")}"
-                    title="Groups is in Beta. We would like you to provide valuable feedback, suggestions and interest in using the groups functionality.">All
-                        Groups</a>
-                </li-->
+            
             </ul>
-        </div>
-        <div class="links_box_column">
+        </div-->
+        <g:each var="page" in="${pages}">
+        	<div class="links_box_column">
+			<ul>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href="${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':pagesWithNoParent[page.key]?.id, 'userGroup':userGroupInstance):'/page/'+pagesWithNoParent[page.key]?.id }">${pagesWithNoParent[page.key]?.title}</a></li>
+                <%pagesWithNoParent.remove(page.key)%>
+                <g:each var="sub_page" in="${page.value}">
+				    <li><a href="${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':sub_page.id, 'userGroup':userGroupInstance):'/page/'+sub_page.id }">${sub_page.title}</a></li>
+                </g:each>
+	        </ul>	
+            </div>
+        </g:each>
+        <!--div class="links_box_column">
             <ul>
                 <li class="nav-header bold"  style="padding-left: 0px;"><a href='/bbp/aboutus'>The Portal</a></li>
                 <li style="width:200px;"><a href="${ '/bbp/theportal'}" >Biodiversity Of Bhutan</a>
@@ -61,10 +83,42 @@
                 </li>
 
             </ul>
-        </div>
+        </div-->
+        
+        <div class="links_box_column">
+			<ul>
+				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/page/415184'><g:message code="link.policy" /></a>
+				</li>
+				<li><a href="/page/415185"><g:message code="link.data.sharing" /></a>
+				</li>
+				<li><a href="/page/415189"><g:message code="default.licenses.label" /></a>
+				</li>
+			</ul>
+		</div>
+		<div class="links_box_column">
+			<ul>
+				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>
+        <g:if test="${pagesWithNoParent}">
+                <g:each var="page" in="${pagesWithNoParent}">
+				    <li><a href="">${page.value.title}</a></li>
+                </g:each>
+        </g:if>
+
+                
+				
+                <li><a href="${ '/biodiv/docs'}"><g:message code="link.apidocs" /></a>
+				</li>
+
+				<li><a href="${ '/page/415197'}"><g:message code="link.feedbak" /></a>
+				</li>
+				<li><a href="${ '/page/415210'}"><g:message code="link.contact.us" /></a>
+				</li>
+
+			</ul>
+		</div>
    </div>
    <div class="powered" style="text-align:center;">
-        Powered by the open source <a href="https://github.com/kxt5258/bbp" target="_blank">Biodiversity Informatics Platform.</a></p>
+        Powered by the open source <a href="https://github.com/strandls/biodiv" target="_blank">Biodiversity Informatics Platform.</a></p>
     </div>
 </div>
 <asset:script>
