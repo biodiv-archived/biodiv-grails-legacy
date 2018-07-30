@@ -117,9 +117,31 @@ userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstanc
 			</ul>
 		</div>
    </div>
-   <div class="powered" style="text-align:center;">
-        Powered by the open source <a href="https://github.com/strandls/biodiv" target="_blank">Biodiversity Informatics Platform.</a></p>
-    </div>
+	
+	<div class="powered" style="text-align:center;">
+        <p title="India Biodiversity Portal Mobile App">
+            <a href="https://play.google.com/store/apps/details?id=com.biodiversity.bt">
+                <asset:image src="/all/googleplayicon1.png" class="mobile_app_icon" absolute="true"/>
+            </a>
+            <a href="https://itunes.apple.com/in/app/bhutan-biodiversity-portal/id1150797403?mt=8">
+                <asset:image src="/all/apple_store1.png" class="mobile_app_icon" absolute="true"/>
+            </a>
+        </p>
+        <p> <a target="_blank" href="${grailsApplication.config.speciesPortal.app.facebookUrl}">
+            <asset:image src="/all/facebook.png" absolute="true"/>
+        </a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}">
+            <asset:image src="/all/twitter.png" absolute="true"/>
+        </a>| <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}">
+            <asset:image src="/all/google_plus.png" absolute="true"/>
+        </a><br />
+<g:message code="text.supported.on" /><br />
+<g:message code="text.powered.by" /> <a href="https://github.com/strandls/biodiv" target="_blank"><g:message code="link.informatics.platform" /></a>
+<g:message code="text.technology.partner" /> <a href="http://www.strandlifefoundation.org/" target="_blank"><g:message code="technology.partner.strandlifesciences" /></a>
+</p>
+	</div>
+	
+	
+
 </div>
 <asset:script>
 $(document).ready(function(){
