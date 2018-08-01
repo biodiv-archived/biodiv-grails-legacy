@@ -70,7 +70,7 @@ userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstanc
    </div>
 	
 	<div class="powered" style="text-align:center;">
-        <p title="India Biodiversity Portal Mobile App">
+        <p title="Bhutan Biodiversity Portal Mobile App">
             <a href="https://play.google.com/store/apps/details?id=com.biodiversity.bt">
                 <asset:image src="/all/googleplayicon1.png" class="mobile_app_icon" absolute="true"/>
             </a>
@@ -82,7 +82,7 @@ userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstanc
             <asset:image src="/all/facebook.png" absolute="true"/>
         </a> | <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.twitterUrl}">
             <asset:image src="/all/twitter.png" absolute="true"/>
-        </a>| <a  target="_blank" href="${grailsApplication.config.speciesPortal.app.googlePlusUrl}">
+        </a>| <a  target="_blank" href="https://plus.google.com/u/3/communities/116655265202776604982">
             <asset:image src="/all/google_plus.png" absolute="true"/>
         </a><br />
 <g:message code="text.supported.on" /><br />
