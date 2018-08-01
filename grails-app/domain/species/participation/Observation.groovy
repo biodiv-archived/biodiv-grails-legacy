@@ -875,7 +875,9 @@ class Observation extends DataObject  implements Serializable {
         filterRule.each { fRule ->
             switch(fRule.fieldName) {
                 case 'topology' :
-                if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
+                if(!this[fRule.fieldName])
+                    isValid = false;
+                else if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
                     isValid = isValid && fRule.ruleValues[0].covers(this[fRule.fieldName]);
                 }
                 break;

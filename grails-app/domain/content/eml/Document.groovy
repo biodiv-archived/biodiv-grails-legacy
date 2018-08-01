@@ -261,11 +261,14 @@ class Document extends DataObject implements Comparable {
         filterRule.each { fRule ->
             switch(fRule.fieldName) {
                 case 'topology' : 
-                if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
+                if(!this.latitude || !this.longitutde)
+                    isValid = false;
+                else if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
                     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
                     def location = geometryFactory.createPoint(new Coordinate(this.longitude, this.latitude));
                     isValid = isValid && fRule.ruleValues[0].covers(location);
                 }
+
                 break;
                 case 'taxon' : 
                 if(fRule.ruleName.equalsIgnoreCase('scope')) {
