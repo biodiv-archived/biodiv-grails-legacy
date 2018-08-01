@@ -62,6 +62,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import org.apache.log4j.Level;
 import species.dataset.DataTable;
+import static groovyx.net.http.ContentEncoding.Type.GZIP;
 
 class DocumentService extends AbstractMetadataService {
 
@@ -736,7 +737,12 @@ println m['topology']
         }
 
         saveDoc(document, m, false);
+        try {
         runCurrentDocuments(document,m)
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
         if(document.id){
             resultObv << document.id
         }
@@ -866,14 +872,27 @@ println m['topology']
         def url= m["externalurl"]
         def hostName = 'http://gnrd.globalnames.org' //url.getHost()
         HTTPBuilder http = new HTTPBuilder(hostName)
+        http.contentEncoding = GZIP;
+        println "***************************"
+        println "***************************"
+        println "***************************"
+        println "***************************"
+        println "***************************"
+        println "***************************"
         http.request( GET, JSON ) {
             uri.path = "/name_finder.json"
             uri.query = [ url:url ]     	
-            headers.Accept = '*/*'
+            headers.Accept = 'application/json'
             response.success = { resp,  reader ->
-            //println "========reader====="+reader;
-            //println "========reader====="+reader.token_url;
+            println "========reader====="+reader;
+            println "========reader====="+reader.token_url;
+            println resp;
             tokenUrl = reader.token_url;
+            }
+            response.failure = { resp, reader ->;
+                println reader
+                println resp
+                 println "Request failed : [URI : ${url}, Status: ${resp.status}]"
             }
             response.'404' = { status = ObvUtilService.FAILED }
         }

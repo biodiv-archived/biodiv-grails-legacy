@@ -679,7 +679,7 @@ environments {
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
-                filesutraURL = "https://fileops.pamba.strandls.com"
+                filesutraURL = "https://fileops.${servername}"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
@@ -831,7 +831,7 @@ environments {
             resources {
                 rootDir = "${app.rootDir}/img"
                 serverURL = "https://${servername}/${appName}/img"
-                filesutraURL = "https://fileops.indiabiodiversity.org"
+                filesutraURL = "https://fileops.${servername}"
             }
             nameSearch.indexStore = "${app.rootDir}/data/names"
             observations {
