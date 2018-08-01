@@ -293,7 +293,7 @@ function drawVisualization(rows) {
             gD[d[i][0].getMonth()] = gD[d[i][0].getMonth()] + d[i][1]
         }
 
-        $("#temporalDist").sparkline(gD, {
+       $("#temporalDist").sparkline(gD, {
             type: 'bar', 
             barWidth: 24,
             height:'108px',

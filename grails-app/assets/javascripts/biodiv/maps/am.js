@@ -12,7 +12,7 @@ function getWorkspace() {
     if (getHost() === 'thewesternghats.indiabiodiversity.org' || getHost() === 'wgp.saturn.strandls.com') { 
     	return 'wgp';
     }
-    return 'biodiv';
+    return 'bbp';
 }
 
 function getWWWBase() {
@@ -156,9 +156,8 @@ function getThemeNames(theme_type) {
     //currently  no way to filter the theme names by domains ibp/wgp, 
     //hence, commented above code and using  hardcoded theme names below
     var by_themes = window.i8ln.observation.maps.listtheme;
-
-    var by_geography = 'India///Uttaranchal///Nilgiri Biosphere Reserve///Papagni, Andhra Pradesh///Western Ghats///BR Hills, Karnataka///Vembanad, Kerala///Satkoshia, Orissa///North East Area///Agar, Madhya Pradesh///Mandla, Madhya Pradesh///Pench, Madhya Pradesh///Bandipur, Karnataka///Kanakapura';
-
+    //var by_geography = 'India///Uttaranchal///Nilgiri Biosphere Reserve///Papagni, Andhra Pradesh///Western Ghats///BR Hills, Karnataka///Vembanad, Kerala///Satkoshia, Orissa///North East Area///Agar, Madhya Pradesh///Mandla, Madhya Pradesh///Pench, Madhya Pradesh///Bandipur, Karnataka///Kanakapura';
+    var by_geography = '';
 
      if (getWorkspace() === 'wgp' ){
     	by_geography = 'India///Nilgiri Biosphere Reserve///Western Ghats///BR Hills, Karnataka///Vembanad, Kerala///Bandipur, Karnataka';
@@ -689,17 +688,17 @@ if (!Array.prototype.indexOf) {
 
 
 function getMaxExtent() {
-    var ext = "5801108.428222222,-7.081154550627198, 12138100.077777777, 4439106.786632658";
+    var ext = "9862211.13746658, 3052589.1615967974, 10331840.239250705, 3326539.470970869";
     return new OpenLayers.Bounds.fromString(ext);
 }
 
 function getMapExtent() {
-    var ext = "6567849.955888889,1574216.547942332,11354588.059333334,3763310.626620795";
+    var ext = "9862211.13746658, 3052589.1615967974, 10331840.239250705, 3326539.470970869";
     return new OpenLayers.Bounds.fromString(ext);
 }
 
 function getRestrictedExtent() {
-    var ext = "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658";
+    var ext = "9862211.13746658, 3052589.1615967974, 10331840.239250705, 3326539.470970869";
     return new OpenLayers.Bounds.fromString(ext);
 }
 
@@ -1220,7 +1219,7 @@ function AugmentedMap(map_div, options) {
         if (features_list_panel_enabled) {
             var oXmlParser = new DOMParser();
             var oXmlDoc = oXmlParser.parseFromString( text, "text/xml" ); 
-            var arrFeatures = oXmlDoc.getElementsByTagName("ibp:state"); 
+            var arrFeatures = oXmlDoc.getElementsByTagName("bbp:state"); 
             var featuresList = [];
 
             for (var i in arrFeatures){
@@ -1393,7 +1392,7 @@ function AugmentedMap(map_div, options) {
         map.setCenter(new OpenLayers.LonLat(77.22, 22.77).transform(
             new OpenLayers.Projection("EPSG:4326"),
             map.getProjectionObject()
-            ), 5);
+            ), 8);
     }
 
     this.layers = map.layers;
@@ -1542,7 +1541,7 @@ function showLinkTable(lnk_table_div, fid, layer, lnk_table, title) {
 // this should make use of browser caching and decrease load time of the page
 function getMapThumbnail(layer_tablename) {
     var html = '<div class="map_thumbnail">';
-    html = html + '<img src="'+window.params.map.serverURL+'/thumbnails/' + layer_tablename + '_thumb.gif" onerror="this.src = \''+window.params.map.serverURL+'/thumbnails/no_preview.png\'"/>'; 
+    html = html + '<img src="'+window.params.map.serverURL+'/thumbnails/' + layer_tablename + '_thumb.gif" onerror="this.src = \''+window.params.map.serverURL+'/thumbnails/no_preview.gif\'"/>'; 
     //html = html + '<img src="' + getWMS() + '?service=WMS&version=1.1.0&request=GetMap&layers=' + layer_tablename + '&styles=&bbox=' + getLayerBoundingBoxString(layer_tablename) + '&width=80&height=80&srs=EPSG:4326&format=image/gif&FORMAT_OPTIONS=antialias:none&transparent=true"/>'; 
     html = html + '</div>';
 
@@ -1779,7 +1778,7 @@ function updateLayersList(tag) {
         var j;
         for (j = 0; j < layers.length; j += 1) {
             var layer = layers[j].name;
-            document.getElementById(layer).style.display = 'none';
+            document.getElementById(layer).style.display = 'block';
 
         }
 
@@ -1867,7 +1866,7 @@ function createLayerExplorerLinks(layers) {
     }
     html = html + '</ul>';
     html = html + '</div></div></li>';
-    html = html + '<li><div class="collapsible_box"><a  class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_geography\', \'fade\'); hideDiv(\'layers_by_theme\', \'fade\', 1);">By geography</a>';
+    /*html = html + '<li><div class="collapsible_box"><a  class="collapsible_box_title" href="#" onClick="toggleDiv(\'layers_by_geography\', \'fade\'); hideDiv(\'layers_by_theme\', \'fade\', 1);">By geography</a>';
     html = html + '<div id="layers_by_geography" style="display:none;">';
     html = html + '<ul class="layer_explorer_sidebar_subitems">';
     var geography = getThemeNames(2);
@@ -1877,7 +1876,7 @@ function createLayerExplorerLinks(layers) {
     }
 
     html = html + '</ul>';
-    html = html + '</div></div></li>';
+    html = html + '</div></div></li>';*/
 
     html = html + '</ul>';
     html = html + '</div>';
@@ -2660,3 +2659,4 @@ function getLayerMetaData(layer_tablename){
     
     return {title:layer_tablename, abstrct:layer_tablename};
 }
+
