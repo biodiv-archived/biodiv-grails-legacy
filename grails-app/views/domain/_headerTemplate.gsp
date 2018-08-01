@@ -136,7 +136,7 @@
                                 </a>
                   </li> 
 
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.dataset.info')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.dataset.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'dataset', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                     data-original-title="Add Dataset" title="${g.message(code:'button.create.dataset')}">
@@ -160,7 +160,7 @@
                                 </a>
                   </li>
 
-                  <li class="contributeUlLi"><a class="btn btn-success" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.datapackage.info')}" data-trigger="hover"
+                  <li class="contributeUlLi"><a class="btn" data-toggle="popover" data-placement="right" data-content="${g.message(code:'title.datapackage.info')}" data-trigger="hover"
                                     href="${uGroup.createLink(
                                     controller:'dataPackage', action:'create', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
                                     data-original-title="Add Data Package" title="${g.message(code:'button.create.dataPackage')}">
