@@ -44,46 +44,7 @@ userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstanc
 	        </ul>	
             </div>
         </g:each>
-        <!--div class="links_box_column">
-            <ul>
-                <li class="nav-header bold"  style="padding-left: 0px;"><a href='/bbp/aboutus'>The Portal</a></li>
-                <li style="width:200px;"><a href="${ '/bbp/theportal'}" >Biodiversity Of Bhutan</a>
-                </li>
-                <li><a href="${ '/bbp/technology'}">Technology</a></li>
-                <li><a href="http://biodiversity.bt/page/170801">FAQ</a></li>
-
-            </ul>
-        </div>
-        <div class="links_box_column">
-            <ul>
-                <li class="nav-header bold"  style="padding-left: 0px;"><a href='/bbp/people'>People</a></li>
-                <li><a href="${ '/bbp/partners'}">Partners</a></li>
-                <li><a href="${ '/bbp/donors'}">Donors</a></li>
-                <li><a href="${ '/bbp/team'}">Team</a></li>
-            </ul>
-        </div>
-
-        <div class="links_box_column">
-            <ul>
-                <li class="nav-header bold"  style="padding-left: 0px;"><a href='/bbp/policy'>Policy</a>
-                </li>
-                <li><a href="${ '/bbp/datasharing'}">Data Sharing</a>
-                </li>
-                <li><a href="${ '/bbp/license'}">Licenses</a>
-                </li>
-
-            </ul>
-        </div>
-        <div class="links_box_column">
-            <ul>
-                <li class="nav-header bold" style="padding-left: 0px;">Others</li>
-                <li><a href="${ '/bbp/feedback'}">Feedback</a>
-                </li>
-                <li><a href="${ '/bbp/contactus'}">Contact Us</a>
-                </li>
-
-            </ul>
-        </div-->
+     
         
         <div class="links_box_column">
 			<ul>
