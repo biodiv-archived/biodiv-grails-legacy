@@ -223,7 +223,7 @@ class ObservationsSearchService extends AbstractSearchService {
             from rating as r inner join suser  as su on r.rater_id=su.id inner join  rating_link as rl on r.id=rl.rating_id
             where rl.rating_ref in ("""+sids+ """) and  rl.type='observation') row group by row.rating_ref""";
 
-          //  def queryForObservationLikeResult=sql.rows(queryForObservationLike);
+            def queryForObservationLikeResult=sql.rows(queryForObservationLike);
 
 
             Map<String,Object> observationLike =new HashMap<String,Object>();
