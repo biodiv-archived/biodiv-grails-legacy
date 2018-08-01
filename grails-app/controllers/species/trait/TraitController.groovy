@@ -285,7 +285,7 @@ println "===================+"
             if(traitInstance.dataTypes == DataTypes.NUMERIC) {
                 Sql sql = Sql.newInstance(dataSource);
                 List numericTraitMinMax =  sql.rows("""
-                select min(f.value::float)::integer,max(f.to_value::float)::integer,t.id from fact f,trait t where f.trait_id = t.id and t.data_types='NUMERIC' and t.id=:traitId group by t.id;
+                select min(f.value::float)::integer,max(f.to_value::float)::integer,t.id from fact f,trait t where f.trait_instance_id = t.id and t.data_types='NUMERIC' and t.id=:traitId group by t.id;
                 """, [traitId:traitInstance.id]);
                 model['numericTraitMinMax'] = numericTraitMinMax[0];
             }
