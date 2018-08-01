@@ -383,5 +383,7 @@ h2{
     width: 940px;
     }
 
-
+.links_box_column li a {
+    color: #5e5e5e;
+}
 
