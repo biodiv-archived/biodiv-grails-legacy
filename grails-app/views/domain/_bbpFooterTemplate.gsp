@@ -46,16 +46,6 @@ userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstanc
         </g:each>
      
         
-        <div class="links_box_column">
-			<ul>
-				<li class="nav-header bold"  style="padding-left: 0px;"><a href='/page/415184'><g:message code="link.policy" /></a>
-				</li>
-				<li><a href="/page/415185"><g:message code="link.data.sharing" /></a>
-				</li>
-				<li><a href="/page/415189"><g:message code="default.licenses.label" /></a>
-				</li>
-			</ul>
-		</div>
 		<div class="links_box_column">
 			<ul>
 				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>
