@@ -51,7 +51,7 @@ userGroupInstance = userGroupInstance && userGroupInstance.id ? userGroupInstanc
 				<li class="nav-header bold" style="color:#5E5E5E; padding-left: 0px;"><g:message code="default.others.label" /></li>
         <g:if test="${pagesWithNoParent}">
                 <g:each var="page" in="${pagesWithNoParent}">
-				    <li><a href="">${page.value.title}</a></li>
+				    <li><a href=${userGroupInstance?uGroup.createLink('mapping':'userGroup', 'action':'page', 'id':page.value.id, 'userGroup':userGroupInstance):'/page/'+page.value.id }">${page.value.title}</a></li>
                 </g:each>
         </g:if>
 
