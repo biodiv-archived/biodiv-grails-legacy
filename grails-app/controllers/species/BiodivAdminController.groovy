@@ -589,10 +589,10 @@ def doCrop(){
     println "----------------DONE OBSERVATION-------------------------------------------------- "
 
     //getting all resources for users
-    //result = geUserResoruceId()
-    //_doCrop(result, grailsApplication.config.speciesPortal.users.rootDir, sql, dataSource)
+    result = geUserResoruceId()
+    _doCrop(result, grailsApplication.config.speciesPortal.users.rootDir, sql, dataSource)
 
-    //println "----------------DONE USERS-------------------------------------------------- "
+    println "----------------DONE USERS-------------------------------------------------- "
 
     println "============= Start  Time " + startDate  + "          end time " + new Date()
 }
