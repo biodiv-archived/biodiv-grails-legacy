@@ -1912,6 +1912,10 @@ def filterChain() {
             return;
         }
         def result = observationService.updateSpeciesGrp(params, observationInstance);
+        List<Observation> obj=new ArrayList<Observation>();
+        obj.add(observationInstance);
+        observationsSearchService.publishSearchIndex(obj, COMMIT);
+
         def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
         render model as JSON
         return;
