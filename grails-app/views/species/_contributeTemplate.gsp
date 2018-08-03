@@ -28,10 +28,7 @@ if(domain.equals(grailsApplication.config.wgp.domain)) {
 	
 				</ol>
 
-                <p>For any technical feedback, please contact Mr. Kezang Wangmo at kwangmo [at] moaf.gov.bt</p>
-
-                <p>For any content feedback, please contact Ms. Sangay Dema at sangaydema [at] moaf.gov.bt</p>
-
+                <g:message code="species.contributetemp.provide.question.provide" /> <span class="mailme">${supportEmail}</span>
 				</div>
 	
 			</div>

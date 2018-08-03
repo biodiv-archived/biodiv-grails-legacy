@@ -97,7 +97,6 @@ function useTitle(obj){
     MapLocationPicker.prototype = {
 
         initialize : function(options) {
-           // alert("initialize map");
             console.log('initializing map');
             var G = google.maps;
             this.M= L;
@@ -111,10 +110,10 @@ function useTitle(obj){
                 } 
                 this.boundsPolygon = wkt.toObject(); 
             }
-            this.allowedBounds = this.boundsPolygon ? this.boundsPolygon.getBounds() : new this.M.LatLngBounds(new this.M.LatLng('26.647', '88.692'), new this.M.LatLng('28.280', '92.170'));
+            this.allowedBounds = this.boundsPolygon ? this.boundsPolygon.getBounds() : new this.M.LatLngBounds(new this.M.LatLng('6.74678', '68.03215'), new this.M.LatLng('35.51769', '97.40238'));
             //var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '59'), new this.M.LatLng('45', '105'));
-            var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('26.421', '88.505'), new this.M.LatLng('28.632', '92.433'));
-            var nagpur_latlng = new this.M.LatLng('27.445', '90.450');                
+            var viewBounds = new this.M.LatLngBounds(new this.M.LatLng('8', '69'), new this.M.LatLng('36', '98'));
+            var nagpur_latlng = new this.M.LatLng('21.07', '79.27');                
 
             this.map = new this.M.Map(this.$ele.context, {
 //              crs:L.CRS.EPSG4326,

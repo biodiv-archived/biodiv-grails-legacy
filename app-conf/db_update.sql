@@ -862,10 +862,7 @@ alter table newsletter alter column show_in_footer set not null;
 update newsletter set show_in_footer = 't' where user_group_id is null and parent_id !=0 ;
 update newsletter set show_in_footer = true where id in (select parent_id from newsletter  where show_in_footer=true);
 
-<<<<<<< HEAD
-=======
 
->>>>>>> master
 #11 Dec 2017
 alter table data_package alter column supporting_modules type text;
 alter table data_package alter column allowed_data_table_types type text;

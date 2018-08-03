@@ -1,7 +1,6 @@
 //= require jquery.plugins/jquery-ui-1.10.3.custom.min
 //= require bootstrap
 //= require jquery.plugins/jquery.jcarousel.min.js 
-//= require jquery.plugins/jquery.sparkline.min.js
 //= require biodiv/carousel.js 
 //= require bootstrap.plugins/bootstrap-multiselect.js
 //= require biodiv/main.js
@@ -52,8 +51,9 @@
 //= require jquery.plugins/jsrender.js
 //= require bootstrap.plugins/bootstrap-combobox.js
 //= require biodiv/observations/map.js
-//= require biodiv/accordion.js
 
+
+//= require jquery.plugins/jquery.sparkline.min.js 
 //= require jquery.plugins/jquery.history.js
 //= require jquery.plugins/jquery.url.js
 //= require jquery.plugins/jstree.min.js
@@ -106,10 +106,10 @@
 ////= require biodiv/curation.js
 
 ////= require maps
-//= require OpenLayers-2.10/OpenLayers.js
-//= require biodiv/maps/map-search.js
-//= require biodiv/maps/mapapp.js
-//= require biodiv/maps/cookie-chef.js
+////= require OpenLayers-2.10/OpenLayers.js
+////= require biodiv/maps/map-search.js
+////= require biodiv/maps/mapapp.js
+////= require biodiv/maps/cookie-chef.js
 
 ////= require show
 //= require biodiv/observations/show.js
@@ -137,7 +137,5 @@
 //= require biodiv/dataset/create.js
 //= require biodiv/datatable/create.js
 //= require dropzone.js
-//= require biodiv/datatable/create.js
-//= require biodiv/dataset/create.js
 //= require biodiv/trait.js
 //= require biodiv/customfield.js

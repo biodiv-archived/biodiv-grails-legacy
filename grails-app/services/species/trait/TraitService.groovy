@@ -571,6 +571,7 @@ println f
                 def classification;
                 if(params.classification)
                     classification = Classification.read(Long.parseLong(params.classification));
+
                 if(!classification)
                     classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
                 
