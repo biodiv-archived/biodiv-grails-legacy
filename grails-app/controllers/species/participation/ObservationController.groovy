@@ -82,8 +82,7 @@ class ObservationController extends AbstractObjectController {
     static defaultAction = "list"
 
     def index = {
-        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
-        //redirect(action: "list", params: params)
+        redirect(action: "list", params: params)
     }
 
     def filteredMapBasedObservationsList = {
