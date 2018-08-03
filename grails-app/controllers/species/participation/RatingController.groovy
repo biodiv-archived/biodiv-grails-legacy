@@ -98,11 +98,16 @@ class RatingController extends RateableController {
     private def updateReprImage(String parent, Long parentId,Long id,String type) {
       if(parent && parentId){
         def obj = grailsApplication.domainClasses.find { it.clazz.simpleName == parent.capitalize() }.clazz.read(parentId);
-        obj.updateReprImage();
-        obj.save();
-				// List<Observation> obvs=new ArrayList<Observation>();
-				// obvs.add(obv);
-				// observationsSearchService.publishSearchIndex(obvs, true);
+				long objId = obj.id;
+				obj.updateReprImage();
+				 obj.save(flush:true);
+				utilsService.cleanUpGorm(true)
+				if(type=="resource"){
+					Observation obv = Observation.get(objId);
+					List<Observation> obvs=new ArrayList<Observation>();
+					obvs.add(obv);
+					observationsSearchService.publishSearchIndex(obvs, true);
+				}
       }else{
 				if(type=="observation"){
 					Observation obv = Observation.get(Long.parseLong(params.id));
