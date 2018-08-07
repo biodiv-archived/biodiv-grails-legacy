@@ -100,13 +100,13 @@ class RatingController extends RateableController {
         def obj = grailsApplication.domainClasses.find { it.clazz.simpleName == parent.capitalize() }.clazz.read(parentId);
 				long objId = obj.id;
 				obj.updateReprImage();
-				 obj.save(flush:true);
+				obj.save(flush:true);
 				utilsService.cleanUpGorm(true)
 				if(type=="resource"){
-					Observation obv = Observation.get(objId);
-					List<Observation> obvs=new ArrayList<Observation>();
-					obvs.add(obv);
-					observationsSearchService.publishSearchIndex(obvs, true);
+				Observation obv = Observation.get(objId);
+				List<Observation> obvs=new ArrayList<Observation>();
+				obvs.add(obv);
+				observationsSearchService.publishSearchIndex(obvs, true);
 				}
       }else{
 				if(type=="observation"){

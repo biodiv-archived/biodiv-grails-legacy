@@ -1906,14 +1906,18 @@ def filterChain() {
     def updateSpeciesGrp(){
         log.debug params
         def observationInstance =  Observation.read(params.observationId);
+        def id=observationInstance.id;
         if(!observationInstance) {
             def model = utilsService.getErrorModel("No observation instance with id ${observationId}", null, OK.value(), null);
             render model as JSON
             return;
         }
         def result = observationService.updateSpeciesGrp(params, observationInstance);
+        observationInstance.save(flush:true);
+      	utilsService.cleanUpGorm(true)
+        Observation obvser = Observation.get(id);
         List<Observation> obj=new ArrayList<Observation>();
-        obj.add(observationInstance);
+        obj.add(obvser);
         observationsSearchService.publishSearchIndex(obj, COMMIT);
 
         def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
