@@ -116,8 +116,6 @@ class RatingController extends RateableController {
 					 observationsSearchService.publishSearchIndex(obvs, true);
 				}
 			}
-
-
     }
 
     private def getRatings(long id, String type, rater=null) {

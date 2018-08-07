@@ -243,25 +243,5 @@ class UrlMappings {
     "/admin/manage/$action?"(controller: "adminManage")
     "/adminManage/$action?"(controller: "errors", action: "urlMapping")
     
-
-    //Custom URL Mapping for BBP
-   "/bbp" (view:'/portal/bioinbhutan')
-   "/bbp/theportal" (view:'/portal/bioinbhutan')
-   "/bbp/aboutus" (view:'/portal/about')
-   "/bbp/contactus" (view:'/portal/contact')
-   "/bbp/datasharing" (view:'/portal/datasharing')
-   "/bbp/donors" (view:'/portal/donors')
-   "/bbp/feedback" (view:'/portal/feedback')
-   "/bbp/license" (view:'/portal/license')
-   "/bbp/partners" (view:'/portal/partners')
-   "/bbp/people" (view:'/portal/people')
-   "/bbp/policy" (view:'/portal/policy')
-   "/bbp/team" (view:'/portal/team')    
-   "/bbp/faq" (view:'/portal/qna') 
-   "/bbp/technology" (view:'/portal/technology')
-    
-    "/checklist/$action?"(controller: "dataTable")
-
-    }
-    
+} 
 }

@@ -90,14 +90,12 @@ def removeBBPHirLevel(){
 	conn.executeUpdate("update taxonomy_registry set parent_taxon_id = 16808 where parent_taxon_id= 16809")
 	//deleting all taxonred at wrong rank
 	conn.executeUpdate("delete from taxonomy_registry where taxon_definition_id in (10185, 6926, 10187, 10188)")
-	conn.executeUpdate("delete from taxonomy_registry where parent_taxon_definition_id in (10185, 6926, 10187, 10188)")
 	conn.executeUpdate("update recommendation set taxon_concept_id = null where taxon_concept_id in (10185, 6926, 10187, 10188)")
-	conn.executeUpdate("update recommendation set accepted_name_id = null where accepted_name_id in (10185, 6926, 10187, 10188)")
 	conn.executeUpdate("delete from taxonomy_definition where id in (10185, 6926, 10187, 10188)")
 
 }
 
-
+//removeBBPHirLevel()
 
 
 def addIBPTaxonHie() {
@@ -137,7 +135,7 @@ def curateAllAcceptedNames(){
 	def nSer = ctx.getBean("namelistService");
 	def config = Holders.config
 	String path = config.speciesPortal.namelist.rootDir + "/../"
-	nSer.populateInfoFromCol(new File(path), 10186L)
+	nSer.populateInfoFromCol(new File(path), 10184L)
 }
 
 
@@ -145,7 +143,7 @@ def addBBPHirToName(){
 	def ds = ctx.getBean("dataSource");
 	ds.setUnreturnedConnectionTimeout(105000);
 
-	long totalCount = 10186L
+	long totalCount = 10184L
 	long offset = 0
         while(true){
             List tds = TaxonomyDefinition.createCriteria().list(max:100, offset:offset) {
@@ -184,9 +182,7 @@ def synNames(){
 }
 
 //bbpNames()
-//testCurate(1L)
-
-//removeBBPHirLevel()
+//testCurate(997L)
 //addIBPTaxonHie()
 //downloadXML()
 //curateAllAcceptedNames()

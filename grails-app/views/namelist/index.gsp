@@ -52,8 +52,6 @@
 .disableSciName{
     opacity: 0.2;
 }
-.span12{
-    width :100% !important;
 #taxonHierachyInput{
     width:400px;
 }

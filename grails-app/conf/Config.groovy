@@ -173,10 +173,10 @@ else {
 //grails.app.context = "/${appName}"
 //println "Deploying at context ${grails.app.context}------------------------------------------"
 speciesPortal {
-    app.siteName = "Bhutan Biodiversity Portal"
-    app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of Bhutan."
+    app.siteName = "India Biodiversity Portal"
+    app.siteDescription = "Welcome to the ${app.siteName} - A repository of information designed to harness and disseminate collective intelligence on the biodiversity of the Indian subcontinent."
     app.homepageDescription = "A unique repository of information on India's biodiversity. The Portal aims to provide open and free access to biodiversity information. The portal enables widespread participation by all citizens in contributing to and accessing information on Indian biodiversity. We believe such open access benefits science and society, and contributes to sustainable future. Your participation is vital. We welcome your participation and feedback."
-    app.siteCode = 'bbp'
+    app.siteCode = 'ibp'
 
     app.twitterUrl = "https://twitter.com/inbiodiversity"
     app.facebookUrl = "https://www.facebook.com/indiabiodiversity"
@@ -187,13 +187,10 @@ speciesPortal {
     data.rootDir = "${app.rootDir}/data"
     download.rootDir = "${data.rootDir}/datarep/downloads"
 
-    app.logo = "/assets/all/bbp-logo.png"
-    app.favicon = "/assets/all/favicon.ico"
-    app.govlogo = "/assets/all/gov-logo.png"
-    app.dzongkha = "/assets/all/accordion/dzongkha.png"
+    app.logo = "logo/IBP.png"
+    app.favicon = "logo/favicon.png"
 
-
-    app.notifiers_bcc = ["moafbhutan@gmail.com", "sdema06@gmail.com","prabha.prabhakar@gmail.com","kaylzangongmo@gmail.com"]
+    app.notifiers_bcc = ["prabha.prabhakar@gmail.com", "thomas.vee@gmail.com", "rohitmg@gmail.com", "balachandert@gmail.com"]
 
     species {
         speciesDownloadDir = "${download.rootDir}/species"
@@ -325,7 +322,7 @@ speciesPortal {
     fields  {
         COMBINED_TAXONOMIC_HIERARCHY = "Combined Taxonomy Hierarchy"
         AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY = "Author Contributed Taxonomy Hierarchy"
-        IBP_TAXONOMIC_HIERARCHY = "BBP Taxonomy Hierarchy"
+        IBP_TAXONOMIC_HIERARCHY = "IBP Taxonomy Hierarchy"
         GBIF_TAXONOMIC_HIERARCHY = "GBIF Taxonomy Hierarchy"
         CATALOGUE_OF_LIFE_TAXONOMIC_HIERARCHY = 'Catalogue of Life Taxonomy Hierarchy'
         EFLORA_TAXONOMIC_HIERARCHY = 'Eflora Taxonomy Hierarchy'
@@ -820,8 +817,8 @@ environments {
         logHibernateStats = 'NEVER' // From ALWAYS, ALLOWED, NEVER
     }
     kk {
-        servername = 'biodiversity.bt'
-        grails.serverURL = "http://${servername}/${appName}"
+        servername = 'indiabiodiversity.org'
+        grails.serverURL = "https://${servername}"
 
         speciesPortal {
             app.rootDir = "/apps/biodiv"
@@ -1065,8 +1062,8 @@ grails.plugin.springsecurity.facebook.domain.classname='species.auth.FacebookUse
 grails.taggable.tag.autoImport=true
 grails.taggable.tagLink.autoImport=true
 
-grails.mail.default.from="notification@biodiversity.bt"
-emailConfirmation.from="notification@biodiversity.bt"
+grails.mail.default.from="notification@indiabiodiversity.org"
+emailConfirmation.from="notification@indiabiodiversity.org"
 
 grails.plugin.springsecurity.password.algorithm = 'MD5'
 grails.plugin.springsecurity.password.hash.iterations = 1
@@ -1078,7 +1075,7 @@ grails.plugin.springsecurity.ui.register.postRegisterUrl  = "${grails.serverURL}
 grails.plugin.springsecurity.ui.register.defaultRoleNames = ['ROLE_USER']
 
 //grails.plugin.springsecurity.ui.notification.emailFrom = 'notification@indiabiodiversity.org'
-grails.plugin.springsecurity.ui.notification.emailReplyTo = "kaylzangongmo@gmail.com";
+grails.plugin.springsecurity.ui.notification.emailReplyTo = "prabha.prabhakar@gmail.com";
 
 grails.plugin.springsecurity.ui.register.emailBody = '''Hi $username,<br/><br/>You (or someone pretending to be you) created an account with this email address.<br/><br/>If you made the request, please click <a href="$url"> dsfdsa here</a> to finish the registration and activate your account.'''
 //grails.plugin.springsecurity.ui.register.emailFrom = 'notification@indiabiodiversity.org'
