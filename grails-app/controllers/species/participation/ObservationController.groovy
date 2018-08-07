@@ -1920,7 +1920,7 @@ def filterChain() {
         obj.add(obvser);
         observationsSearchService.publishSearchIndex(obj, COMMIT);
 
-        def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
+        def model = utilsService.getSuccessModel('success', obvser, OK.value(),result);
         render model as JSON
         return;
     }

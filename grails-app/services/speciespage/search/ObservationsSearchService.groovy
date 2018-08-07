@@ -337,7 +337,7 @@ class ObservationsSearchService extends AbstractSearchService {
 
 def fromdate=obvRow.get("fromdate");
 
-def geoprivacy=obvRow.get("geo_privacy");
+def geoprivacy=obvRow.get("geoprivacy");
 List<Double> location=new ArrayList<Double>();
 
 if(geoprivacy){
