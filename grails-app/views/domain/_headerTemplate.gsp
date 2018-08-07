@@ -203,7 +203,7 @@
 
 
 										<li class=" ${(params.controller == 'activityFeed')?'active':''}"><a
-                                href="${uGroup.createLink("controller":"activityFeed")}" title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
+                                href="${uGroup.createLink("controller":"activityFeed", 'userGroup':userGroupInstance))}" title="${g.message(code:'button.activity')}"><g:message code="button.activity" /></a>
 					</li>
 
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -212,14 +212,14 @@
 						<ul class="dropdown-menu" style="text-align: left; color: #000">
 						
                             <li class="${(params.action == 'pages')?' active':''}"><a
-                                href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages")}"
+                                href="${uGroup.createLink(mapping:"pages", controller:"userGroup", 'action':"pages", 'userGroup':userGroupInstance))}"
                                 title="${g.message(code:'default.pages.label')}"><g:message code="default.pages.label" /></a>
                             </li>
 
 
 							<li
 								class="${((params.controller == 'user' || params.controller == 'SUser') && params.action != 'header')?' active':''}"><a
-								href="${uGroup.createLink(controller:'user', action:'list')}"
+								href="${uGroup.createLink(controller:'user', action:'list', 'userGroup':userGroupInstance))}"
 								title="${g.message(code:'default.members.label')}"><g:message code="default.members.label" /></a></li>
 <%--							<li--%>
 <%--								class="${(request.getHeader('referer')?.contains('/calendar') && params.action == 'header')?' active':''}"><a--%>
@@ -230,7 +230,7 @@
 							
 							<li
 								class="${(params.controller == 'chart')?' active':''}"><a
-								href="${uGroup.createLink(controller:'chart')}"
+								href="${uGroup.createLink(controller:'chart', 'userGroup':userGroupInstance))}"
 								title="${g.message(code:'button.dashboard')}"><g:message code="button.dashboard" /></a> </li>
 							<li
 								class="${(request.getHeader('referer')?.contains('/about') && params.action == 'header')?' active':''}"><a
