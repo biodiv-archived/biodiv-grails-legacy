@@ -133,6 +133,7 @@ grails.project.dependency.resolution = {
 
         compile group: 'net.postgis', name: 'postgis-jdbc', version: '2.2.1'
   	    compile "com.bedatadriven:jackson-datatype-jts:2.4"
+        compile group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
 
     }
 
@@ -161,7 +162,7 @@ grails.project.dependency.resolution = {
         compile "org.grails.plugins:spring-security-acl:2.0.1"
 
         compile (":spring-security-rest:1.5.4") {
-                excludes 'spring-security-core', 'cors','pac4j-cas'
+                excludes 'spring-security-core', 'cors','pac4j-cas', 'http-builder'
         }
 
         compile (":spring-security-facebook:0.15.2-CORE2") {

@@ -337,14 +337,23 @@ class ObservationsSearchService extends AbstractSearchService {
 
 def fromdate=obvRow.get("fromdate");
 
-def geoPrivacyAdjust = Utils.getRandomFloat()
-def longitude = obvRow.get("longitude") + geoPrivacyAdjust
-def latitude = obvRow.get("latitude") + geoPrivacyAdjust
-
+def geoprivacy=obvRow.get("geoprivacy");
 List<Double> location=new ArrayList<Double>();
 
-location.add(longitude);
-location.add(latitude);
+if(geoprivacy){
+  def geoPrivacyAdjust = Utils.getRandomFloat()
+  def longitude = obvRow.get("longitude") + geoPrivacyAdjust
+  def latitude = obvRow.get("latitude") + geoPrivacyAdjust
+  location.add(longitude);
+  location.add(latitude);
+}
+else{
+  def longitude = obvRow.get("longitude")
+  def latitude = obvRow.get("latitude")
+  location.add(longitude);
+  location.add(latitude);
+}
+
 
 eData.put("location",location);
 eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));
