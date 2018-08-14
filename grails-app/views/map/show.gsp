@@ -48,8 +48,8 @@
         </div>
         <asset:script>
             $(document).ready(function() {
-            loadGoogleMapsAPI(function() {
-
+            var mapCanvasEle = document.getElementById('map');
+            loadGoogleMapsAPI(mapCanvasEle, function() {
                 india_baundary_lyr = getWorkspace() + ':lyr_121_india_boundary';
                 var mapOptions = {
                     popup_enabled: false,

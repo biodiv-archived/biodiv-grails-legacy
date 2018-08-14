@@ -730,7 +730,7 @@ class UtilsService {
                 default:
                 log.debug "invalid notification type"
             }
-
+println "-----------------------11112222---------------"
             toUsers.eachWithIndex { toUser, index ->
                 if(toUser) {
                     if(!toUser.enabled || toUser.accountLocked){
@@ -747,6 +747,7 @@ class UtilsService {
                     }
 
                     log.info "Sending email to ${toUser}"
+println"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
                     try{
                         mailService.sendMail {
                             to toUser.email
@@ -769,6 +770,7 @@ class UtilsService {
                                 html bodyContent
                             }
                         }
+println  "MMMMMMMMMMMMMMAAAAAAAAAAAAAAAAAIIIIIIIIIIIIIIIIIIILLLLLLLLLLLLLL"
                     } catch(Exception e) {
                         log.error "Error sending message ${e.getMessage()} toUser : ${toUser} "
                         e.printStackTrace();
@@ -780,6 +782,7 @@ class UtilsService {
             log.error "Error sending email $e.message"
             e.printStackTrace();
         }
+println "sent"
     }
 
     private  void  populateTemplate(def obv, def templateMap, String userGroupWebaddress="", def feed=null, def request=null)  {

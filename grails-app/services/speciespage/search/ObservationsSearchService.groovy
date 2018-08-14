@@ -223,6 +223,7 @@ class ObservationsSearchService extends AbstractSearchService {
             from rating as r inner join suser  as su on r.rater_id=su.id inner join  rating_link as rl on r.id=rl.rating_id
             where rl.rating_ref in ("""+sids+ """) and  rl.type='observation') row group by row.rating_ref""";
 
+
             def queryForObservationLikeResult=sql.rows(queryForObservationLike);
 
 
@@ -255,7 +256,7 @@ class ObservationsSearchService extends AbstractSearchService {
                                                    left join recommendation r on obv.max_voted_reco_id=r.id
                                                    left join taxonomy_definition t on r.taxon_concept_id=t.id
                                                    left join taxonomy_registry tres on tres.taxon_definition_id=t.id
-                                                    where (tres.classification_id=265799 or tres.classification_id=null)
+                                                    where (tres.classification_id=40000 or tres.classification_id=null)
                                                     and obv.id in ( """+sids+""" )""";
 
 
@@ -337,23 +338,14 @@ class ObservationsSearchService extends AbstractSearchService {
 
 def fromdate=obvRow.get("fromdate");
 
-def geoprivacy=obvRow.get("geoprivacy");
+def geoPrivacyAdjust = Utils.getRandomFloat()
+def longitude = obvRow.get("longitude") + geoPrivacyAdjust
+def latitude = obvRow.get("latitude") + geoPrivacyAdjust
+
 List<Double> location=new ArrayList<Double>();
 
-if(geoprivacy){
-  def geoPrivacyAdjust = Utils.getRandomFloat()
-  def longitude = obvRow.get("longitude") + geoPrivacyAdjust
-  def latitude = obvRow.get("latitude") + geoPrivacyAdjust
-  location.add(longitude);
-  location.add(latitude);
-}
-else{
-  def longitude = obvRow.get("longitude")
-  def latitude = obvRow.get("latitude")
-  location.add(longitude);
-  location.add(latitude);
-}
-
+location.add(longitude);
+location.add(latitude);
 
 eData.put("location",location);
 eData.put("frommonth",new SimpleDateFormat("M").format(fromdate));

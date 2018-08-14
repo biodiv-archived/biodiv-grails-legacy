@@ -1283,7 +1283,7 @@ class UserGroupService {
 					obvs << obj
 					/*if(obj.instanceOf(Checklists)){
 						obvs.addAll(obj.observations)
-                        }*/
+                       }*/
                 }
 			}
 			r['resourceObj'] = (params.pullType == 'single')? obvs[0]:null

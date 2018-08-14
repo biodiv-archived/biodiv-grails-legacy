@@ -28,19 +28,19 @@
    %>
 <div class="row-fluid">
 <div class="span1" style="padding:2px 0px 2px 12px">
-   <g:link url="${uGroup.createLink(controller:controller, action:'show', id:docId,  'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" >
+   <g:link url="${uGroup.createLink(controller:'document', action:'show', id:docId,  'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" >
       <img   src="${imagePath}" style="height:42px; margin-top:4px"/>
    </g:link>
 </div>
 <div class="span10" style="margin: 0px; padding-top: 5px;">
    <i style="margin: 2px;">Title  : </i>
    <g:if test="${titlesize>101}" >
-      <g:link url="${uGroup.createLink(controller:controller, action:'show', id:docId,  'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" style="color:blue; ">
+      <g:link url="${uGroup.createLink(controller:'document', action:'show', id:docId,  'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" style="color:blue; ">
          ${docTitle[0..101]}...
       </g:link>
    </g:if>
    <g:else>
-      <g:link url="${uGroup.createLink(controller:controller, action:'show', id:docId,  'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" style="color:blue; " >
+      <g:link url="${uGroup.createLink(controller:'document', action:'show', id:docId,  'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }" style="color:blue; " >
          ${docTitle}
       </g:link>
    </g:else>

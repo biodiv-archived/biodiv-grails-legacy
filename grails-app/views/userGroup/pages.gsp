@@ -28,6 +28,9 @@
         background-color: #CEEBD3;
         border: none
     }
+    .tab-content {
+	    overflow: inherit;
+	}
     .page_chevron{
     	position:absolute;
     }

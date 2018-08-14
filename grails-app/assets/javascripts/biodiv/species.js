@@ -107,30 +107,30 @@ function showOccurence(speciesName) {
                 //bbox : "5801108.428222222,674216.547942332, 12138100.077777777, 4439106.786632658"
         };
         var layersOptions = [
-        {
-            title :window.i8ln.species.specie.oc ,
-            layers : 'biodiv:occurrence',
-            styles : '',
-            cql_filter : "species_name='" + speciesName + "'",
-            opacity : 0.7
-        },
-        {
-            title :window.i8ln.species.specie.obs ,
-            layers : 'biodiv:observation_locations',
-            styles : '',
-            cql_filter : "species_name='" + speciesName + "'",
-            opacity : 0.7
-        },
-        {
-            title :window.i8ln.species.specie.ckl,
-            layers : 'biodiv:checklist_species_locations',
-            styles : '',
-            cql_filter : "species_name='" + speciesName + "'",
-            opacity : 0.7
-        }
-        ]
-            showMap("map1311326056727", mapOptions, layersOptions)
-            $("#mapSpinner").hide();
+    {
+        title :window.i8ln.species.specie.oc ,
+    layers : 'biodiv:occurrence',
+    styles : '',
+    cql_filter : "species_name='" + speciesName + "'",
+    opacity : 0.7
+    },
+    {
+        title :window.i8ln.species.specie.obs ,
+    layers : 'biodiv:observation_locations',
+    styles : '',
+    cql_filter : "species_name='" + speciesName + "'",
+    opacity : 0.7
+    },
+    {
+        title :window.i8ln.species.specie.ckl,
+        layers : 'biodiv:checklist_species_locations',
+        styles : '',
+        cql_filter : "species_name='" + speciesName + "'",
+        opacity : 0.7
+    }
+    ]
+        showMap("map1311326056727", mapOptions, layersOptions)
+        $("#mapSpinner").hide();
     });
 }
 

@@ -1,12 +1,3 @@
-/*
-
-COLORING
-
-For ease of colortheming, the color selectors are grouped together with descriptive comments.
-Just change the color-values to apply your own color-scheme.
-
-*/
-
 /* Main navigation */
 .navigation li a { background-color: #aaa }                         /* Background-color */
 .navigation li.navigation_active a { background-color: #555; }      /* Background-color of active item */
@@ -33,7 +24,6 @@ Just change the color-values to apply your own color-scheme.
     clear: both;
     margin: 5px 0;
     font-size: 13px;
-    /*overflow: hidden;*/ /* Clearing floats */
 }
 
 .navigation li {
@@ -120,12 +110,6 @@ Just change the color-values to apply your own color-scheme.
     /* border-color: #e0e0e0; */
 }
 
-
-/* MEGA MENU STYLE
-********************************/ 
-
-
-
 .siteNav .mega-menu {
   padding: 10px ! important;
   width: auto;
@@ -177,21 +161,12 @@ Just change the color-values to apply your own color-scheme.
 }
 .siteNav .mega-menu img { padding-bottom: 10px; }
 
-/* Disable Toggle style
-********************************/  
-
-/* Dropdown Toggle on style */
-
-
-
 .siteNav .nav li.dropdown.open > .dropdown-toggle,
 .siteNav .nav li.dropdown.active > .dropdown-toggle,
 .siteNav .nav li.dropdown.open.active > .dropdown-toggle {
   background: inherit; /* Set to inherit when using mouse hover to open dropdown */
   color: inherit;
 }
-
-/* Toggle off style */
 
 
 

@@ -108,7 +108,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 </td>
 </tr>
 <tr>
-    <td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="${grailsApplication.config.grails.serverURL}/"><img src="${assetPath(src:'/all/'+'whatsnewbanner_3.gif',absolute:'true' )}" alt="${grailsApplication.config.speciesPortal.app.siteName}" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
+    <td id="header" class="w640" align="center" bgcolor="#ffffff" width="640"><a href="${grailsApplication.config.grails.serverURL}/"><img src="${assetPath(src:'/all/'+'bhutan.gif',absolute:'true')}" alt="${grailsApplication.config.speciesPortal.app.siteName}" style="border: 0px solid ; width: 639px; height: 53px;"></a></td>
 </tr>
 <tr>
 <td class="w580" style="width: 580px; height: 10px; background-color: white;"></td>
@@ -149,7 +149,7 @@ body, td { font-family: 'Helvetica Neue', Arial, Helvetica, Geneva, sans-serif; 
 <table align="left" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
-<td class="w30" width="15"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><img src="${assetPath(src:'/all/'+'observations_cr.png',absolute:'true' )}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Observations" hspace="5"></a></td>
+<td class="w30" width="15"><a href="${uGroup.createLink(controller:'observation', action:'list', absolute:true)}"><img src="${assetPath(src:'/all/'+'observations_cr.png',absolute:'true')}" style="border: 0px solid ; width: 150px; height: 150px;" alt="Observations" hspace="5"></a></td>
 </tr>
 </tbody>
 </table>

@@ -82,7 +82,8 @@ class ObservationController extends AbstractObjectController {
     static defaultAction = "list"
 
     def index = {
-        redirect(action: "list", params: params)
+        redirect (url:uGroup.createLink(action:'list', controller:"observation", 'userGroupWebaddress':params.webaddress))
+        //redirect(action: "list", params: params)
     }
 
     def filteredMapBasedObservationsList = {
@@ -811,7 +812,7 @@ class ObservationController extends AbstractObjectController {
                 recommendationVoteInstance = recVoteResult?.recVote;
                 msg = recVoteResult?.msg;
             }
-
+println "1111";
             def observationInstance = Observation.get(params.obvId);
             def mailType
             try {
@@ -870,9 +871,10 @@ class ObservationController extends AbstractObjectController {
                     observationInstance.calculateMaxVotedSpeciesName();
                     def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
                     observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-
+println "4444"
                     //just updates species time stamp on recommendation
                     recommendationVoteInstance.updateSpeciesTimeStamp();
+println "44441111"
 
                     //sending email
                     if( params["createNew"] && ( params.oldAction == "save" || params.oldAction == "bulkSave" ) ) {
@@ -880,9 +882,12 @@ class ObservationController extends AbstractObjectController {
                     } else {
                         mailType = utilsService.SPECIES_RECOMMENDED;
                     }
+println "44442222"
                     utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
-                    commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
 
+println "44443333"
+                    commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
+println "5555"
                     if(!params["createNew"]) {
                         def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value());
                         withFormat {
@@ -893,16 +898,19 @@ class ObservationController extends AbstractObjectController {
                             xml { render model as XML }
                         }
                     } else {
+println "222"
                         if(params.oldAction != "bulkSave"){
                             def model = utilsService.getSuccessModel(msg, observationInstance, OK.value());
                             withFormat {
                                 html {
+println "333"
                                     redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
                                 }
                                 json { render model as JSON }
                                 xml { render model as XML }
                             }
                         } else {
+println "66666"
                             //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
                             def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml,statusComplete : true]);
@@ -919,6 +927,7 @@ class ObservationController extends AbstractObjectController {
                     }
                     return
                 } else {
+println "77777"
                     msg = msg ?: messageSource.getMessage("default.recommendation.vote.failed", null, RCU.getLocale(request))
                     log.debug msg
                     observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
@@ -1905,22 +1914,13 @@ def filterChain() {
     def updateSpeciesGrp(){
         log.debug params
         def observationInstance =  Observation.read(params.observationId);
-        def id=observationInstance.id;
         if(!observationInstance) {
             def model = utilsService.getErrorModel("No observation instance with id ${observationId}", null, OK.value(), null);
             render model as JSON
             return;
         }
         def result = observationService.updateSpeciesGrp(params, observationInstance);
-
-        observationInstance.save(flush:true);
-      	utilsService.cleanUpGorm(true)
-        Observation obvser = Observation.get(id);
-        List<Observation> obj=new ArrayList<Observation>();
-        obj.add(obvser);
-        observationsSearchService.publishSearchIndex(obj, COMMIT);
-
-        def model = utilsService.getSuccessModel('success', obvser, OK.value(),result);
+        def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
         render model as JSON
         return;
     }
