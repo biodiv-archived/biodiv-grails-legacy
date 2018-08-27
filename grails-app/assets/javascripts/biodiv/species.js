@@ -118,7 +118,7 @@ function showOccurence(speciesName) {
         showMap("map1311326056727", mapOptions, layersOptions)
         $("#mapSpinner").hide();
 
-    });
+   });
 }
 
 function updateEditorContent() {
@@ -424,7 +424,7 @@ function initEditor($ele) {
 
 function initEditables($ele) {
     if($ele == undefined) $ele = $(document);
-    $ele.find('.editField').editable({
+     $ele.find('.editField').editable({
         params: function(params) {
             if(params.name == 'synonym') {
                 //collecting additional params like relationship for synonym
@@ -460,7 +460,7 @@ function initEditables($ele) {
         var $textarea = $(this).nextAll('textarea');
         var $editable = $(this).nextAll('.editField.editable')
         if($textarea.length != 0)
-        initEditor($textarea);
+            initEditor($textarea);
         else {
             initEditor($editable);
             $(this).parent().parent().find('.synRel.selector').editable('show');
@@ -931,6 +931,9 @@ $(document).ready(function() {
             //$('.hidePoint').show();
             $('#editSpecies').addClass('editing').html('<i class="icon-edit"></i>'+window.i8ln.species.specie.eem);
             if($e) rate($e.find('.star_rating'));
+
+            $('.trait_edit_panel').show();
+            $('.trait_panel').hide();
         }
 
         $('#editSpecies').click(function() {

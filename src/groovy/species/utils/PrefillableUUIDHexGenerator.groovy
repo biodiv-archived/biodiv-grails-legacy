@@ -1,6 +1,6 @@
 package species.utils
 
-import org.hibernate.engine.SessionImplementor
+import org.hibernate.engine.spi.SessionImplementor;
 
 
 public class PrefillableUUIDHexGenerator extends org.hibernate.id.enhanced.SequenceStyleGenerator {

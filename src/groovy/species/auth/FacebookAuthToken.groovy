@@ -18,6 +18,7 @@ class FacebookAuthToken extends com.the6hours.grails.springsecurity.facebook.Fac
 
 		@Override
 		String toString() {
+            println accessToken;
 			return "Domain: $domain, Principal: $principal, uid: $uid, roles: ${authorities.collect { it.authority}}"
 		}
 }

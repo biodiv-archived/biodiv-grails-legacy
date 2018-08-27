@@ -34,13 +34,11 @@ import species.Resource;
 import species.BlockedMails;
 import species.Resource.ResourceType;
 import species.auth.SUser;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import species.participation.ActivityFeedService
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class ActionController {
-    
+
     def grailsApplication;
     def utilsService;
 	def observationService;
@@ -60,10 +58,12 @@ class ActionController {
 	static allowedMethods = [save:"POST", update: "POST", delete: "POST"]
 
     def index = { }
-    
+
     def searchIndex(type,obv){
         if(type == "species.participation.Observation"){
-            observationsSearchService.publishSearchIndex(obv, true);
+            List<Observation> obvs=new ArrayList<Observation>();
+            obvs.add(obv);
+            observationsSearchService.publishSearchIndex(obvs, true);
         }
         else if(type == "species.participation.Species"){
              speciesSearchService.publishSearchIndex(obv, true);
@@ -72,7 +72,7 @@ class ActionController {
             documentSearchService.publishSearchIndex(obv, true);
 
         }
-    } 
+    }
 
     private boolean saveActMail(params, Featured featuredInstance , obv, UserGroup ug) {
         if(!featuredInstance.save(flush:true)){
@@ -91,8 +91,8 @@ class ActionController {
         boolean status = false;
         def r = [:]
 
-        def obv = activityFeedService.getDomainObject(params.type,params.id); 
-        
+        def obv = activityFeedService.getDomainObject(params.type,params.id);
+
         def resourceGroupHtml = ""
 
         if(obv) {
@@ -106,15 +106,15 @@ class ActionController {
     }
 
     @Secured(['ROLE_USER'])
-    def featureIt() {  
+    def featureIt() {
         log.debug params;
         boolean status = false;
         String msg = '';
         def r = [:]
-       
+
         params.author = springSecurityService.currentUser;
 
-        def obv = activityFeedService.getDomainObject(params.type,params.id); 
+        def obv = activityFeedService.getDomainObject(params.type,params.id);
         def ugParam = params['userGroup']
         def resourceGroupHtml
 
@@ -127,7 +127,7 @@ class ActionController {
                 }
             }
             else {
-                splitGroups.add("")    
+                splitGroups.add("")
             }
 
             List groups = splitGroups.collect { (it == '') ? null : UserGroup.read(Long.parseLong(it)) }
@@ -146,9 +146,9 @@ class ActionController {
                             return
                         }
                     }
-                    else {  
+                    else {
                         if (ug.isFounder(params.author) || ug.isExpert(params.author)) {
-                        }  
+                        }
                         else {
                              msg = messageSource.getMessage("default.notHave.permission", null, RCU.getLocale(request))
                              status = false;
@@ -156,12 +156,12 @@ class ActionController {
                              r['msg'] = msg
                              render r as JSON
                              return
-                        } 
+                        }
                     }
                      try{
                         featuredInstance = Featured.findWhere(objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
                            if(!featuredInstance) {
-                            def userLanguage = utilsService.getCurrentLanguage(request); 
+                            def userLanguage = utilsService.getCurrentLanguage(request);
                             featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes,language:userLanguage, expireTime:utilsService.parseDate(params.expireTime, false))
                             status = saveActMail(params, featuredInstance, obv, ug);
                             obv.featureCount++
@@ -169,14 +169,14 @@ class ActionController {
                                 obv.errors.allErrors.each { log.error it }
                             }
                             if(status) msg = messageSource.getMessage("featured.success", null, RCU.getLocale(request))
-                        } 
+                        }
                         else {
                             if(featuredInstance.author == params.author){
                                 featuredInstance.notes = params.notes
                                 featuredInstance.createdOn = new Date()
                                 featuredInstance.expireTime = utilsService.parseDate(params.expireTime, false);
-                                featuredInstance.language = utilsService.getCurrentLanguage(request);  
-                                status = saveActMail(params, featuredInstance, obv, ug) 
+                                featuredInstance.language = utilsService.getCurrentLanguage(request);
+                                status = saveActMail(params, featuredInstance, obv, ug)
                                 if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes", [obv.class.simpleName] as Object[], RCU.getLocale(request))
                             }
                             else{
@@ -186,9 +186,9 @@ class ActionController {
                                     e.printStackTrace()
                                 }
 								def expireTime = utilsService.parseDate(params.expireTime, false)
-								
-                                def userLanguage = utilsService.getCurrentLanguage(request); 
-								
+
+                                def userLanguage = utilsService.getCurrentLanguage(request);
+
                                 featuredInstance = new Featured(author:params.author, objectId: params.id.toLong(), objectType: params.type, userGroup: ug, notes: params.notes,language:userLanguage, expireTime:expireTime)
                                 status = saveActMail(params, featuredInstance, obv, ug)
                                 if(status) msg = messageSource.getMessage("default.SuccessUpdated.notes.again", [obv.class.simpleName] as Object[], RCU.getLocale(request))
@@ -202,8 +202,8 @@ class ActionController {
                         log.error e.getMessage();
                     }
                  }
-             } 
-            
+             }
+
             if(!status)
                 msg = "Error while featuring the ${obv.class.simpleName}. ${msg}"
 
@@ -258,9 +258,9 @@ class ActionController {
                             return
                         }
                     }
-                    else { 
+                    else {
                         if (ug.isFounder(params.author) || ugroup.isExpert(params.author)) {
-                        } 
+                        }
                         else {
                              msg = messageSource.getMessage("default.notHave.permission", null, RCU.getLocale(request))
                              status = false;
@@ -268,7 +268,7 @@ class ActionController {
                              r['msg'] = msg
                              render r as JSON
                              return
-                        } 
+                        }
                     }
                 featuredInstance = Featured.findWhere(objectId: params.id.toLong(), objectType: params.type, userGroup: ug)
                 if(!featuredInstance) {
@@ -306,17 +306,17 @@ class ActionController {
         r["resourceGroupHtml"] = resourceGroupHtml
         render r as JSON
 
-    } 
+    }
 
 	@Secured(['ROLE_USER'])
-	def flagIt() { 
+	def flagIt() {
         log.debug params;
         params.author = springSecurityService.currentUser;
         def r = [:]
         def msg =''
-        if(params.type && params.obvFlag) { 
-            def obv = activityFeedService.getDomainObject(params.type,params.id);     
-            FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.DETAILS_INAPPROPRIATE.name());    
+        if(params.type && params.obvFlag) {
+            def obv = activityFeedService.getDomainObject(params.type,params.id);
+            FlagType flag = observationService.getObservationFlagType(params.obvFlag?:FlagType.DETAILS_INAPPROPRIATE.name());
             def flagInstance = Flag.findWhere(author: params.author,objectId: params.id.toLong(),objectType: params.type);
             if (!flagInstance) {
                 try {
@@ -329,9 +329,13 @@ class ActionController {
                     def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
                     obv.flagCount++
                     obv.save(flush:true)
-                    def act = activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes); 
-                    searchIndex(params.type,obv)				
-                    utilsService.sendNotificationMail(utilsService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act) 
+                    List<Observation> obvs=new ArrayList<Observation>();
+                    obvs.add(obv);
+                    observationsSearchService.publishSearchIndex(obvs, true);
+
+                    def act = activityFeedService.addActivityFeed(obv, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes);
+                    searchIndex(params.type,obv)
+                    utilsService.sendNotificationMail(utilsService.OBSERVATION_FLAGGED, obv, request, params.webaddress, act)
                     flash.message = "${message(code: 'flag.added', default: 'Flag added')}"
                     msg = "Flagged..."
                 }
@@ -344,9 +348,9 @@ class ActionController {
                 flash.message  = "${message(code: 'flag.duplicate', default:'Already flagged')}"    ///change message
             }
             r["success"] = true;
-            def observationInstance = activityFeedService.getDomainObject(params.type,params.id); 
+            def observationInstance = activityFeedService.getDomainObject(params.type,params.id);
             def flagListUsersHTML = g.render(template:"/common/observation/flagListUsersTemplate" ,model:['observationInstance':observationInstance])
-            
+
             r['msg'] = msg
 
             r['flagListUsersHTML'] = flagListUsersHTML
@@ -365,20 +369,23 @@ class ActionController {
 	def deleteFlag() {
 		log.debug params;
         params.author = springSecurityService.currentUser;
-		def flagInstance = Flag.read(params.id.toLong());  
+		def flagInstance = Flag.read(params.id.toLong());
 		if(!flagInstance){
 			return
 		}
 		try {
             def obv = activityFeedService.getDomainObject(flagInstance.objectType, flagInstance.objectId);
             def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
-			flagInstance.delete(flush: true);
-            obv.flagCount--
-			obv.save(flush:true)
+      			flagInstance.delete(flush: true);
+                  obv.flagCount--
+      			obv.save(flush:true)
+            List<Observation> obvs=new ArrayList<Observation>();
+            obvs.add(obv);
+            observationsSearchService.publishSearchIndex(obvs, true);
             activityFeedService.addActivityFeed(obv, flagInstance, params.author, activityFeedService.REMOVED_FLAG, activityNotes);
 			searchIndex(params.type,obv);    //observation ke liye only
             def message = [:]
-            message['flagCount'] = obv.flagCount 
+            message['flagCount'] = obv.flagCount
 			render message as JSON;
 			return;
 		}catch (Exception e) {
@@ -386,6 +393,6 @@ class ActionController {
 			response.setStatus(500);
 			def message = [error: g.message(code: 'flag.error.onDelete', default:'Error on deleting flag')];
             render message as JSON
-		} 
-	} 
+		}
+	}
 }

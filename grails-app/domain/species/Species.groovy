@@ -3,7 +3,7 @@ package species
 import java.util.Date;
 
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
+import grails.util.Holders;
 
 import species.Resource;
 import species.Resource.ResourceType;
@@ -21,8 +21,9 @@ import species.participation.Featured;
 import species.sourcehandler.XMLConverter;
 import species.trait.Fact;
 import content.eml.Document;
+import species.dataset.DataTable;
 
-class Species implements Rateable { 
+class Species implements Rateable, Serializable { 
  	String title;
 	String guid; 
 	TaxonomyDefinition taxonConcept;
@@ -48,11 +49,11 @@ class Species implements Rateable {
     def speciesPermissionService;
     def utilsService;
     def traitService;
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
 
 	private static final log = LogFactory.getLog(this);
 	
-	def fieldsConfig = ConfigurationHolder.config.speciesPortal.fields
+	def fieldsConfig = Holders.config.speciesPortal.fields
 	
 	static hasMany = [fields: SpeciesField,
 		globalDistributionEntities:GeographicEntity, 
@@ -61,10 +62,11 @@ class Species implements Rateable {
 		indianEndemicityEntities:GeographicEntity, 
 		//taxonomyRegistry:TaxonomyRegistry, 
 		resources:Resource,
-		userGroups:UserGroup];
+		userGroups:UserGroup,
+        dataTables : DataTable];
  
 
-	static belongsTo = [UserGroup]
+	static belongsTo = [UserGroup, DataTable]
 
 	static constraints = {
 		guid(blank: false, unique: true);
@@ -74,6 +76,7 @@ class Species implements Rateable {
         featureCount nullable:false;
         habitat nullable:true;
 		isDeleted nullable:false;
+		//dataTable nullable:true;
 	}
 
 	static mapping = {
@@ -393,6 +396,9 @@ class Species implements Rateable {
 	 * @return
 	 */
 	def clearBasicContent(){
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
+        println "clearBasicContent====================================+"
 		//this.resources?.clear();
         def tmp = [] ;
         tmp.addAll fields;
@@ -532,20 +538,20 @@ class Species implements Rateable {
         Map queryParams = ['trait':[:]];
         def traitList = [];
         factList.each { fact ->
-            if(!traitFactMap[fact.trait.id]) {
-                traitFactMap[fact.trait.id] = []
+            if(!traitFactMap[fact.traitInstance.id]) {
+                traitFactMap[fact.traitInstance.id] = []
                 if(fact.traitValue)
-                    queryParams['trait'][fact.trait.id] = '';
+                    queryParams['trait'][fact.traitInstance.id] = '';
                 traitFactMap['fact'] = []
-                traitList << fact.trait;
+                traitList << fact.traitInstance;
             }
             if(fact.traitValue) {
-                traitFactMap[fact.trait.id] << fact.traitValue
-                queryParams['trait'][fact.trait.id] += fact.traitValue.id+',';
+                traitFactMap[fact.traitInstance.id] << fact.traitValue
+                queryParams['trait'][fact.traitInstance.id] += fact.traitValue.id+',';
             } else if(fact.value)
-                traitFactMap[fact.trait.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
+                traitFactMap[fact.traitInstance.id] << fact.value+(fact.toValue?":"+fact.toValue:'')
             if(fact.fromDate && fact.toDate)
-                traitFactMap[fact.trait.id] << fact.fromDate.toString()+";"+fact.toDate.toString()
+                traitFactMap[fact.traitInstance.id] << fact.fromDate.toString()+";"+fact.toDate.toString()
 
             traitFactMap['fact'] << fact.id
         }
@@ -558,10 +564,33 @@ class Species implements Rateable {
 
     Map getTraits() {
         //def traitList = traitService.getFilteredList(['sGroup':this.taxonConcept.group.id], -1, -1).instanceList;
-        def allTraitList = traitService.getFilteredList(['sGroup':this.guid, 'isNotObservationTrait':true,'taxon':this.taxonConcept.id], -1, -1).instanceList;
+//        def allTraitList = traitService.getFilteredList(['isNotObservationTrait':true, 'showInObservation':false, 'taxon':this.taxonConcept.id], -1, -1).instanceList;
         def r = getTraitFacts();
-        r['allTraitList'] = allTraitList; 
+//        r['allTraitList'] = allTraitList; 
         return r;
+    }
+
+    def fetchChecklistAnnotation(){
+        def res = [:]
+        res['id'] = this.id;
+        res['type'] = 'species';
+        res['speciesid'] = this.id; 
+        res['title'] = this.title();
+ 
+        return res
+    }
+
+    SUser getAuthor() {
+        return SUser.findByEmail('admin@strandls.com');
+    }
+
+    static long countSpecies() {
+        def c = Species.createCriteria();
+        def count = c.count {
+            gt ('percentOfInfo',  new Float(0.0));
+            cache true;
+        }
+        return count;
     }
 
     @Override

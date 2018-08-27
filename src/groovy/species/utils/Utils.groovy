@@ -147,8 +147,10 @@ class Utils {
 	}
 
 	static String getCanonicalForm(String name){
+        println namesParser;
 		try {
 			def taxonDef = namesParser.parse([name])?.get(0)
+            println taxonDef;
 			if(taxonDef){
 				return taxonDef.canonicalForm ?:taxonDef.name
 			}
@@ -219,26 +221,26 @@ class Utils {
 	static String getDomainServerUrl(HttpServletRequest request) {
         if(!request) return null;
 		def domain = getDomain(request);
-		return "$request.scheme://$domain";
+		return "https://$domain";
 	}
 
 	static String getDomainServerUrlWithContext(HttpServletRequest request) {
 		def domain = getDomain(request);
-		return "$request.scheme://$domain$request.contextPath";
+		return "https://$domain$request.contextPath";
 	}
 
 	//	static String getIBPServerUrl() {
-	//		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+	//		def config = grails.util.Holders.config;
 	//		return getIBPServerDomain() + "/$config.appName";
 	//	}
 
 	static String getIBPServerDomain() {
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
-		return "http://$config.ibp.domain";
+		def config = grails.util.Holders.config;
+		return config.grails.serverURL;//"http://$config.ibp.domain";
 	}
 
 	static String getIBPServerCookieDomain() {
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+		def config = grails.util.Holders.config;
 		return "$config.ibp.domain";
 	}
 
@@ -249,13 +251,13 @@ class Utils {
 		}
 		
 		def domain = getDomain(request);
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 
-		if(domain.startsWith(config.wgp.domain)) {
-			return "The Westernghats Portal"
-		} else {
+		//if(domain.startsWith(config.wgp.domain)) {
+		//	return "The Westernghats Portal"
+		//} else {
 			return config.speciesPortal.app.siteName
-		}
+		//}
 		return "";
 	}
 

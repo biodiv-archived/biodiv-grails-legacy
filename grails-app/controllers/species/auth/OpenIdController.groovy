@@ -14,14 +14,16 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.PortResolver;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
-import org.springframework.social.facebook.api.FacebookProfile;
+import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
-import org.springframework.social.oauth2.Spring30OAuth2RequestFactory;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
 import org.springframework.util.StringUtils;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-
+import org.springframework.social.facebook.connect.FacebookConnectionFactory;
+import org.springframework.social.facebook.api.Facebook;
 import com.the6hours.grails.springsecurity.facebook.FacebookAuthToken;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.LinkedMultiValueMap;
 
 import species.auth.DefaultAjaxAwareRedirectStrategy;
 import species.auth.Role
@@ -53,7 +55,10 @@ class OpenIdController {
 	def messageSource
 	static defaultAction = 'auth'
 
-	def checkauth = { log.debug "inside check auth " + params }
+	def checkauth = { 
+        log.debug "inside check auth " + params 
+        render (view : 'checkauth', model:params);
+    }
 
 	/**
 	 * Shows the login page. The user has the choice between using an OpenID and a username
@@ -67,7 +72,7 @@ class OpenIdController {
 		def config = SpringSecurityUtils.securityConfig
 
  		if (springSecurityService.isLoggedIn()) {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+config.successHandler.defaultTargetUrl
 			return
 		}
 		
@@ -99,8 +104,8 @@ class OpenIdController {
 		        requestCache.removeRequest(request, response);
 			}
 		}
-		render (view:'auth', model:[openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-					daoPostUrl:"${request.contextPath}${config.apf.filterProcessesUrl}",
+		render (view:'auth', model:[openIdPostUrl: "$openIDAuthenticationFilter.filterProcessesUrl",
+					daoPostUrl:"${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
 					openidIdentifier: config.openid.claimedIdentityFieldName,
@@ -212,17 +217,38 @@ class OpenIdController {
 	def createFacebookAccount = {
 
 		def token = session["LAST_FACEBOOK_USER"]
-
 		if (!token) {
 			flash.error = messageSource.getMessage("login.errors.facebook.fetch.accessToken", null, RCU.getLocale(request))
 			return
 		}
 
 		log.debug "Processing facebook registration in createAccount"
+        log.debug "LAST_FACEBOOK_USER : ${token}"
 		FacebookTemplate facebook = new FacebookTemplate(token.accessToken.accessToken);
-		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
-		FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
+        //TODO:following line shd be enabled
+//		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
+		User fbProfile = facebook.userOperations().getUserProfile();
 
+        /*log.debug facebook
+        println ClientHttpRequestFactorySelector.getRequestFactory();
+        
+        /*def facebookConnectionFactory = new FacebookConnectionFactory(client, secret);
+        facebookConnectionFactory.setScope("public_profile,email");
+        Connection<Facebook> connection = facebookConnectionFactory.findPrimaryConnection(Facebook.class);
+        Facebook facebook = connection != null ? connection.getApi() : null;
+/*
+		facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), token.accessToken.accessToken, facebook.getOAuth2Version()));
+        MultiValueMap map = new LinkedMultiValueMap();
+        map.addAll('fields', 'id, name, email');
+        FacebookProfile fbProfile = facebook.fetchObject("me", FacebookProfile.class, map);
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+        println "--------------------------------------------"
+		//FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
+log.debug fbProfile
+*/
 		//TODO: if there are multiple email accounts available choose among them
 		String email = fbProfile.email;
 
@@ -257,6 +283,30 @@ class OpenIdController {
 		}
 	}
 
+	def createSocialAccountFromProfile () {
+        log.info "Redirecting to register"
+        println params
+        CustomRegisterCommand command = new CustomRegisterCommand();
+        Map profile = params;
+        command['username'] = profile.username
+        command['name'] = profile.name
+        command['email'] = profile.email
+        if(profile.website)
+            command['website'] = profile.website
+            command['profilePic'] = "http://graph.facebook.com/$profile.id/picture?type=large";
+        if(profile.timezone)
+            command['timezone'] = profile.timezone;
+        if(profile.link)
+            command.openId = profile.link
+        if(profile.sexType) 
+            command.sexType = profile.sexType.toLowerCase().capitalize();
+        if(profile.facebookUser)
+            command.facebookUser = true;
+        log.debug "register command : $command"
+        flash.chainedParams = [command: command]
+        chain ( controller:"register");
+	}
+
 	/**
 	 * Authenticate the user for real now that the account exists/is linked and redirect
 	 * to the originally-requested uri if there's a SavedRequest.
@@ -278,7 +328,7 @@ class OpenIdController {
 			(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, savedRequest.getRedirectUrl());
 		}
 		else {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+config.successHandler.defaultTargetUrl
 		}
 	}
 
@@ -399,7 +449,7 @@ class OpenIdLinkAccountCommand {
 	String password = ""
 
 	static constraints = {
-		username blank: false
-		password blank: false
+		username blank: false,nullable:false
+		password blank: false, nullable:false
 	}
 }

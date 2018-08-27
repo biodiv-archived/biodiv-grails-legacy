@@ -31,14 +31,14 @@ import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
-
+import species.dataset.Dataset1;
+import species.dataset.DataTable;
 
 
 class UserGroup implements Taggable {
-	
 	def dataSource;
 	def activityFeedService
-	
+
 	String name;
 	String description;
 	//String aboutUs;
@@ -69,12 +69,12 @@ class UserGroup implements Taggable {
 	// Language
     Language language;
 
-	
+
 	boolean sendDigestMail=false;
 	//when sending digest mail to count no. of days for calulating top contributors
 	Date statStartDate = new Date();
 
-	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species, discussions:Discussion]
+	static hasMany = [speciesGroups:SpeciesGroup, habitats:Habitat, observations:Observation, newsletters:Newsletter, documents:Document, projects:Project, species:Species, discussions:Discussion, dataTables:DataTable, datasets:Dataset1]
 
 	static constraints = {
 		name nullable: false, blank:false, unique:true
@@ -85,7 +85,7 @@ class UserGroup implements Taggable {
 		allowObvCrossPosting nullable:false
 		allowNonMembersToComment nullable:false
 		allowUsersToJoin nullable:false
-            
+
         sw_latitude nullable:false
         sw_longitude nullable:false
         ne_latitude nullable:false
@@ -102,9 +102,11 @@ class UserGroup implements Taggable {
 		description type:'text';
 		//aboutUs type:'text';
 		sort name:"asc"
-        cache true
+        //cache usage: 'nonstrict-read-write', include: 'non-lazy'
 		filterRule type:'text';
 	}
+
+	static userGroupFilterRules = [:];
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -135,7 +137,7 @@ class UserGroup implements Taggable {
 			return false;
 
 		UserGroup other = (UserGroup) obj;
-		
+
 		//reading complete object again
 		try {
 			other = UserGroup.get(other.id)
@@ -148,7 +150,7 @@ class UserGroup implements Taggable {
 				//log.debug other.name
 			}
 		}
-		
+
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -212,7 +214,7 @@ class UserGroup implements Taggable {
 			return UserGroupMemberRole.findAllByUserGroupAndRole(this, founderRole, [max:max, offset:offset]).collect { it.sUser};
 		}
 	}
-	
+
 	def getExperts(int max, long offset) {
 		UserGroupMemberRole.withTransaction {
 			def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
@@ -249,7 +251,7 @@ class UserGroup implements Taggable {
 		if(founder) {
             boolean success = true;
 			if(isMember(founder)){
-				success = deleteMember(founder)	
+				success = deleteMember(founder)
 			}
             if(success) {
 			    def founderRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_FOUNDER.value())
@@ -264,7 +266,7 @@ class UserGroup implements Taggable {
 		def role = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
 		return getUserList(max, offset, sortBy, role.id)
 	}
-	
+
 
 	void setMembers(List<SUser> members) {
 		if(members) {
@@ -283,7 +285,7 @@ class UserGroup implements Taggable {
 		}
 	}
 
-	
+
 	boolean addMember(SUser member) {
 		if(member) {
 			def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_MEMBER.value())
@@ -291,12 +293,12 @@ class UserGroup implements Taggable {
 		}
 		return false;
 	}
-	
+
 	boolean addExpert(SUser member) {
 		if(member) {
             boolean success = true;
 			if(isMember(member)){
-				success = deleteMember(member)	
+				success = deleteMember(member)
 			}
             if(success) {
 			    def memberRole = Role.findByAuthority(UserGroupMemberRoleType.ROLE_USERGROUP_EXPERT.value())
@@ -393,7 +395,7 @@ class UserGroup implements Taggable {
 			String query = "select umg.s_user_id as user, count(*) as activitycount from user_group_member_role as umg left outer join activity_feed as af on(umg.s_user_id = af.author_id) where umg.user_group_id = $groupId and af.is_showable = true ";
         	query += (roleId) ? " and umg.role_id $roleId" : ""
 			query += " group by umg.s_user_id  order by activitycount desc limit $max offset $offset"
-			
+
 			//log.debug "Getting users list : $query"
 			def sql =  Sql.newInstance(dataSource);
 			sql.rows(query).each{
@@ -401,7 +403,7 @@ class UserGroup implements Taggable {
 			};
 			return res;
 		}
-		
+
 		String sortOrder = sortBy.trim().equalsIgnoreCase("name") ? "asc" : "desc"
 		String query = "from UserGroupMemberRole as umr where umr.userGroup = :userGroup"
 		query += (roleId) ? " and umg.role.id $roleId" : ""
@@ -413,15 +415,15 @@ class UserGroup implements Taggable {
 	def getPages(){
 		return userGroupService.getNewsLetters(this, null, null, null, null);
 	}
-	
+
 	def getThemes(){
 		return userGroupService.getGroupThemes()
 	}
-	
+
 	def fetchHomePageTitle(){
 		return userGroupService.fetchHomePageTitle(this)
 	}
-	
+
 	def beforeDelete(){
 		activityFeedService.deleteFeed(this)
 	}
@@ -437,11 +439,11 @@ class UserGroup implements Taggable {
     def noOfDocuments() {
         return userGroupService.getCountByGroup(Document.simpleName, this.id?this:null);
     }
-	
+
 	def noOfDiscussions() {
 		return userGroupService.getCountByGroup(Discussion.simpleName, this.id?this:null);
 	}
-    
+
     static UserGroup findByWebaddress(webaddress){
     	if(webaddress){
             return UserGroup.createCriteria().get {
@@ -451,7 +453,7 @@ class UserGroup implements Taggable {
     	}
     }
 
-    static List<UserGroup> list() { 
+    static List<UserGroup> list() {
         return UserGroup.createCriteria().list {
             order('name', 'asc')
             cache true
@@ -465,16 +467,20 @@ class UserGroup implements Taggable {
         fRJson.add(['fieldName':fieldName, 'ruleName':ruleName, 'ruleValues':ruleValuesJSONArray]);
         this.filterRule = fRJson.toString();
     }
-    
+
     void setFilterRules(JSONObject filterRules) {
         this.filterRule = filterRules.toString();
     }
 
     List<FilterRule> getFilterRules() {
+	if (userGroupFilterRules.containsKey(this.id)) {
+          return userGroupFilterRules.get(this.id);
+	}
         List<FilterRule> filterRules = [];
+
         if(this.filterRule) {
             JSON.parse(this.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 if(rule.fieldName.equalsIgnoreCase('topology') && rule.ruleName.equalsIgnoreCase('dwithin')) {
                     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
                     if(rule.ruleValues[0]) {
@@ -491,6 +497,8 @@ class UserGroup implements Taggable {
                 filterRules << new FilterRule(rule.fieldName, rule.ruleName, rule.ruleValues);
             }
         }
+	userGroupFilterRules[id] = filterRules;
+	log.debug "added user group filter to userGroupFilterRules: ${userGroupFilterRules}"
         return filterRules;
     }
 
@@ -502,7 +510,7 @@ class UserGroup implements Taggable {
         String topologyFilterRule;
         if(this.filterRule) {
             JSON.parse(this.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 if(rule.fieldName.equalsIgnoreCase('topology') && rule.ruleName.equalsIgnoreCase('dwithin')) {
                     topologyFilterRule = rule.ruleValues[0];
                     return;
@@ -522,6 +530,22 @@ class UserGroup implements Taggable {
             this.ruleName = ruleName;
             this.ruleValues = ruleValues;
         }
-        
+
+    }
+
+    static long countUserGroups() {
+        def c = UserGroup.createCriteria();
+println "countUserGroups%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        def count = c.count {
+            cache true;
+        }
+println "countUserGroups%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
+        return count;
     }
 }

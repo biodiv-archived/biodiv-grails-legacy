@@ -16,8 +16,6 @@ import grails.converters.XML;
 import groovy.sql.GroovyRowResult;
 import groovy.sql.Sql
 import groovy.xml.MarkupBuilder;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -53,7 +51,7 @@ class SpeciesController extends AbstractObjectController {
 	def springSecurityService;
     def taxonService;
     def activityFeedService;
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
     def messageSource;
     def namelistService;
     def sessionFactory;
@@ -264,6 +262,8 @@ class SpeciesController extends AbstractObjectController {
 		else {
             Map t = speciesInstance.getTraits();
 
+            def allTraitList = traitService.getFilteredList(['sGroup':speciesInstance.taxonConcept.group?.id, 'isNotObservationTrait':true, 'showInObservation':false], -1, -1).instanceList;
+            t['allTraitList'] = allTraitList;
             /*
             def factList = Fact.findAllByObjectIdAndObjectType(speciesInstance.id, speciesInstance.class.getCanonicalName())
              def traitListValue = traitService.getFilteredList(['sGroup':speciesInstance.guid, 'isNotObservationTrait':true,'taxon':speciesInstance.taxonConcept.id], -1, -1).instanceList;
@@ -657,7 +657,6 @@ class SpeciesController extends AbstractObjectController {
         if(!(params.name && params.pk) && !params.otherParams) {
         	msg=messageSource.getMessage("default.species.error.fieldOrname", null, RCU.getLocale(request))
             render ([success:false, msg:msg] as JSON)
-            println "=======HERE========= "
             return;
         }
          
@@ -667,7 +666,6 @@ class SpeciesController extends AbstractObjectController {
             def value = params.value;
             userLanguage = utilsService.getCurrentLanguage(request);
             params.locale_language = userLanguage;
-            println "near switch case=================="
             switch(params.name) {
                 case "contributor":
                 long cid = params.cid?params.long('cid'):null;
@@ -882,14 +880,12 @@ class SpeciesController extends AbstractObjectController {
                         utilsService.sendNotificationMail(result.mailType, result.speciesInstance, request, params.webaddress, feedInstance, otherParamsForMail);
                     }
                 }
-                println "---------RESULT---- " + result
                 result.remove('speciesInstance');
                 result.remove('speciesFieldInstance');
                 result.remove('activityType');
                 result.remove('synonymInstance');
                 result.remove('taxonConcept');
             }
-			println "--------------final result at synonym update " +  result
             render result as JSON
             return;
         } catch(Exception e) {
@@ -1372,8 +1368,6 @@ class SpeciesController extends AbstractObjectController {
         else{
             result = ['success'  : false]
         }
-        println "---------------------------"
-        println result
         render result as JSON
     }
 
@@ -1440,7 +1434,6 @@ class SpeciesController extends AbstractObjectController {
 	def editSpeciesPage(){
 		Long taxonId = params.taxonId ? params.taxonId.toLong() : TaxonomyDefinition.findByMatchId(params.colId)?.id
 		def result = [taxonRanks:getTaxonRankForUI(), 'success':true]
-		println "======================== parasm " + params + "  taxon id " + taxonId
 		
 		if(taxonId){
 			def taxon = TaxonomyDefinition.read(taxonId)
@@ -1449,7 +1442,6 @@ class SpeciesController extends AbstractObjectController {
 				species = speciesUploadService.createSpeciesStub(taxon)
 			}
 			result.id = species?.id
-			println "result after create stub " + result
 			render result as JSON
 			return
 		}
@@ -1554,8 +1546,6 @@ class SpeciesController extends AbstractObjectController {
 				def taxonRegistry
                 Map r = getTaxon(params.page, rank);
 				
-				println "-----------------------------------ddd   " + r
-				
                 if(r.success) {
                     TaxonomyDefinition taxon = r.taxon;
 					List taxonList = r.taxonList
@@ -1630,8 +1620,6 @@ class SpeciesController extends AbstractObjectController {
         NamesParser namesParser = new NamesParser();
         List<TaxonomyDefinition> names = namesParser.parse([name]);
         TaxonomyDefinition page = names[0];
-        println "=============NamesParser========page==================="
-        println page
         if(page && page.canonicalForm) {
 			if((rank == TaxonomyRank.SPECIES.ordinal() || rank == TaxonomyRank.INFRA_SPECIFIC_TAXA.ordinal()) && !page.binomialForm) { //TODO:check its not uninomial
             	msg = messageSource.getMessage("default.species.not.validName", [name] as Object[], RCU.getLocale(request))
@@ -1808,8 +1796,6 @@ class SpeciesController extends AbstractObjectController {
 
     def testingCount() {
         def sp = Species.read(228424L);
-        println "=========!ST COUNT ====== " + sp.fetchResourceCount();
-        println "===NEXT COUNT ==== " + sp.fetchSpeciesFieldResourceCount();
     }
 
     def test() {
@@ -1872,8 +1858,104 @@ class SpeciesController extends AbstractObjectController {
     @Secured(['ROLE_ADMIN'])
     def postSpeices(){
         String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
-	    def m = [author:"1", userGroups:params.userGroupId, objectType:Species.class.getCanonicalName(), submitType:'post', objectIds: new File(file).text]
-	    println m
-	    userGroupService.updateResourceOnGroup(m)
+	    def m = [author:"1", userGroups:params.userGroupId, objectType:Species.class.getCanonicalName(), submitType:(params.submitType?:'post'), objectIds: new File(file).text]
+	    userGroupService.updateResourceOnGroup(m, params.sendMail?:false)
+        render "done";
     }
+
+    @Secured(['ROLE_ADMIN'])
+    def getSpeciesIdsForTaxonIds(){
+        String file = grailsApplication.config.speciesPortal.content.rootDir+"/species/"+params.file;
+        String text = new File(file).text;
+        List speciesIds = [];
+        text.split(',').each { taxonId ->
+            def taxon = TaxonomyDefinition.read(Long.parseLong(taxonId.trim()));
+            if(taxon) {
+                Long speciesId = taxon.findSpeciesId();
+                if(speciesId) speciesIds << speciesId;
+            }        
+        }
+        render speciesIds.join(',');
+    }
+
+    def traits() {
+        def model = getTraitsList(params);
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+        if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
+        else model.displayAny = true;
+        if(params.editable) model.editable = params.editable?.toBoolean();
+        else model.editable = false;
+        if(params.filterable) model.filterable = params.filterable?.toBoolean();
+        else model.filterable = true;
+        if(params.fromObservationShow) model.fromObservationShow = params.fromObservationShow;
+        if(params.ifOwns) model.ifOwns = params.ifOwns.toBoolean();
+        //HACK
+        if(params.trait) {
+            model.queryParams = ['trait':[:]];
+            params.trait.each { t,v ->
+                model.queryParams.trait[Long.parseLong(t)] = v
+            }
+        }
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.resultType = params.controller;
+            model.hackTohideTraits = true;
+            //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+            model['obvListHtml'] =  g.render(template:"/species/showTraitListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model.remove('instanceList');
+        }
+
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+        withFormat {
+            html {
+                if(params.loadMore?.toBoolean()){
+                    render(template:"/species/showTraitsListTemplate", model:model.model);
+                    return;
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    model.model.hackTohideTraits = true;
+                    model.model['width'] = 300;
+                    model.model['height'] = 200;
+                    render (view:"traits", model:model.model)
+                    return;
+                } else {
+
+                    return;
+                }
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
+    }
+
+    protected def getTraitsList(params) {
+        try { 
+            params.max = params.max?Integer.parseInt(params.max.toString()):100;
+        } catch(NumberFormatException e) { 
+            params.max = 100;
+        }
+
+        try { 
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
+        } catch(NumberFormatException e) { 
+            params.offset = 0 
+        }
+
+        def max = Math.min(params.max ? params.int('max') : 100, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        params.isNotObservationTrait = true;
+
+        def filteredList = traitService.getFilteredList(params, max, offset)
+        def instanceList = filteredList.instanceList
+
+        def queryParams = filteredList.queryParams
+        def activeFilters = filteredList.activeFilters
+        def count = filteredList.instanceTotal	
+
+        activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
+        
+        log.debug "Storing all ${params.controller} ids list in session ${session[params.controller+'_ids_list']} for params ${params}";
+        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:params.controller, 'factInstance':filteredList.traitFactMap, instance:filteredList.object, numericTraitMinMax:filteredList.numericTraitMinMax];
+    }
+
+
 }

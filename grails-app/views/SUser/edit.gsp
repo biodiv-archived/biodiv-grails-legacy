@@ -1,6 +1,5 @@
 <%@ page import="species.ScientificName.TaxonomyRank"%>
 <html>
-<%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder"%>
 
 <sec:ifNotSwitched>
 	<sec:ifAllGranted roles='ROLE_SWITCH_USER'>

@@ -30,7 +30,7 @@ class ImageUtils {
 	static void createScaledImages(  File imageFile, File dir, boolean defaultFileType=false) {
 		log.debug "Creating scaled versions of image : "+imageFile.getAbsolutePath();
 
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.images
+		def config = grails.util.Holders.config.speciesPortal.resources.images
 
 		String fileName = imageFile.getName();
 		int lastIndex = fileName.lastIndexOf('.');
@@ -73,6 +73,25 @@ class ImageUtils {
             }
 
         } 
+		
+        ////////////////////////////////////////////////
+        log.debug "Creating thumbnail 2 image";
+        extension = (defaultFileType)?config.thumbnail_2.suffix.replaceAll('.'+config.defaultType,originalFileExt):config.thumbnail_2.suffix
+        try {
+            doResize(imageFile1, new File(dir, name+extension), config.thumbnail_2.width, config.thumbnail_2.height);
+        } catch (Exception e) {
+            log.debug "Error while resizing image probably due to unsupported type so using _gall_th.jpg image for _th1.jpg image $imageFile"
+            def jpgGall_extension = config.gallery.suffix
+
+            try{
+                doResize(new File(dir, name+jpgGall_extension), new File(dir, name+extension), config.thumbnail_2.width, config.thumbnail_2.height);
+            }
+            catch (Exception e1){
+                log.error "Error even on using _gall_th.jpg image for this file " + dir +"/" + name+jpgGall_extension +" target file " + name+extension;
+                log.error e1.message
+            }
+
+        } 
 				
 	}
 
@@ -97,7 +116,7 @@ class ImageUtils {
 
 		// note: CONVERT_PROG is a class variable that stores the location of ImageMagick's convert command
 		// it might be something like "/usr/local/magick/bin/convert" or something else, depending on where you installed it.
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 		command.add(config.imageConverterProg);
         command.add("-auto-orient")
 		command.add("-resize");
@@ -127,7 +146,7 @@ class ImageUtils {
         
 		ArrayList command = new ArrayList(6);
 
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 		command.add(config.imageConverterProg);
         command.add("-auto-orient")
 		command.add(inImg.getAbsolutePath());
@@ -239,7 +258,7 @@ class ImageUtils {
 
 		ArrayList command = new ArrayList(10);
 
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 		command.add(config.jpegOptimProg);
 		//command.add("--strip-all");// we are reading location tags so commenting for now
 		command.add(file.getAbsolutePath());
@@ -339,7 +358,7 @@ class ImageUtils {
 
 		if(!type) type = ImageType.NORMAL;
 
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 
 		if(!defaultFileType) defaultFileType = '.'+config.speciesPortal.resources.images.defaultType;
 
@@ -391,7 +410,7 @@ class ImageUtils {
 
 public enum ImageType {
 	ORIGINAL, NORMAL,SMALL,VERY_SMALL, LARGE
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 
 	public String getSuffix() {
 		switch(this) {

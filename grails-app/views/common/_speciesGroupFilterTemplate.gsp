@@ -110,10 +110,9 @@ $(document).ready(function(){
 <%--		<button id="observationChecklistOnlyButton" class="btn" rel="tooltip"--%>
 <%--			data-original-title="${g.message(code:'speciesgroupfilter.title.show.only')}"><g:message code="default.checklist.label" /></button>--%>
 <%--	</div>--%>
-
-	<div style="height:30px;">
+<div style="height:30px;">
 	<g:if test="${!params.isChecklistOnly}">
-		<div id="observationMediaFilter" class="btn-group"
+		<div class="btn-group"
 			style="float: right;">
 			<input type="text" id="observationMediaFilter"
 				value="${params.isMediaFilter}" style="display: none" />

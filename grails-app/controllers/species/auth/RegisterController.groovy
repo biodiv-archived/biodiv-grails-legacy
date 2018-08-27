@@ -43,7 +43,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;
 		}
 		
@@ -61,8 +61,8 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 		if(flash.chainedParams?.command) {
 			log.debug("Registration with openId command: $flash.chainedParams");
 			['command': flash.chainedParams?.command, 
-				openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-				daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+				openIdPostUrl: "$openIDAuthenticationFilter.filterProcessesUrl",
+				daoPostUrl:    "${config.apf.filterProcessesUrl}",
 				persistentRememberMe: config.rememberMe.persistent,
 				rememberMeParameter: config.rememberMe.parameter,
 				openidIdentifier: config.openid.claimedIdentityFieldName
@@ -76,8 +76,8 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			copy.remove 'controller'
 			copy.remove 'action'
 			['command': new CustomRegisterCommand(copy), 
-				openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+				openIdPostUrl: "$openIDAuthenticationFilter.filterProcessesUrl",
+					daoPostUrl:    "${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
 					openidIdentifier: config.openid.claimedIdentityFieldName]
@@ -87,20 +87,23 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	def register = { CustomRegisterCommand command ->
 		def config = SpringSecurityUtils.securityConfig
 		
-		def redirectModel = [openIdPostUrl: "${request.contextPath}$openIDAuthenticationFilter.filterProcessesUrl",
-					daoPostUrl:    "${request.contextPath}${config.apf.filterProcessesUrl}",
+		def redirectModel = [openIdPostUrl: "${openIDAuthenticationFilter.filterProcessesUrl}",
+					daoPostUrl:    "${config.apf.filterProcessesUrl}",
 					persistentRememberMe: config.rememberMe.persistent,
 					rememberMeParameter: config.rememberMe.parameter,
 					openidIdentifier: config.openid.claimedIdentityFieldName]
 		
 		log.debug "Registering user $command"
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            log.debug "isLoggedIn already"
+			redirect uri:request.scheme+"://"+request.serverName+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 			return;
 		}
 		
 		def conf = SpringSecurityUtils.securityConfig
 		if (command.hasErrors()) {
+            log.debug "has errors ${command} ... redirecting ..."
+            command.errors.allErrors.each { log.error it } 
 			redirectModel.command = command
 			render view: 'index', model: redirectModel
 			return
@@ -120,7 +123,9 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 			if(command.facebookUser) {
 				log.debug "registering facebook user"
 				def token = session["LAST_FACEBOOK_USER"]
-				facebookAuthService.registerFacebookUser token, user
+                if(token) {
+				    facebookAuthService.registerFacebookUser token, user
+                }
 			} else {
 			    SUserService.assignRoles(user);
             }
@@ -257,7 +262,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
     def verifyRegistration = {
         if (springSecurityService.isLoggedIn()) {
-            redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            redirect uri:request.scheme+"://"+request.serverName+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
             return;
         }
 
@@ -270,7 +275,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         def registrationCode = token ? RegistrationCode.findByToken(token) : null
         if (!registrationCode) {
             flash.error = message(code: 'spring.security.ui.register.badCode')
-            redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ defaultTargetUrl
+            redirect uri:request.scheme+"://"+request.serverName+ defaultTargetUrl
             return
         }
 
@@ -289,7 +294,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
 		if (!user) {
 			flash.error = message(code: 'spring.security.ui.register.badCode')
-			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+ defaultTargetUrl
 			return	
 		}
 
@@ -395,7 +400,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         def registrationCode = token ? RegistrationCode.findByToken(token) : null
         if (!registrationCode) {
             flash.error = message(code: 'spring.security.ui.resetPassword.badCode')
-            redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+            redirect uri:request.scheme+"://"+request.serverName + SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
             return
         }
         flash.error = '';
@@ -430,7 +435,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
         def conf = SpringSecurityUtils.securityConfig
         String postResetUrl = conf.ui.register.postResetUrl ?: conf.successHandler.defaultTargetUrl
-        redirect uri: request.scheme+"://"+request.serverName+request.contextPath+postResetUrl
+        redirect uri: request.scheme+"://"+request.serverName+postResetUrl
     }
 
 	protected String generateLink(String controller, String action, linkParams, request) {
@@ -648,6 +653,14 @@ class CustomRegisterCommand {
 				return 'reCaptcha.invalid.message'
 			}
 		}
+        username nullable:true
+        website nullable:true
+        aboutMe nullable:true
+        sexType nullable:true
+        occupationType nullable:true
+        institutionType nullable:true
+        profilePic nullable:true
+        openId nullable:true
 	}
 
 	/* (non-Javadoc)
@@ -689,10 +702,18 @@ class CustomRegisterCommand2 {
 		}
 		password blank: false, nullable: false, validator: RegisterController.myPasswordValidator
 		password2 validator: RegisterController.password2Validator
-        location blank:false, nullable:false, validator : RegisterController.locationValidator
-        latitude blank:false, nullable:false, validator : RegisterController.latitudeValidator
-        longitude blank:false, nullable:false, validator : RegisterController.longitudeValidator
-
+        location nullable:true
+        latitude nullable:true
+        longitude nullable:true
+        //location blank:false, nullable:false, validator : RegisterController.locationValidator
+        //latitude blank:false, nullable:false, validator : RegisterController.latitudeValidator
+        //longitude blank:false, nullable:false, validator : RegisterController.longitudeValidator
+        username nullable:true
+        website nullable:true
+        aboutMe nullable:true
+        sexType nullable:true
+        occupationType nullable:true
+        institutionType nullable:true
 	}
 
 	/* (non-Javadoc)

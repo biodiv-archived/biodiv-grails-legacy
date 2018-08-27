@@ -83,6 +83,7 @@ function rate(ele, successHandler, inputName) {
         halfShow:true, 
         scoreName:inputName,
         score: function() {
+            console.log($(this).attr('data-score'));
             return $(this).attr('data-score');
         },
         click: function(score, evt) {

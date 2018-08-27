@@ -106,7 +106,7 @@
                         <a class="btn btn-danger pull-right" style="margin-right: 5px;"
                             href="#"
                             onclick="return deleteObservation();"><i class="icon-trash"></i><g:message code="button.delete.observation" /></a>
-                        <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm'>
+                        <form action="${uGroup.createLink(controller:'observation', action:'flagDeleted')}" method='POST' name='deleteForm' class="deleteForm">
                             <input type="hidden" name="id" value="${observationInstance.id}" />
                         </form>
                     </div>
@@ -150,10 +150,12 @@
 
 $(document).ready(function(){
 
-    var uploadResource = new $.fn.components.UploadResource($('.observation_create'));
-    uploadResource.POLICY = "${policy}";
-    uploadResource.SIGNATURE = "${signature}";
-    <%
+    var uploadResource = new $.fn.components.UploadResource($('.observation_create'), {
+        POLICY : "${policy}",
+        SIGNATURE :"${signature}"
+    });
+    $('.filePicker').data('uploadResource', uploadResource);
+   <%
            if(observationInstance?.group) {
            out << "jQuery('#group_${observationInstance.group.id}').addClass('active');";
            }
@@ -187,6 +189,23 @@ $(document).ready(function(){
                 $(this).addClass('active btn-success');
             }
       return false;
+    });
+
+ 
+    if ($('input.dateAccuracy[type=radio][name=dateAccuracy]:checked').val() == 'UNKNOWN') {
+        $('.addObservation input.date[name="fromDate"]').attr('disabled', 'disabled');
+        $('.addObservation input.date[name="toDate"]').attr('disabled', 'disabled');
+    } else {
+        $('.addObservation input.date').removeAttr('disabled');
+    }
+
+    $('input.dateAccuracy[type=radio][name=dateAccuracy]').change(function() {
+        if (this.value == 'UNKNOWN') {
+            $('.addObservation input.date[name="fromDate"]').attr('disabled', 'disabled');
+            $('.addObservation input.date[name="toDate"]').attr('disabled', 'disabled');
+        } else {
+            $('.addObservation input.date').removeAttr('disabled');
+        }
     });
 
 });

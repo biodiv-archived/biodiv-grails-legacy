@@ -18,13 +18,13 @@ import species.namelist.NameInfo;
 import species.participation.SpeciesBulkUpload
 import species.ScientificName.TaxonomyRank
 import species.participation.UploadLog
-
+import species.dataset.DataTable;
 
 class MappedSpreadsheetConverter extends SourceConverter {
 	
 	//protected static SourceConverter _instance;
 	private static def log = LogFactory.getLog(this);
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 	def fieldsConfig = config.speciesPortal.fields
 	
 	public List<Map> imagesMetaData;
@@ -49,24 +49,13 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	public initCurationInfo(String file){
 		List<Map> content = SpreadsheetReader.readSpreadSheet(file, NameInfo.TAXON_NAMES_SHEET, 0);
 		addToSummary("Checking TAXON_NAMES_SHEET for duplicates")
-		println "Checking TAXON_NAMES_SHEET for duplicates"
 		updateMap(content, speciesNameMap)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.HIR_SHEET, 0);
 		addToSummary("Checking HIR_SHEET for duplicates")
-		println "Checking HIR_SHEET for duplicates"
 		updateMap(content, taxonHirMap, true)
 		content = SpreadsheetReader.readSpreadSheet(file, NameInfo.SYNONYMS_SHEET, 0);
 		addToSummary("Checking SYNONYM for duplicates\n")
-		println "Checking SYNONYM for duplicates"
 		updateMap(content, synonymMap)
-		
-//		println '---------------------------------------------------'
-//		
-//		println speciesNameMap
-//		println taxonHirMap
-//		println synonymMap
-//		
-//		println '---------------------------------------------------'
 	}
 	
 	private updateMap(List<Map> content, Map targetMap, boolean useRank=false){
@@ -79,7 +68,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				String key = Math.round(m['index'].toFloat()) + KEY_SEP +  m['source name'] + KEY_SEP + m['name'] + rankSuffix
 				if(targetMap.containsKey(key)){
 					addToSummary(" Multiple matching rows for given key " + key)
-					println " Multiple matching rows for given key " + key
 					multipleMatchingRow = true
 				}
 				m.id = m.id ? m.id.split('\\.')[0]:""
@@ -97,14 +85,12 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		
 		boolean isValid = true
 		String tmpSummary
-		
 		nList.each { NameInfo sc ->
 			addToSummary(nameSeparator + sc.sourceIndex)
 			String key = sc.sourceIndex +  KEY_SEP + sc.sourceName +  KEY_SEP + sc.name
 			if(!speciesNameMap.containsKey(key) || !speciesNameMap.get(key)['match found']){
 				tmpSummary = "$ln" + "TAXON NAMES SHEET ::: key not present  or match column is empty -- key " +  key + sc
 				addToSummary(tmpSummary)
-				println tmpSummary
 				//println " map " + speciesNameMap
 				isValid = false
 				//return
@@ -116,7 +102,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(!taxonHirMap.containsKey(key) || !taxonHirMap.get(key)['match found']){
 					tmpSummary = "$ln" + "HIR NAMES SHEET ::: key not present  or match column is empty --  key " +  key +  ti
 					addToSummary(tmpSummary)
-					println tmpSummary
 					isValid = false
 					return
 				}
@@ -128,7 +113,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				if(!synonymMap.containsKey(key)|| !synonymMap.get(key)['match found']){
 					tmpSummary = "$ln" + "SYNONYMS NAMES SHEET ::: key not present  or match column is empty -- key " +  key + ti
 					addToSummary(tmpSummary)
-					println tmpSummary
 					isValid = false
 					return
 				}
@@ -166,7 +150,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 //		return species;
 //	}
 	
-	public Node createSpeciesXML(Map speciesContent, String imagesDir="") {
+	public Node createSpeciesXML(Map speciesContent, String imagesDir="", DataTable dataTable = null) {
 		if(!mappingConfig) {
 			log.error "No mapping config";
 			return;
@@ -184,7 +168,9 @@ class MappedSpreadsheetConverter extends SourceConverter {
 				Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
 				Map customFormatMap = getCustomFormat(mappedField.get("content format"));
 				if(fieldName && (customFormatMap || speciesContent.get(fieldName.toLowerCase()))) {
-					//myPrint("================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase()))
+					myPrint("================== PROCESSING FILED NAME == " + fieldName + "  and raw text == " + speciesContent.get(fieldName.toLowerCase()))
+					myPrint("================== CUSTOM DELIMITER == " + delimiterMap);
+					myPrint("================== CUSTOM FORMAT MAP == " + customFormatMap);
 					fieldName = fieldName.toLowerCase();
 					//String delimiter = delimiterMap.get(fieldName)
 					//Map customFormat = customFormatMap.get(fieldName)
@@ -208,7 +194,8 @@ class MappedSpreadsheetConverter extends SourceConverter {
 					} else if (category.text().equalsIgnoreCase("video")) {
 						//						Node images = getVideo(fieldName, customFormat, speciesContent);
 						//						new Node(speciesElement, video);
-					} else if (concept.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.INFORMATION_LISTING,1,language)) && field.category.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.REFERENCES,1,language))) {
+					} else if (concept.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.INFORMATION_LISTING,1,language)) && field.category.text().equalsIgnoreCase(getFieldFromName(fieldsConfig.REFERENCES,2,language))) {
+
 						fieldName.split(SpreadsheetWriter.FIELD_SEP).each { fieldNameToken -> 
 							fieldNameToken = fieldNameToken.trim().toLowerCase()
 							String delimiter = delimiterMap.get(fieldNameToken);
@@ -247,7 +234,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 											if(isCommonName){
 												createCommonNameNode(part, field, speciesContent, mappedField)
 											} else {
-												createDataNode(field, part, speciesContent, mappedField);
+												createDataNode(field, part, speciesContent, mappedField, dataTable);
 											}
 										}
 									}
@@ -255,14 +242,14 @@ class MappedSpreadsheetConverter extends SourceConverter {
 									if(isCommonName){
 										createCommonNameNode(text, field, speciesContent, mappedField)
 									}else{
-										createDataNode(field, text, speciesContent, mappedField);
+										createDataNode(field, text, speciesContent, mappedField, dataTable);
 									}
 								}
 							}
 						}
 					} else {
 						String text = getCustomFormattedText(mappedField.get("field name(s)"), customFormatMap, delimiterMap, speciesContent);
-						createDataNode(field, text, speciesContent, mappedField);
+						createDataNode(field, text, speciesContent, mappedField, dataTable);
 					}
 				}
 			}
@@ -295,7 +282,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	}
 
 	protected void createReferences(Node dataNode, Map speciesContent, Map mappedField) {
-        log.debug "Creating References"
+        log.debug "***********************Creating References"
         Map delimiterMap = getCustomDelimiterMap(mappedField.get("content delimiter"));
         def referenceFields = mappedField.get("field name(s)");		
         if(referenceFields) {
@@ -489,7 +476,7 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	private void populateImageNode(Node images, List<String> groupValues, String delimiter, int location, int source, int caption, int attribution, int contributor, int license, int name, boolean incremental, String imagesDir, Language language) {
 		if(location != -1 && groupValues.get(location)) {
 			String locationStr = groupValues.get(location);
-			def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+			def config = grails.util.Holders.config
 			String uploadDir = imagesDir;
 			if(locationStr) {
 				if(delimiter) {
@@ -542,13 +529,18 @@ class MappedSpreadsheetConverter extends SourceConverter {
         }
     }
 	
-	protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
+	protected void attachMetadata(Node data, Map speciesContent, Map mappedField, DataTable dataTable=null) {
 		addMetaAttibute("contributor", data, speciesContent, mappedField, "contributor", ",|;|\n")
 		addMetaAttibute("attributions", data, speciesContent, mappedField, "attribution", "\n")
 		addMetaAttibute("license", data, speciesContent, mappedField, "license", ",|;|\n")
 		addMetaAttibute("audience", data, speciesContent, mappedField, "audienceType", ",|;|\n")
 		addMetaAttibute("references", data, speciesContent, mappedField, "reference", "\n")
 		addMetaAttibute("images", data, speciesContent, mappedField, "image", "\n|\\s{3,}|,|;")
+		
+		if(dataTable) {
+        	    new Node(data, "dataTable", dataTable.id);
+	        }
+
 	}
 	
 	private void addMetaAttibute(String fieldName, Node data, Map speciesContent, Map mappedField, String resultNodeName, String defaultDelimiter="\n"){
@@ -612,16 +604,15 @@ class MappedSpreadsheetConverter extends SourceConverter {
 	/////////////////////////////////////////// Name validation related //////////////////////////
 	
 	
-	public static boolean validateUserSheetForName(SpeciesBulkUpload sbu){
+	public static boolean validateUserSheetForName(SpeciesBulkUpload sbu, DataTable dataTable=null){
 		MappedSpreadsheetConverter converter = new MappedSpreadsheetConverter();
 		converter.mappingConfig = SpreadsheetReader.readSpreadSheet(sbu.filePath, 2, 0);
 		List<Map> content = SpreadsheetReader.readSpreadSheet(sbu.filePath, 0, 0);
-		
 		List sNodeList = []
 		content.each { m ->
-			sNodeList << converter.createSpeciesXML(m)
+			sNodeList << converter.createSpeciesXML(m, null, dataTable);
+
 		}
-		
 		
 		//creating nameinfo object from input name sheet(ist sheet)
 		List nameInfoList = []
@@ -630,7 +621,6 @@ class MappedSpreadsheetConverter extends SourceConverter {
 		sNodeList.each {
 			nameInfoList << xc.populateNameDetail(it, index++)
 		}
-		
 		log.debug "Nameinfo list size " + nameInfoList.size()
 		
 		//taking info from the matched sheet generate system (taxonname, hier, synonyms)

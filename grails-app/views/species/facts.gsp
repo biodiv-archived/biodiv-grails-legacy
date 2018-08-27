@@ -15,8 +15,8 @@
                     <form id="traitSearch" class="form-inline">
                         <input type="hidden" name="id" value="${params.id}">
                         <select id="traitName" name="trait" type="text" class="input-xlarge" placeholder="Trait">
-                            <g:each in="${traitsList}" var="trait">
-                            <option value="${trait}" ${(params.trait?.equalsIgnoreCase(trait))?"selected='selected'":''}>${trait}</option>
+                            <g:each in="${traitsList}" var="traitInstance">
+                            <option value="${traitInstance}" ${(params.trait?.equalsIgnoreCase(traitInstance))?"selected='selected'":''}>${traitInstance}</option>
                             </g:each>
                         </select>
                         <input type="text" class="input-xlarge" name="traitValue" placeholder="Value" value="${params.traitValue?:''}">

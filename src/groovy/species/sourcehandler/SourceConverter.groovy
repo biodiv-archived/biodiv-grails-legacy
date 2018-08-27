@@ -11,6 +11,7 @@ import species.auth.SUser;
 import species.TaxonomyDefinition;
 import species.ScientificName.TaxonomyRank;
 import species.Language;
+import species.dataset.DataTable;
 
 class SourceConverter {
 	protected static final String KEY_SEP = "##"
@@ -74,20 +75,20 @@ class SourceConverter {
         return data;
     }
 
-    protected Node createDataNode(Node field, String text, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
+    protected Node createDataNode(Node field, String text, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status, DataTable dataTable = null) {
         if(!field) return;
 
         Node data = new Node(field, "data", text);
-        attachMetadata(data, contributors, attributions, licenses, audiences, status);
+        attachMetadata(data, contributors, attributions, licenses, audiences, status, dataTable);
 
         return data;
     }
 
-    protected Node createDataNode(Node field, String text, Map speciesContent, Map mappedField) {
+    protected Node createDataNode(Node field, String text, Map speciesContent, Map mappedField, DataTable dataTable = null) {
         if(!text) return;
 
         Node data = new Node(field, "data", text);
-        attachMetadata(data, speciesContent, mappedField);
+        attachMetadata(data, speciesContent, mappedField, dataTable);
         return data;
     }
 
@@ -128,7 +129,7 @@ class SourceConverter {
         return nodes;
     }
 
-    protected void attachMetadata(Node data, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status) {
+    protected void attachMetadata(Node data, List<String> contributors, List<String> attributions, List<String> licenses, List<String> audiences, List<String> status, DataTable dataTable=null) {
         log.debug "Attaching metadata $contributors $attributions $licenses $audiences $status"
         for(contributor in contributors) {
             new Node(data, "contributor", contributor);
@@ -145,6 +146,11 @@ class SourceConverter {
         for(s in status) {
             new Node(data, "status", s);
         }
+
+        if(dataTable) {
+            new Node(data, "dataTable", dataTable.id);
+        }
+
     }
 
     protected void createImages(Node speciesElement, List<Map> imageMetaData, String imagesDir="") {
@@ -167,7 +173,7 @@ class SourceConverter {
         }
     }
 
-    protected void attachMetadata(Node data, Map speciesContent, Map mappedField) {
+    protected void attachMetadata(Node data, Map speciesContent, Map mappedField, DataTable dataTable=null) {
 
         String contributorFields = mappedField.get("contributor");
         if(contributorFields) {
@@ -264,6 +270,11 @@ class SourceConverter {
             if(action) {
                 new Node(data, "action", action);
             }
+        }
+
+
+        if(dataTable) {
+            new Node(data, "dataTable", dataTable.id);
         }
     }
 
@@ -586,6 +597,14 @@ class SourceConverter {
 	public String getLogs(){
 		return summary.toString()
 	}
+    
+    public void clearSummary() {
+        shortSummary.setLength(0);
+    }
+
+    public void clearLogs() {
+        summary.setLength(0);
+    }
 
 	def static myPrint(str){
 //		if(!Environment.getCurrent().getName().equalsIgnoreCase("kk")){
@@ -605,7 +624,7 @@ class SourceConverter {
                             connectionMap = new HashMap<Integer, Field>();
                             def fields = Field.list(sort:'id');
 
-                            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                            def config = grails.util.Holders.config
                             def fieldsConfig = config.speciesPortal.fields
 
                             for(Field field in fields) {

@@ -27,8 +27,8 @@ instanceList.each{ iL ->
                    </g:if>
                    
                  <ul id="trait${j}" class="grid_view thumbnails obvListwrapper">
-				<g:each in="${inst.value}" status="i" var="trait_instance">
-				<div data-isNotObservation="${trait_instance.isNotObservationTrait}">
+				<g:each in="${inst.value}" status="i" var="traitInstance">
+				<div data-isNotObservation="${traitInstance.isNotObservationTrait}">
 					<li class="thumbnail" style="clear: both;margin-left:0px;width:100%;border:0px !important;">
 					<%						
 				        def traitTrans = TraitTranslation.findByTraitAndLanguage(trait_instance,userLanguage);
@@ -36,7 +36,7 @@ instanceList.each{ iL ->
 				        trait_instance.description = (traitTrans?.description)?:'';
 				        trait_instance.source = (traitTrans?.source)?:'';
 					%>
-                    <g:render template="/trait/showTraitTemplate" model="['trait':trait_instance, 'factInstance':factInstance, object:instance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable, 'ifOwns':ifOwns, 'filterable':filterable, numericTraitMinMax:numericTraitMinMax]"/>
+                    <g:render template="/trait/showTraitTemplate" model="['traitInstance':traitInstance, 'factInstance':factInstance, object:instance, 'fromSpeciesShow':fromSpeciesShow, 'queryParams':queryParams, 'editable':editable, 'ifOwns':ifOwns, 'filterable':filterable, numericTraitMinMax:numericTraitMinMax]"/>
 					</li>
 					</div>
 				</g:each>

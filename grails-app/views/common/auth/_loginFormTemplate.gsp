@@ -5,7 +5,7 @@
 			<a href="${uGroup.createLink(controller:'register', 'userGroup':userGroup, 'userGroupWebaddress':params.webaddress) }"><g:message code="button.register" /></a> 
 		</legend>
 		
-        <div class="loginMessage" class="alert alert-error" style="display:none"></div>
+        <div class="loginMessage alert alert-error" style="display:none"></div>
 		
         <div class="control-group ${ajax?'ajax':''}"
 			style="clear: both; float: left; line-height: 40px;"><g:message code="loginformtemplate.using" />:</div>

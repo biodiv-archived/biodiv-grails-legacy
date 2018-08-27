@@ -17,7 +17,7 @@
 //= require biodiv/users.js
 //= require jquery.plugins/jquery.linkify-1.0.js
 //= require jquery.plugins/timeago.js
-//= require jquery.plugins/trunk8.min.js
+//= require jquery.plugins/trunk8.js
 //= require biodiv/membership.js
 //= require jquery.plugins/date.js
 //= require jquery.plugins/moment.min.js
@@ -58,6 +58,8 @@
 //= require jquery.plugins/jquery.url.js
 //= require jquery.plugins/jstree.min.js
 //= require jquery.plugins/jquery.autopager-1.0.0.min.js
+//= require biodiv/dataset/create.js
+//= require biodiv/datatable/create.js
 //= require biodiv/observations/list.js
 		
 //= require biodiv/comment.js
@@ -70,6 +72,8 @@
 //= require biodiv/chooseLanguage.js
 
 ////= require slickgrid
+//= require biodiv/filesutra.js
+
 ////= require create
 //= require jquery.plugins/filepicker.js
 //= require jquery.plugins/jquery.exif.js
@@ -108,7 +112,6 @@
 ////= require biodiv/maps/cookie-chef.js
 
 ////= require show
-//= require jquery.plugins/jsrender.js
 //= require biodiv/observations/show.js
 //= require biodiv/content.js
 
@@ -127,8 +130,12 @@
 ////= require userGroups
 //= require biodiv/userGroups/main.js
 //= require biodiv/pages.js
-//= require biodiv/dataset.js
-//= require biodiv/trait.js
-
 //= require bootstrap.plugins/bootstrap-colorpicker.min.js
 //= require jquery.plugins/ion.rangeSlider.min
+//= require jwt-decode.min.js
+//= require biodiv/dataset/dataset.js
+//= require biodiv/dataset/create.js
+//= require biodiv/datatable/create.js
+//= require dropzone.js
+//= require biodiv/trait.js
+//= require biodiv/customfield.js

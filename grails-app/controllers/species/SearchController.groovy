@@ -3,15 +3,13 @@ package species
 import grails.converters.JSON;
 import grails.converters.XML;
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import static org.springframework.http.HttpStatus.*;
 
 import species.utils.Utils;
 
 
 /**
- * 
+ *
  * @author sravanthi
  *
  */
@@ -30,13 +28,13 @@ class SearchController {
     */
     def select () {
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
-        params['userLangauge'] = utilsService.getCurrentLanguage(request); 
-       
+        params['userLangauge'] = utilsService.getCurrentLanguage(request);
+
         def model = biodivSearchService.select(params);
 
         model['userLanguage'] = params.userLanguage;
         model.remove('responseHeader');
- 
+
         if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
             model['resultType'] = 'search result'
             model['obvListHtml'] =  g.render(template:"/search/showSearchResultsListTemplate", model:model);
@@ -80,12 +78,13 @@ class SearchController {
 
         suggestions.addAll(namesLookupResults);
         suggestions.addAll(biodivSearchService.nameTerms(params));
-        render suggestions as JSON 
+        render suggestions as JSON
     }
 
     /**
     *
     */
+    /*
     def search() {
         NamedList paramsList = new NamedList()
         params.each {key,value ->
@@ -95,19 +94,8 @@ class SearchController {
 
         println result;
         println "++++++++++++++++++++++++++++++++++++++++++"
-/*        def facetResults = [];
-        if(result.getFacetField(params['facet.field'])) {
-        List objectTypeFacets = result.getFacetField(params['facet.field'])?.getValues()
-        if(objectTypeFacets) {
-        objectTypeFacets.each {
-            //TODO: sort on name
-            facetResults <<  [name:it.getName(), count:it.getCount()]
 
-        }
-        }
-        }
-*/
         render result as JSON
     }
-
+*/
 }

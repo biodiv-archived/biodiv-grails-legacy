@@ -9,7 +9,6 @@ import species.auth.SUser;
 import utils.Newsletter;
 import content.Project
 import species.groups.UserGroup;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import org.springframework.context.ApplicationContext
 import species.utils.Utils;
 
@@ -17,93 +16,87 @@ import java.text.SimpleDateFormat;
 
 //import org.apache.lucene.document.DateField;
 import org.apache.lucene.document.DateTools;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 
 import java.net.URLDecoder;
-import org.apache.solr.common.util.DateUtil;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.codehaus.groovy.grails.web.util.WebUtils;
-import org.apache.solr.common.SolrDocument
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 class BiodivSearchService extends AbstractSearchService {
-    
+
     static transactional = false
 
-    @Autowired
     def observationsSearchService
-    @Autowired
     def speciesSearchService
-    @Autowired
     def documentSearchService
-    @Autowired
     def SUserSearchService
     //def newsletterSearchService
-    @Autowired
     def userGroupSearchService
-    @Autowired
     def resourceSearchService
+    def newsletterSearchService
+    def projectSearchService
+
+
 
     //ApplicationContext applicationContext
 /*
     def getObservationsSearchServiceBean() {
         println "=======HELLO==========="
-        if(!observationsSearchServiceBean) { 
+        if(!observationsSearchServiceBean) {
             println "=================="
             observationsSearchServiceBean = applicationContext.getBean("observationsSearchService");
         }
         return observationsSearchServiceBean;
     }
-    
+
     def getSpeciesSearchServiceBean() {
-        if(!speciesSearchServiceBean) { 
+        if(!speciesSearchServiceBean) {
             speciesSearchServiceBean = applicationContext.getBean("speciesSearchService");
         }
         return speciesSearchServiceBean;
-    
+
     }
-    
+
     def getDocumetSearchServiceBean() {
-        if(!documentSearchServiceBean) { 
+        if(!documentSearchServiceBean) {
             documentSearchServiceBean = applicationContext.getBean("documentSearchService");
         }
         return documentSearchServiceBean;
-    
+
     }
-    
+
     def getSUserSearchServiceBean() {
-        if(!SUserSearchServiceBean) { 
+        if(!SUserSearchServiceBean) {
             SUserSearchServiceBean = applicationContext.getBean("SUserSearchService");
         }
         return SuserSearchServiceBean;
-    
+
     }
-    
+
     def getNewsletterSearchServiceBean() {
-        if(!newsletterSearchServiceBean) { 
+        if(!newsletterSearchServiceBean) {
             newsletterSearchServiceBean = applicationContext.getBean("newsletterSearchService");
         }
         return newsletterSearchServiceBean;
     }
-    
+
     def getUserGroupSearchServiceBean() {
-        if(!userGroupSearchServiceBean) { 
+        if(!userGroupSearchServiceBean) {
             userGroupSearchServiceBean = applicationContext.getBean("userGroupSearchService");
         }
         return userGroupSearchServiceBean;
     }
-*/  
+*/
     /**
-     * 
+     *
      */
     def publishSearchIndex() {
         log.info "Initializing publishing to biodiv search index"
 
         //TODO: change limit
-        int limit = BATCH_SIZE//Observation.count()+1, 
+        int limit = BATCH_SIZE//Observation.count()+1,
         int offset = 0;
 
         def startTime = System.currentTimeMillis()
@@ -146,6 +139,22 @@ class BiodivSearchService extends AbstractSearchService {
         userGroupSearchService.INDEX_DOCS = INDEX_DOCS
         userGroupSearchService.publishSearchIndex()
 
+        log.info "=====INDEXING NEWSLETTER==== "
+        newsletterSearchService.INDEX_DOCS = INDEX_DOCS
+        newsletterSearchService.publishSearchIndex()
+
+        log.info "=====INDEXING RESOURCE==== "
+        resourceSearchService.INDEX_DOCS = INDEX_DOCS
+        resourceSearchService.publishSearchIndex()
+
+        log.info "=====INDEXING PROJECT==== "
+        projectSearchService.INDEX_DOCS = INDEX_DOCS
+        projectSearchService.publishSearchIndex()
+
+        log.info "=====INDEXING UserGroup==== "
+        userGroupSearchService.INDEX_DOCS = INDEX_DOCS
+        userGroupSearchService.publishSearchIndex()
+
         log.info "===DONE INDEXING========"
         println "===DONE INDEXING========"
         return true;
@@ -155,11 +164,11 @@ class BiodivSearchService extends AbstractSearchService {
         List result = new ArrayList();
         def queryResponse = terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            /*NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"General"]);
-            }
+            }*/
         }
         return result;
     }
@@ -177,7 +186,7 @@ class BiodivSearchService extends AbstractSearchService {
 
         try {
             model = getFilteredObjectsFromSearch(params, max, offset, false);
-        } catch(SolrException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
         return model;
@@ -190,11 +199,14 @@ class BiodivSearchService extends AbstractSearchService {
      * executing query
      */
     Map getFilteredObjectsFromSearch(params, max, offset, isMapView){
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         def queryParts = getFilteredObjectsQueryFromSearch(params, max, offset, isMapView);
-        NamedList paramsList = queryParts.paramsList
+        def paramsList = queryParts.paramsList
         def queryParams = queryParts.queryParams
         def activeFilters = queryParts.activeFilters
+
+
+
 
         if(isMapView) {
             //query = mapViewQuery + filterQuery + orderByClause
@@ -211,106 +223,20 @@ class BiodivSearchService extends AbstractSearchService {
         List objectTypes = [], uGroups = [], sGroups = [], tags= [], contributors = [];
 
         if(paramsList) {
-            //Facets
-            paramsList.add('facet', "true");
-            paramsList.add('facet.mincount', "1");
-            paramsList.add('facet.field', searchFieldsConfig.OBJECT_TYPE);
-            paramsList.add('facet.field', searchFieldsConfig.USER_GROUP);
-            paramsList.add('f.'+searchFieldsConfig.USER_GROUP+'.facet.limit', max);
-            paramsList.add('f.'+searchFieldsConfig.USER_GROUP+'.facet.offset', 0);
-
-
-//            paramsList.add('facet.field', searchFieldsConfig.SGROUP);
-//            paramsList.add('facet.field', searchFieldsConfig.TAG);
-//            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.limit', max);
-//            paramsList.add('f.'+searchFieldsConfig.TAG+'.facet.offset', 0);
-
-//            paramsList.add('facet.field', searchFieldsConfig.CONTRIBUTOR+"_exact");
-//            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.limit', max);
-//            paramsList.add('f.'+searchFieldsConfig.CONTRIBUTOR+"_exact"+'.facet.offset', 0);
-
-
-            def queryResponse = search(paramsList);
-
-            if(queryResponse) {
-                if(!params.loadMore?.toBoolean()){
-                    List objectTypeFacets = queryResponse.getFacetField(searchFieldsConfig.OBJECT_TYPE)?.getValues()?:[]
-                    objectTypeFacets.each {
-                        //TODO: sort on name
-                        objectTypes << [name:it.getName(), count:it.getCount()]
-                    }
-
-                    List uGroupFacets = queryResponse.getFacetField(searchFieldsConfig.USER_GROUP)?.getValues()?:[]
-                    uGroupFacets.each {
-                        //TODO: sort on name
-                        uGroups << [name:it.getName(), count:it.getCount()]
-                    }
-
-
-    /*                List sGroupFacets = queryResponse.getFacetField(searchFieldsConfig.SGROUP).getValues()
-                    sGroupFacets.each {
-                        //TODO: sort on name
-                        sGroups << [name:it.getName(), count:it.getCount()]
-                    }
-
-                    List tagFacets = queryResponse.getFacetField(searchFieldsConfig.TAG).getValues()
-                    tagFacets.each {
-                        //TODO: sort on name
-                        tags << [name:it.getName(), count:it.getCount()]
-                    }
-
-                    List contributorFacets = queryResponse.getFacetField(searchFieldsConfig.CONTRIBUTOR+"_exact").getValues()
-                    contributorFacets.each {
-                        //TODO: sort on name
-                        contributors << [name:it.getName(), count:it.getCount()]
-                    }
-    */ 
-                }
-
-                responseHeader = queryResponse.responseHeader;
-                org.apache.solr.common.SolrDocumentList results = queryResponse.getResults();
+                def queryResponse = search(params);
                 def instance;
-                results.each { doc ->
-                    Long instanceId = Long.parseLong(doc.getFieldValue(searchFieldsConfig.ID).split('_')[1])
-                    String className = doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)
-                    Class clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
+                queryResponse.eData.each { doc ->
+                    Long instanceId = Long.parseLong(doc.id);
+                    String className = doc.type
+                    Class clazz = grailsApplication.domainClasses.find { it.clazz.simpleName.equalsIgnoreCase(className) }?.clazz
                     if(clazz) {
                         instance = clazz.read(instanceId);
                     }
 
-                    def containers = doc.getFieldValue(searchFieldsConfig.CONTAINER)
+                    def containers = doc.container;
                     List containerInstances = [];
-                    containers.each { container ->
-                        container = container.split('_')
-                        if(container) {
-                            Long containerId = Long.parseLong(container[1])
-                            className = container[0]
-                            clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
-                            if(clazz) {
-                                containerInstances << clazz.read(containerId);
-                            }
-                        }
-                    }
-    /*                    switch(doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)) {
-                        case Species.simpleName:
-                            instance = Species.read(instanceId);
-                            break;
-                        case Observation.simpleName:
-                            instance = Observation.read(instanceId);
-                            break;
-                        case Document.simpleName:
-                            instance = Species.read(instanceId);
-                            break;
-                        case SUser.simpleName:
-                            break;
-                        case Newsletter.simpleName:
-                            break;
-                        case UserGroup.simpleName:
-                            break;
-                        default:
-                            log.debug "Not a valid object ${doc}"
-                    }
-    */
+
+
                     if(instance) {
                         if(params.format?.equalsIgnoreCase("json")) {
                             instanceList.add([id:instanceId, object_type:className, title:instance.title(), summary:instance.summary(params.userLanguage), containers:containerInstances]);
@@ -321,8 +247,67 @@ class BiodivSearchService extends AbstractSearchService {
                         log.error "${doc} has invalid id in search index. May be out of sync from db"
                     }
                 }
-                noOfResults = queryResponse.getResults().getNumFound();
-            }
+                noOfResults = queryResponse.count;
+
+                queryResponse.docCount.each {
+                    println it;
+                    it.each {key,value ->
+                     objectTypes << [name:key, count:value]
+                   }
+                }
+
+            // if(queryResponse) {
+            //     if(!params.loadMore?.toBoolean()){
+            //         List objectTypeFacets = queryResponse.getFacetField(searchFieldsConfig.OBJECT_TYPE)?.getValues()?:[]
+            //         objectTypeFacets.each {
+            //             //TODO: sort on name
+            //             objectTypes << [name:it.getName(), count:it.getCount()]
+            //         }
+            //
+            //         List uGroupFacets = queryResponse.getFacetField(searchFieldsConfig.USER_GROUP)?.getValues()?:[]
+            //         uGroupFacets.each {
+            //             //TODO: sort on name
+            //             uGroups << [name:it.getName(), count:it.getCount()]
+            //         }
+            //     }
+            //
+            //     responseHeader = queryResponse.responseHeader;
+            //     org.apache.solr.common.SolrDocumentList results = queryResponse.getResults();
+            //     def instance;
+            //     results.each { doc ->
+            //         Long instanceId = Long.parseLong(doc.getFieldValue(searchFieldsConfig.ID).split('_')[1])
+            //         String className = doc.getFieldValue(searchFieldsConfig.OBJECT_TYPE)
+            //         Class clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
+            //         if(clazz) {
+            //             instance = clazz.read(instanceId);
+            //         }
+            //
+            //         def containers = doc.getFieldValue(searchFieldsConfig.CONTAINER)
+            //         List containerInstances = [];
+            //         containers.each { container ->
+            //             container = container.split('_')
+            //             if(container) {
+            //                 Long containerId = Long.parseLong(container[1])
+            //                 className = container[0]
+            //                 clazz = grailsApplication.domainClasses.find { it.clazz.simpleName == className }?.clazz
+            //                 if(clazz) {
+            //                     containerInstances << clazz.read(containerId);
+            //                 }
+            //             }
+            //         }
+            //
+            //         if(instance) {
+            //             if(params.format?.equalsIgnoreCase("json")) {
+            //                 instanceList.add([id:instanceId, object_type:className, title:instance.title(), summary:instance.summary(params.userLanguage), containers:containerInstances]);
+            //             } else {
+            //                 instanceList.add([id:instanceId, object_type:className, instance:instance, containers:containerInstances]);
+            //             }
+            //         } else {
+            //             log.error "${doc} has invalid id in search index. May be out of sync from db"
+            //         }
+            //     }
+            //     noOfResults = queryResponse.getResults().getNumFound();
+            // }
         }
 
         return [responseHeader:responseHeader, queryParams:queryParams, activeFilters:activeFilters, instanceTotal:noOfResults, instanceList:instanceList, objectTypes:objectTypes, uGroups:uGroups]
@@ -330,8 +315,8 @@ class BiodivSearchService extends AbstractSearchService {
     }
 
     private Map getFilteredObjectsQueryFromSearch(params, max, offset, isMapView) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
-        def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config;
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
+        def config = grails.util.Holders.config;
         params.sGroup = (params.sGroup)? params.sGroup : SpeciesGroup.findByName(config.speciesPortal.group.ALL).id
         params.habitat = (params.habitat)? params.habitat : Habitat.findByName(config.speciesPortal.group.ALL).id
         params.habitat = params.habitat.toLong()
@@ -340,7 +325,7 @@ class BiodivSearchService extends AbstractSearchService {
         def activeFilters = [:]
 
 
-        NamedList paramsList = new NamedList();
+        Map paramsList = [:];
 
         //params.userName = springSecurityService.currentUser.username;
         queryParams["query"] = params.query
@@ -356,10 +341,10 @@ class BiodivSearchService extends AbstractSearchService {
                 activeFilters["aq."+key] = value;
                 if(key.equalsIgnoreCase(searchFieldsConfig.OBJECT_TYPE)) {
                     if(!value.equalsIgnoreCase('All')) {
-                        paramsList.add('fq', key+":"+value)
+                        paramsList.put('fq', key+":"+value)
                     }
                 } else if(key.equalsIgnoreCase(searchFieldsConfig.LICENSE) || key.equalsIgnoreCase(searchFieldsConfig.TAG) || key.equalsIgnoreCase(searchFieldsConfig.USER_GROUP_WEBADDRESS) || key.equalsIgnoreCase(searchFieldsConfig.CONTEXT) || key.equalsIgnoreCase(searchFieldsConfig.CONTAINER) || key.equalsIgnoreCase(searchFieldsConfig.DOC_TYPE)) {
-                    paramsList.add('fq', key+':"'+value+'"')
+                    paramsList.put('fq', key+':"'+value+'"')
                 } else if(!(key ==~ /action|controller|sort|fl|start|rows|webaddress/) && value ) {
                     if(i++ == 0) {
                         aq = key + ':('+value+')';
@@ -369,7 +354,7 @@ class BiodivSearchService extends AbstractSearchService {
                 }
             }
         }
-        
+
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String lastRevisedStartDate = '';
         String lastRevisedEndDate = '';
@@ -488,67 +473,67 @@ class BiodivSearchService extends AbstractSearchService {
 
         String cleanSearchQuery = Utils.cleanSearchQuery(params.query);
         if(!cleanSearchQuery) cleanSearchQuery = "id:*"
-        paramsList.add('q', cleanSearchQuery);
+        paramsList.put('q', cleanSearchQuery);
         //options
         if(offset>= 0)
-            paramsList.add('start', offset);
+            paramsList.put('start', offset);
         if(max >= 0)
-            paramsList.add('rows', max);    
+            paramsList.put('rows', max);
         params['sort'] = params['sort']?:"score"
-        String sort = params['sort'].toLowerCase(); 
+        String sort = params['sort'].toLowerCase();
         if(isValidSortParam(sort)) {
             if(sort.indexOf(' desc') == -1) {
                 sort += " desc";
             }
-            paramsList.add('sort', sort);
+            paramsList.put('sort', sort);
         }
 
-        paramsList.add('fl', params['fl']?:searchFieldsConfig.ID+","+searchFieldsConfig.OBJECT_TYPE+","+searchFieldsConfig.CONTAINER);
-        
+        paramsList.put('fl', params['fl']?:searchFieldsConfig.ID+","+searchFieldsConfig.OBJECT_TYPE+","+searchFieldsConfig.CONTAINER);
+
         //Filters
         if(params.sGroup) {
             params.sGroup = params.sGroup.toLong()
-            def groupId = utilsServiceBean.getSpeciesGroupIds(params.sGroup)
+            def groupId = utilsService.getSpeciesGroupIds(params.sGroup)
             if(!groupId){
                 log.debug("No groups for id " + params.sGroup)
             } else{
-                paramsList.add('fq', searchFieldsConfig.SGROUP+":"+groupId);
+                paramsList.put('fq', searchFieldsConfig.SGROUP+":"+groupId);
                 queryParams["groupId"] = groupId
                 activeFilters["sGroup"] = groupId
             }
         }
 
         if(params.habitat && (params.habitat != Habitat.findByName(config.speciesPortal.group.ALL).id)){
-            paramsList.add('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
+            paramsList.put('fq', searchFieldsConfig.HABITAT+":"+params.habitat);
             queryParams["habitat"] = params.habitat
             activeFilters["habitat"] = params.habitat
         }
 
         if(params.tag) {
-            paramsList.add('fq', searchFieldsConfig.TAG+":"+params.tag);
+            paramsList.put('fq', searchFieldsConfig.TAG+":"+params.tag);
             queryParams["tag"] = params.tag
             activeFilters["tag"] = params.tag
         }
 
         if(params.user){
-            paramsList.add('fq', searchFieldsConfig.USER+":"+params.user);
+            paramsList.put('fq', searchFieldsConfig.USER+":"+params.user);
             queryParams["user"] = params.user.toLong()
             activeFilters["user"] = params.user.toLong()
         }
 
         if(params.speciesName && (params.speciesName != config.speciesPortal.group.ALL)) {
-            paramsList.add('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.speciesName);
+            paramsList.put('fq', searchFieldsConfig.MAX_VOTED_SPECIES_NAME+":"+params.speciesName);
             queryParams["name"] = params.name
             activeFilters["name"] = params.name
         }
 
         if(params.isFlagged && params.isFlagged.toBoolean()){
-            paramsList.add('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
+            paramsList.put('fq', searchFieldsConfig.ISFLAGGED+":"+params.isFlagged.toBoolean());
             activeFilters["isFlagged"] = params.isFlagged.toBoolean()
         }
 
         if(params.isChecklistOnly && params.isChecklistOnly.toBoolean()){
-            paramsList.add('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
+            paramsList.put('fq', searchFieldsConfig.IS_CHECKLIST+":"+params.isChecklistOnly.toBoolean());
             activeFilters["isChecklistOnly"] = params.isChecklistOnly.toBoolean()
         }
 
@@ -558,13 +543,13 @@ class BiodivSearchService extends AbstractSearchService {
             def swLon = bounds[1]
             def neLat = bounds[2]
             def neLon = bounds[3]
-            paramsList.add('fq', searchFieldsConfig.LATLONG+":["+swLat+","+swLon+" TO "+neLat+","+neLon+"]");
+            paramsList.put('fq', searchFieldsConfig.LATLONG+":["+swLat+","+swLon+" TO "+neLat+","+neLon+"]");
             activeFilters["bounds"] = params.bounds
         }
 
         if(params.uGroup) {
             if (params.uGroup) {
-                paramsList.add('fq', searchFieldsConfig.USER_GROUP+":("+params.uGroup+")");
+                paramsList.put('fq', searchFieldsConfig.USER_GROUP+":("+params.uGroup+")");
                 queryParams["uGroup"] = params.uGroup
                 activeFilters["uGroup"] = params.uGroup
             } else {
@@ -574,19 +559,19 @@ class BiodivSearchService extends AbstractSearchService {
         }
 
         if(params.object_type && !params.object_type.equalsIgnoreCase('All')){
-            paramsList.add('fq', searchFieldsConfig.OBJECT_TYPE+":("+params.object_type.capitalize()+")");
+            paramsList.put('fq', searchFieldsConfig.OBJECT_TYPE+":("+params.object_type.capitalize()+")");
             queryParams["object_type"] = params.object_type
             activeFilters["object_type"] = params.object_type
         }
-        
+
         if(params.contributor){
-            paramsList.add('fq', searchFieldsConfig.CONTRIBUTOR+":"+params.contributor);
+            paramsList.put('fq', searchFieldsConfig.CONTRIBUTOR+":"+params.contributor);
             queryParams["contributor"] = params.contributor
             activeFilters["contributor"] = params.contributor
         }
 
         log.debug "Along with faceting params : "+paramsList;
-        return [paramsList:paramsList, queryParams:queryParams, activeFilters:activeFilters];	
+        return [paramsList:paramsList, queryParams:queryParams, activeFilters:activeFilters];
     }
 
     private boolean isValidSortParam(String sortParam) {

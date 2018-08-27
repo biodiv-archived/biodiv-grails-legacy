@@ -7,6 +7,7 @@
 <%@ page import="species.NamesMetadata"%>
 <%@ page import="species.TaxonomyDefinition"%>
 <%@ page import="species.dataset.Dataset"%>
+<%@ page import="species.dataset.DataTable"%>
 <%@ page import="species.trait.Trait"%>
 <%@ page import="species.trait.Trait.DataTypes"%>
 <%@ page import="species.trait.TraitValue"%>
@@ -142,6 +143,29 @@
                  <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
                 </span>
             </g:elseif>
+            <g:if
+				test="${queryParam.key == 'dataTable' && queryParam.value instanceof Long }">
+				<g:if test="${queryParam.value && DataTable.read(queryParam.value)}">
+                                  <g:message code="text.in" />   <span class="highlight"><a
+						href="${uGroup.createLink(
+						controller:params.controller, action:params.action,
+						params:[dataTable: queryParam.value, isMediaFilter:false])}">
+                        ${DataTable.read(queryParam.value).title} </a>
+                    
+                        <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                        </span>
+                            </g:if>
+			</g:if>
+			<g:elseif test="${queryParam.key == 'dataTable' && queryParam.value}">
+                           		 <g:message code="text.in" /> <span class="highlight"><a
+					href="${uGroup.createLink(
+					controller:params.controller, action:params.action,
+					params:[dataTable: queryParam.value.id, isMediaFilter:false])}">
+						${queryParam.value.title } </a>  
+                 <a class="removeQueryFilter" data-target="${queryParam.key}" href="#">[X]</a>
+                </span>
+            </g:elseif>
+
 
 			<g:if
 				test="${queryParam.key == 'taxonRank' && queryParam.value instanceof Integer }">
@@ -246,19 +270,37 @@
 			</g:if>
 			<g:if test="${queryParam.key=='trait' && queryParam.value && hackTohideTraits != true}"> 
             <g:message code="trait.for.key" />  
-            <g:each in="${queryParam.value}" var="trait">
-            <g:each in="${trait.value.startsWith('rgb')?[trait.value]:trait.value.split(',')}" var="tv">
+            <g:each in="${queryParam.value}" var="traitInstance">
+            <g:each in="${traitInstance.value.startsWith('rgb')?[traitInstance.value]:traitInstance.value.split(',')}" var="tv">
                                     <span
 					class="highlight"> <a
 					href="${uGroup.createLink(controller:params.controller,
-					action:params.action, params:[('trait.'+trait.key): tv])}">
-                    <%Trait t = Trait.read(trait.key)%>
+					action:params.action, params:[('trait.'+traitInstance.key): tv])}">
+                    <%Trait t = Trait.read(traitInstance.key)%>
 						${t?.name}:${tv.equalsIgnoreCase('none')||tv.equalsIgnoreCase('all')||tv.equalsIgnoreCase('any')||tv.contains(':')||tv.contains('-')||t.dataTypes == DataTypes.COLOR?tv.capitalize():TraitValue.read(tv)?.value} 
-                        <a class="removeQueryFilter" data-target="trait.${trait.key}=${tv}" href="#">[X]</a> 
+                        <a class="removeQueryFilter" data-target="trait.${traitInstance.key}=${tv}" href="#">[X]</a> 
                         </span>
                         </g:each>
                         </g:each>
 			</g:if>
+			<g:if test="${queryParam.key=='trait' && queryParam.value && hackTohideTraits != true}"> 
+            <g:message code="trait.for.key" />  
+            <g:each in="${queryParam.value}" var="traitInstance">
+            <g:each in="${traitInstance.value.startsWith('rgb')?[traitInstance.value]:traitInstance.value.split(',')}" var="tv">
+                                    <span
+					class="highlight"> <a
+					href="${uGroup.createLink(controller:params.controller,
+					action:params.action, params:[('trait.'+traitInstance.key): tv])}">
+                    <%Trait t = Trait.read(traitInstance.key)%>
+						${t?.name}:${tv.equalsIgnoreCase('none')||tv.equalsIgnoreCase('all')||tv.equalsIgnoreCase('any')||tv.contains(':')||tv.contains('-')||t.dataTypes == DataTypes.COLOR?tv.capitalize():TraitValue.read(tv)?.value} 
+                        <a class="removeQueryFilter" data-target="traitInstance.${traitInstance.key}=${tv}" href="#">[X]</a> 
+                        </span>
+                        </g:each>
+                        </g:each>
+			</g:if>
+
+
+
 		</g:each>
 
 </div>

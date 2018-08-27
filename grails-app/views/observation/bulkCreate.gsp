@@ -17,9 +17,7 @@
                 border-top: 1px solid #9E9E9E;
                 box-shadow: 0 2px 11px -3px inset;
                 padding: 10px;
-                min-height: 212px;
-                height:250px;
-                width:870px;
+                min-height: 260px;
             }
             td {
                 text-align:center;
@@ -40,7 +38,7 @@
                 position:relative;
             }
             .propagateBlock .group_options, .propagateBlock .habitat_options {
-                width : 218px;
+                width : 295px;
             }
             .addObservation .group_options, .addObservation .habitat_options {
                 width : 287px;
@@ -67,7 +65,7 @@
                 width:133px;
             }
             .column {
-                width:221px;
+                width:295px;
                 float: left;
                 padding: 10px 0px;
                 margin:0px;
@@ -77,7 +75,7 @@
                 -webkit-border-radius: 4px;
                 -moz-border-radius: 4px;
                 border-radius: 4px;
-                height:100px;
+             /*   height:100px;*/
             }
             .selected_habitat, .selected_group {
                 padding: 4px 3px !important;
@@ -97,7 +95,7 @@
                 background-color: #a6dfc8;
             }
             .placeName{
-                width:89% !important;
+                width:94% !important;
             }
             .map_search .latlng {
                 z-index:2;
@@ -139,41 +137,49 @@
             .controls.textbox {
                 height:40px !important;
             }
-            .imagesListWrapper {
+            .uploaded_files_list_container {
                 overflow-x:scroll;
                 overflow-y:hidden;
-                height: 284px;
+                clear:both;
+                margin-left:0px;
+                width:100%;
+                line-height:20px !important;
+                /*height: 284px;
                 width:884px;
                 margin-left:2px;
+            */
             }
             .imageHolder {
                 border: 1px solid grey ;
                 background-color: lightgrey ;
                 margin-bottom:90px !important;
                 position: relative; 
-                left: 50px; 
+                left: 25px; 
                 top: 0; 
-                width: 150px; 
+                width: 200px; 
                 height: 250px; 
                 padding: 0.5em; 
                 margin: 10px;
-                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)})
+                background: url(${assetPath(src: '/all/dragndropgrey.png', absolute:true)});
+                background-position: 38px;
+
+
             }
             .imageDr{
                 position: absolute;
                 top: 46%;
-                width: 127px;
+                width: 200px;
                 margin-left: 15px;
                 font-size: 19px;
                 color: grey;
                 line-height: 23px;
             }
-            .imagesListWrapper .imagesList {
+            .uploaded_files_list {
                 width:100000px;
                 white-space:nowrap !important;
             }
             .imagesListWrapper .imagesList .addedResource {
-                display : inline !important;   
+                //display : inline !important;   
                 z-index:15;             
             }
             .resources .addedResource input[type="text"]{
@@ -195,7 +201,7 @@
             .selected_group .caret, .selected_habitat .caret , .propagateLicense .caret {
                 margin-top: 12px !important;
             }
-            .propagateDate .fromDate {
+            .propagateDate .fromDate, .propagateLocation .placeName {
                 height:42px;
             }
             .propagateLicense .license_div {
@@ -222,9 +228,10 @@
             .sortMediaOnExif {
                 margin-right:2px;
                 margin-top:2px;
+                clear:both;
             }            
             .propagateBlock .groups_super_div, .propagateBlock .habitat_super_div{
-                width: 220px;
+                width: 295px;
             }
             
         </style>
@@ -247,7 +254,7 @@
                     <div class="section clearfix" style="text-align:center;">
                         <a class="btn btn-primary togglePropagateDiv" style="width:269px;"> <g:message code="button.show.bulk" /> <b class="caret"></b></a>
                         <div class= "propagateBlock hide clearfix">
-                            <div >
+                            <div  style="clear:both;">
                                 <div class="column propagateLicense">
                                     <label><g:message code="default.licenses.label" /></label>
                                     <g:render template="/observation/selectLicense" model="['i':0, 'selectedLicense':License.findByName("CC_BY"),'isEditable':true]"/>
@@ -258,11 +265,11 @@
                                 <div class="column propagateGrpHab">
                                     <g:render template="/common/speciesHabitatDropdownTemplate" model="['observationInstance':observationInstance, 'action':'show']"/> 
                                 </div>
-                                <div class="column propagateDate">
+                            </div>
+                            <div style="clear:both;">
+                                <div class="column span6 propagateDate block_row">
                                     <g:render template="dateInput" model="['observationInstance':observationInstance]"/>
                                 </div>
-                            </div>
-                            <div>
                                 <div class="column span6 propagateLocation block_row">
                                     <%
                                     def obvInfoFeeder = lastCreatedObv ? lastCreatedObv : observationInstance
@@ -271,7 +278,9 @@
                                         <obv:showMapInput model="[observationInstance:observationInstance, userObservationInstanceList: totalObservationInstanceList, obvInfoFeeder:obvInfoFeeder, locationHeading:'Where did you find this observation?', webaddress:params.webaddress]"></obv:showMapInput>
                                     </div>
                                 </div>
-                                <div class="column span6 propagateTags block_row">
+                            </div>
+                            <div style="clear:both;">
+                                <div class="column propagateTags block_row">
                                     <label><g:message code="default.tags.label" /></label>
                                     <div class="create_tags" style="clear: both;">
                                         <ul class="obvCreateTags" rel="${g.message(code:'placeholder.add.tags')}">
@@ -282,24 +291,24 @@
                                     </div>
                                 </div>
                                 
-                            </div>
-                            <div>
-                                <div class="column propagateGroups small_block_row">
+                                <div class="column propagateGroups block_row">
                                     <label><g:message code="button.user.groups" /></label>
                                     <div style="clear:both">
-                                        <button type="button" class="btn toggleGrpsDiv"> <g:message code="button.user.groups" /></button> 
+                                        <button type="button" class="btn toggleGrpsDiv" style="width:100%; height:40px;"> <g:message code="button.user.groups" /></button> 
                                         <div class="postToGrpsToggle" style="display:none;">
                                             <g:render template="postToUserGroups" model="['observationInstance':obervationInstance]"/>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="column propagateHelpID small_block_row">
+                            </div>
+                            <div style="clear:both;">
+                                <div class="column propagateHelpID block_row">
                                     <label><g:message code="link.help.identify" /></label>
                                     <div style="margin-left:40px;clear:both">
                                         <input class="helpID" type="checkbox">
                                     </div>
                                 </div>
-                                <div class="column small_block_row" style="text-align:center">
+                                <div class="column block_row" style="text-align:center">
                                     <a class="applyAll btn btn-primary"
                                         style=" margin-right: 5px; margin-top:17px;"> <g:message code="button.apply.below" />
                                     </a>
@@ -369,9 +378,11 @@
 
 
     $(document).ready(function(){
-        var uploadResource = new $.fn.components.UploadResource($('.bulk_observation_create'));
-        uploadResource.POLICY = "${policy}";
-        uploadResource.SIGNATURE = "${signature}";
+        var uploadResource = new $.fn.components.UploadResource($('.bulk_observation_create'),{
+            POLICY : "${policy}",
+            SIGNATURE :"${signature}" 
+        });
+        $('.filePicker').data('uploadResource', uploadResource);
 
             <%
                 if(observationInstance?.group) {

@@ -5,14 +5,13 @@ import groovy.sql.Sql
 import grails.converters.JSON
 
 import java.io.File;
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +50,10 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import java.awt.Point;
+import species.dataset.DataTable;
+import species.dataset.DataPackage.DataTableType;
+import content.eml.UFile;
+import species.groups.CustomField;
 
 class ChecklistService {
 
@@ -456,15 +459,16 @@ class ChecklistService {
 
 		def queryResponse = checklistSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+        /*    NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Checklists"]);
             }
+        */
         }
 		return result;
 	}
-
+/*
 	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -573,14 +577,14 @@ class ChecklistService {
 			//queryParams = queryResponse.responseHeader.params
 			result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), checklistInstanceList:checklistInstanceList, snippets:queryResponse.getHighlighting()]
 			return result;
-		} catch(SolrException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
 		result = [queryParams:queryParams, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
-
+*/
 	private boolean isValidSortParam(String sortParam) {
 		if(sortParam.equalsIgnoreCase("score"))
 			return true
@@ -737,4 +741,124 @@ class ChecklistService {
 		}
 	}
 	
+	def migrateChecklistToDataTable(){
+        dataSource.setUnreturnedConnectionTimeout(10000000);
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+		List clIdList = Checklists.listOrderById(order: "asc").collect{it.id}
+		clIdList.each {  id ->
+            println "migrating checklist : ${id}"
+            Checklists.withNewTransaction {
+                def cl = Checklists.findById(id, [fetch: [observations: 'join']])
+                DataTable dataTable = new DataTable();
+                dataTable.id = cl.id
+                dataTable.agreeTerms = cl.agreeTerms;
+                dataTable.dataTableType = DataTableType.OBSERVATIONS;
+                dataTable.isDeleted = cl.isDeleted;
+                def cols = JSON.parse(cl.columns);
+                List dataTableCols = [];
+                cols.each {
+                    String url = '';
+                    float order = 1000;
+                    if(it == cl.sciNameColumn) {
+                        url = "http://rs.tdwg.org/dwc/terms/scientificName";
+                        order = 10.1;
+                    }
+                    else if(it == cl.commonNameColumn) {
+                        url = "http://rs.tdwg.org/dwc/terms/vernacularName";
+                        order = 10.2;
+                    }
+                    dataTableCols << [url, it, order];
+                }
+                dataTable.columns = dataTableCols as JSON;
+                dataTable.title = cl.title;
+                dataTable.description = cl.notes;
+                String attributions = ""
+                if(cl.attributions) {
+                    attributions += cl.attributions.collect{it.name+"\n"}
+                }
+                if(cl.sourceText) {
+                    attributions += cl.sourceText
+                }
+                println "==============="
+println cl.contributors.collect{it.id+','}.join(',')
+String contributor = cl.contributors.collect{it.id+','}.join(',')
+if(!contributor)
+    contributor = cl.author.id+'';
+                dataTable.initParams([author:cl.author, contributorUserIds:contributor,attributions:attributions, licenseStr:cl.license.name, placeName:cl.placeName, latitude:cl.latitude+'', longitude:cl.longitude+'', topology:cl.topology, locationScale:cl.locationScale.value(),locationAccuracy:cl.locationAccuracy, geoPrivacy:Boolean.toString(cl.geoPrivacy), fromDate:cl.fromDate, toDate:cl.toDate, group:['0':cl.group.id+''], (CustomField.PREFIX+"References"):cl.refText, (CustomField.PREFIX+"Publication Date"):cl.publicationDate]);
+                dataTable.uploader = cl.author;
+                dataTable.createdOn = cl.createdOn;
+                dataTable.lastRevised = cl.lastRevised;
+                dataTable.language = cl.language;
+                dataTable.externalId = cl.externalId;
+                dataTable.externalUrl = cl.externalUrl;
+                dataTable.viaId = cl.viaId;
+                dataTable.viaCode = cl.viaCode;
+                dataTable.checklistId = cl.id; 
+                //uFile
+                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                if(cl.rawChecklist) {
+                    String contentRootDir = config.speciesPortal.content.rootDir;
+                    try{
+                        File destinationFile = new File(contentRootDir, cl.rawChecklist);
+                        if(destinationFile.exists()) {
+                            UFile f = new UFile()
+                            f.size = destinationFile.length()
+                            f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "");
+                            log.debug "============== " + f.path
+                            if(f.save()) {
+                                dataTable.uFile = f;
+                            }
+                        } else {
+                            UFile f = new UFile()
+                            f.size = 0;
+                            f.path = cl.rawChecklist;
+                            log.debug "============== " + f.path
+                            if(f.save()) {
+                                dataTable.uFile = f;
+                            }
+                        }
+                    }catch(e){
+                        e.printStackTrace()
+                    }
+                }
+
+
+                if(cl.habitat) {
+                    dataTable.description += "Habitat : "+cl.habitat.name;
+                }
+                if(cl.states)
+                    dataTable.description += "States : "+cl.states.join(',');
+                if(cl.districts)
+                    dataTable.description += "Districts : "+cl.districts.join(',');
+                if(cl.talukas)
+                    dataTable.description += "Talukas : "+cl.talukas.join(',');
+                dataTable.setTags(cl.tags);
+                dataTable.setTags(Arrays.asList(cl.states.toArray()));
+                dataTable.setTags(Arrays.asList(cl.districts.toArray()));
+                dataTable.setTags(Arrays.asList(cl.talukas.toArray()));
+                if(dataTable.save(flush:true)) {
+                    println "Saved dataTable ${dataTable}"
+                    cl.observations.each { obv ->
+                        println "Setting dataTable ${dataTable} to observation ${obv.id}"
+                        obv.dataTable = dataTable;
+                        obv.save()
+                    }
+                } else {
+                    dataTable.errors.allErrors.each { println it }
+                }
+                cl.userGroups.each { ug ->
+                    ug.addToDataTables(dataTable);
+                    if(ug.save(flush:true)) {
+                        println "Posted dataTable ${dataTable} of checklist ${cl} to usergroup ${ug}"
+                    } else {
+                        ug.errors.allErrors.each { println it }
+                    }
+                }
+                utilsService.cleanUpGorm();
+            }
+            println "Checklist ${id} migration done"
+	    }
+        println "Successfully migrated all checklists"
+	}
 }

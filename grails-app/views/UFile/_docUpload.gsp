@@ -11,14 +11,22 @@
         //Available variables: id, fileName, responseJSON
         
         if(responseJSON.success) {
+            console.log(responseJSON);
             $('#${name}_uploaded').show();
             $('#${name}_file').attr('href',responseJSON.fileURL);
             $('#${name}_file').html(fileName);
             $('#${name}_path').val(responseJSON.filePath);
+            $('#${name}_size').val(responseJSON.fileSize);
             $('#${name}_name').val(fileName);
-            $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
-            $('#isSimpleSheet').val(responseJSON.isSimpleSheet);
-            $('#headerMetadata').val(responseJSON.headerMetadata);
+            if(responseJSON.xlsxFileUrl) {
+                //dont reset these fields if the upload is for images dir
+                $('#xlsxFileUrl').val(responseJSON.xlsxFileUrl);
+                console.log('-------------------------------------');
+                console.log(responseJSON.xlsxFileUrl);
+                console.log($('#xlsxFileUrl').val());
+                $('#isSimpleSheet').val(responseJSON.isSimpleSheet);
+                $('#headerMetadata').val(JSON.stringify(responseJSON.headerMetadata));
+            }
         }
 
         <g:if test="${uploadCallBack}">
@@ -39,7 +47,7 @@ fileURL = g.createLinkTo(base:grailsApplication.config.speciesPortal.content.ser
  %>
 	<i class="icon-file"></i> <a id="${name}_file" href="${fileURL}">${fileName}</a>
 
-    <input type="hidden" name="uFile.path"  id="${name}_path" value="${path}">
-    <input type="hidden" name="uFile.size"  id="${name}_size" value="${size}">
+    <input type="hidden" name="${inputName?inputName+'.path':'uFile.path'}"  id="${name}_path" value="${path}">
+    <input type="hidden" name="${inputName?inputName+'.size':'uFile.size'}"  id="${name}_size" value="${size}">
 	
 </div>

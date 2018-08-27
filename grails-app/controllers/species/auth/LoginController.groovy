@@ -47,7 +47,7 @@ class LoginController {
 	 */
 	def index = {
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+SpringSecurityUtils.securityConfig.successHandler.defaultTargetUrl
 		}
 		else {
 			redirect url:uGroup.createLink(action:'auth', controller:"login", 'userGroupWebaddress':params.webaddress, params:params)
@@ -61,11 +61,11 @@ class LoginController {
 	def auth = {
 		def config = SpringSecurityUtils.securityConfig
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri:request.scheme+"://"+request.serverName+request.contextPath+ config.successHandler.defaultTargetUrl
+			redirect uri:request.scheme+"://"+request.serverName+ config.successHandler.defaultTargetUrl
 			return
 		}
 		String view = 'auth'
-		String postUrl = "${request.contextPath}${config.apf.filterProcessesUrl}"
+		String postUrl = "${config.apf.filterProcessesUrl}"
 		render view: view, model: [postUrl: postUrl,
 					rememberMeParameter: config.rememberMe.parameter]
 	}
@@ -93,7 +93,7 @@ class LoginController {
 				(new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
 				return
 			} else {
-				redirect uri:request.scheme+"://"+request.serverName+request.contextPath+"/";
+				redirect uri:request.scheme+"://"+request.serverName+"/";
 				return;
 			}
 		} else {
@@ -115,6 +115,19 @@ class LoginController {
                 model = utilsService.getSuccessModel('Successfully logged in', null, OK.value(), params);
             } else if(params.error) {
                 model = utilsService.getErrorModel(params.message, null, params.int('error'))
+            } else {
+
+                def requestCache = new HttpSessionRequestCache();
+                def defaultSavedRequest = requestCache.getRequest(request, response);
+                //def defaultSavedRequest = request.getSession()?.getAttribute(WebAttributes.SAVED_REQUEST)
+                log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
+                if(defaultSavedRequest) {
+                    (new DefaultAjaxAwareRedirectStrategy()).sendRedirect(request, response, defaultSavedRequest.getRedirectUrl());
+                    return
+                } else {
+                    redirect uri:request.scheme+"://"+request.serverName+"/";
+                    return;
+                }
             }
             withFormat {
                 json { render model as JSON }
@@ -150,7 +163,7 @@ class LoginController {
 		def config = SpringSecurityUtils.securityConfig
 		render controller:'openId', view: 'auth', params: params,
 				model: [hasCookie: authenticationTrustResolver.isRememberMe(SCH.context?.authentication),
-					postUrl: "${request.contextPath}${config.apf.filterProcessesUrl}"]
+					postUrl: "${config.apf.filterProcessesUrl}"]
 	}
 
 	/**
@@ -203,7 +216,7 @@ class LoginController {
 	 * The Ajax success redirect url.
 	 */
 	def ajaxSuccess = {
-/*        def requestCache = new HttpSessionRequestCache();
+        def requestCache = new HttpSessionRequestCache();
         println request;
         def defaultSavedRequest = requestCache.getRequest(request, response);
         log.debug "Redirecting to DefaultSavedRequest : $defaultSavedRequest";
@@ -215,7 +228,7 @@ class LoginController {
         } finally {
             requestCache.removeRequest request, response
         }
-*/		render([success: true, username: springSecurityService.authentication.name, redirectUrl:redirectUrl] as JSON)
+//		render([success: true, username: springSecurityService.authentication.name, redirectUrl:redirectUrl] as JSON)
 	}
 
 	/**
@@ -229,7 +242,7 @@ class LoginController {
 		def config = SpringSecurityUtils.securityConfig
 
 		if (springSecurityService.isLoggedIn()) {
-			redirect uri: request.scheme+"://"+request.serverName+request.contextPath+config.successHandler.defaultTargetUrl
+			redirect uri: request.scheme+"://"+request.serverName+config.successHandler.defaultTargetUrl
 			return
 		}
 		//		//String postUrl = "/${grailsApplication.metadata['app.name']}${config.apf.filterProcessesUrl}"

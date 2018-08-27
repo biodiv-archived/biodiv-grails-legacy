@@ -6,7 +6,8 @@ import groovy.util.Node;
 import java.util.List
 
 import org.apache.commons.logging.LogFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import org.apache.commons.validator.routines.UrlValidator;
+import grails.util.Holders;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.FetchMode;
@@ -59,7 +60,7 @@ class XMLConverter extends SourceConverter {
 
 
     //protected static SourceConverter instance;
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = grails.util.Holders.config
     def fieldsConfig = config.speciesPortal.fields
     NamesParser namesParser;
     String resourcesRootDir = config.speciesPortal.resources.rootDir;
@@ -88,7 +89,7 @@ class XMLConverter extends SourceConverter {
 
     public XMLConverter() {
         namesParser = new NamesParser();
-        def ctx = ApplicationHolder.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getGrailsApplication().getMainContext();
         //markupSanitizerService = ctx.getBean("markupSanitizerService");
     }
 
@@ -151,7 +152,6 @@ class XMLConverter extends SourceConverter {
 	
 	private updateNode(Node node, Map completeMap, String k){
 		def m = completeMap.get(k)
-		
 		new Node(node, "matchStatus", m['status']);
 		new Node(node, "rank", m['rank']);
 				
@@ -190,11 +190,10 @@ class XMLConverter extends SourceConverter {
 		
 		String speciesName = getNodeDataFromSubCategory(species, fieldsConfig.SCIENTIFIC_NAME);
 		int rank = getTaxonRank(getNodeDataFromSubCategory(species, fieldsConfig.RANK));
-		
 		NameInfo n = new NameInfo(speciesName, rank, index)
 		//getting hir
 		List taxonNodes = getNodesFromCategory(species.children(), fieldsConfig.AUTHOR_CONTRIBUTED_TAXONOMIC_HIERARCHY);
-		//println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
+		println "====== taxon =====>>>>>>>>>>======= " + taxonNodes
 		taxonNodes.each { tn ->
 			rank = getTaxonRank(tn.subcategory.text())
 			def hirNodeData = getData((tn && tn.data)?tn.data[0]:null)
@@ -589,7 +588,7 @@ class XMLConverter extends SourceConverter {
 		}
 		try {
 			def colId = nameNode.colId.text()
-			return ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
+			return grails.util.Holders.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
 		}catch(e){
 			e.printStackTrace()
 		}
@@ -780,10 +779,17 @@ class XMLConverter extends SourceConverter {
                 attributors.each {  speciesField.addToAttributors(it); }
                 resources.each {  it.saveResourceContext(speciesField); speciesField.addToResources(it); }
                 if(field.connection == 81 ){
-					def ref = new Reference(title:data);
-                    speciesField.addToReferences(ref);                	
+					//def ref = new Reference(title:data);
+                    //speciesField.addToReferences(ref);                	
+					references.each { 
+                        log.debug "Adding reference to field 81 ${it}"
+                        speciesField.addToReferences(it); 
+                    }
             	}else{
-					references.each { speciesField.addToReferences(it); }            		
+					references.each { 
+                        log.debug "Adding reference to field 81 ${it}"
+                        speciesField.addToReferences(it); 
+                    }	
             	}
             
                 speciesField.language = language;
@@ -806,7 +812,8 @@ class XMLConverter extends SourceConverter {
     private String getData(Node dataNode) {
         if(!dataNode) return "";
         //sanitize the html text
-        return dataNode.text()?:"";
+        return dataNode.localText().size() > 0 ? dataNode.localText()[0]:"";
+        //return dataNode.value()?:"";
     }
 
     /**
@@ -1104,8 +1111,6 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private Resource createImage(Node imageNode, String relImagesFolder, resourceType) {
-        println ";;;;;;;;;;;;;;;::::"
-        println imageNode
         File tempFile = getImageFile(imageNode, relImagesFolder);
         def sourceUrl = imageNode.source?.text() ? imageNode.source?.text() : "";
         def absUrl = imageNode.url?.text() ? imageNode.url?.text() : "";
@@ -1151,10 +1156,8 @@ class XMLConverter extends SourceConverter {
                 res.url = absUrl?:sourceUrl
                 if(rate) res.rating = Integer.parseInt(rate);
                 for(Contributor con : getContributors(imageNode, true)) {
-                    println con
                     res.addToContributors(con);
                 }
-                println "-----------------------"
                 for(Contributor con : getAttributions(imageNode, true)) {
                     res.addToAttributors(con);
                 }
@@ -1173,9 +1176,7 @@ class XMLConverter extends SourceConverter {
                 res.license = null;//?.clear()
                 res.contributors?.clear()
                 res.attributors?.clear();
-                println "-----------------------"
                 for(Contributor  con : getContributors(imageNode, true)) {
-                    println con
                     res.addToContributors(con);
                 }
                 for(Contributor con : getAttributions(imageNode, true)) {
@@ -1524,6 +1525,13 @@ class XMLConverter extends SourceConverter {
             refs.each {
                 String title = cleanData(it?.title?.text().trim(), taxon, synonyms);
                 String url = it?.url?.text().trim();
+                if(url) {
+                    UrlValidator urlValidator = new UrlValidator();
+                    if(!urlValidator.isValid(url)) {
+                        title = title + url;
+                        url = null;
+                    }
+                }
                 if(title || url) {
                     def ref = new Reference(title:title, url:url);
                     references.add(ref);
@@ -1564,7 +1572,7 @@ class XMLConverter extends SourceConverter {
             Language lang = getLanguage(n.language?.name?.text(), n.language?.threeLetterCode?.text());
 
             def criteria = CommonNames.createCriteria();
-            String cleanName = Utils.cleanName(n.text().trim()).capitalize();
+            String cleanName = Utils.cleanName(n.localText()[0].trim()).capitalize();
             CommonNames sfield = criteria.get {
                 lang ? eq("language", lang): isNull("language");
                 ilike("name", cleanName);
@@ -1573,7 +1581,7 @@ class XMLConverter extends SourceConverter {
             }
 
             if(!sfield) {
-                log.debug "Saving common name :"+n.text();
+                log.debug "Saving common name :"+n.localText()[0];
                 sfield = new CommonNames();
                 sfield.name = cleanName;
                 sfield.taxonConcept = taxonConcept;
@@ -1650,7 +1658,7 @@ class XMLConverter extends SourceConverter {
             RelationShip rel = getRelationship(n.relationship?.text());
             if(rel) {
 				try{
-	                def cleanName = Utils.cleanName(n.text()?.trim());
+	                def cleanName = Utils.cleanName(n.localText()[0]?.trim());
 	                def parsedNames = namesParser.parse([cleanName]);
 	                def viaDatasource = null;
 	                if(n.viaDatasource) {
@@ -1711,7 +1719,7 @@ class XMLConverter extends SourceConverter {
 	            println "Looking at existing name : ${taxon}"
 	            if(taxon.status == NameStatus.ACCEPTED) {
 					//if existing name is acceted then ignoring XXX need to be reported to user
-	                //sfield = ApplicationHolder.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
+	                //sfield = grails.util.Holders.getApplication().getMainContext().getBean("namelistService").changeAcceptedToSynonym(taxon, [acceptedNamesList:[['taxonConcept':taxonConcept]]]);
 					log.error "Ignoring synonym taxon entry as the name existing name is ACCEPTED : "+parsedName.name
 					addToSummary("Ignoring synonym taxon entry as the name existing name is ACCEPTED : "+parsedName.name)
 					return
@@ -2341,7 +2349,7 @@ class XMLConverter extends SourceConverter {
 		if(colId){
 			def taxon = TaxonomyDefinition.findByMatchId(colId)
 			if(!taxon)
-				taxon =  ApplicationHolder.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
+				taxon =  grails.util.Holders.getApplication().getMainContext().getBean("namelistService").createNameFromColId(colId)
 				
 			return [taxon]
 		}
@@ -2359,7 +2367,7 @@ class XMLConverter extends SourceConverter {
     static int getTaxonRank(String rankStr) {
 		return ScientificName.TaxonomyRank.getTaxonRank(rankStr);
         /* // moved to TaxonRank
-        MessageSource messageSource = ApplicationHolder.application.mainContext.getBean('messageSource')
+        MessageSource messageSource = grails.util.Holders.grailsApplication.mainContext.getBean('messageSource')
         def request = null;
         try {
             request = RequestContextHolder.currentRequestAttributes().request
@@ -2478,13 +2486,6 @@ class XMLConverter extends SourceConverter {
     static Species findDuplicateSpecies(s) {
         def species = Species.withCriteria() {
                 eq("guid", s.guid);
-                fetchMode 'userGroups', FetchMode.JOIN
-                fetchMode 'resources', FetchMode.JOIN
-                fetchMode 'fields', FetchMode.JOIN
-                fetchMode 'globalDistributionEntities', FetchMode.JOIN
-                fetchMode 'globalEndemicityEntities', FetchMode.JOIN
-                fetchMode 'indianDistributionEntities', FetchMode.JOIN
-                fetchMode 'indianEndemicityEntities', FetchMode.JOIN
         //      if(!species.isAttached()) {
         //          species.attach();
         //      }
@@ -2521,7 +2522,7 @@ class XMLConverter extends SourceConverter {
      * @return
      */
     private updateSpeciesGroup(List<TaxonomyRegistry> taxonEntities) {
-        def ctx = ApplicationHolder.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getApplication().getMainContext();
         groupHandlerService = ctx.getBean("groupHandlerService");
 
         taxonEntities.each { taxonReg ->
@@ -2537,7 +2538,7 @@ class XMLConverter extends SourceConverter {
      *
      */
     private void cleanUpGorm() {
-        def ctx = ApplicationHolder.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getApplication().getMainContext();
         SessionFactory sessionFactory = ctx.getBean("sessionFactory")
         def hibSession = sessionFactory?.getCurrentSession()
         if(hibSession) {

@@ -3,10 +3,7 @@ package speciespage
 
 import java.util.List
 import java.text.DateFormat
-import org.apache.solr.common.util.DateUtil;
 import org.apache.commons.logging.LogFactory
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.hibernate.exception.ConstraintViolationException;
 import grails.plugin.springsecurity.SpringSecurityUtils;
@@ -102,15 +99,16 @@ class SpeciesService extends AbstractObjectService  {
         List result = new ArrayList();
         def queryResponse = speciesSearchService.terms(params.term, params.field, params.max);
         if(queryResponse) {
-            NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
+            /*NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
             for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
                 Map.Entry tag = (Map.Entry) iterator.next();
                 result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Species Pages"]);
             }
+        */
         }
         return result;
     }
-
+/*
     def search(params) {
         def result;
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -286,14 +284,14 @@ class SpeciesService extends AbstractObjectService  {
             //queryParams = queryResponse.responseHeader.params
             result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:queryResponse.getResults().getNumFound(), speciesInstanceList:speciesInstanceList, snippets:queryResponse.getHighlighting()]
             return result;
-        } catch(SolrException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
 
         result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
         return result;
     }
-
+*/
     private boolean isValidSortParam(String sortParam) {
         if(sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.SCORE) || sortParam.equalsIgnoreCase(grailsApplication.config.speciesPortal.searchFields.UPDATED_ON))
             return true;
@@ -356,6 +354,7 @@ class SpeciesService extends AbstractObjectService  {
             def newSpeciesFieldInstance = (new XMLConverter()).createSpeciesField(speciesInstance, fieldInstance, value, [springSecurityService.currentUser.email], [], [LicenseType.CC_BY.value()], [SpeciesField.AudienceType.GENERAL_PUBLIC.value()], [SpeciesField.Status.UNDER_VALIDATION.value()]);
             newSpeciesFieldInstance.species = speciesInstance;
             newSpeciesFieldInstance.field = fieldInstance;
+            newSpeciesFieldInstance.description = null;
             return newSpeciesFieldInstance;
     }
 
@@ -2494,7 +2493,7 @@ def checking(){
 	
     def getMatchingSpeciesList(params) {
         def result = _getSpeciesList(params);
-        def matchingSpeciesList = [];
+        def matchingList = [];
         result.speciesInstanceList.each {it->
             String link = utilsService.createHardLink("species", "show", it.id);
             def mainImage = it.mainImage();
@@ -2510,36 +2509,81 @@ def checking(){
             List traitIcons = [];
             factInstances?.each { f ->
                 if(f.traitValue) { 
-                    traitIcons << [f.traitValue.value, f.trait.name, f.traitValue.mainImage()?.fileName, f.trait.dataTypes.value()]
+                    traitIcons << [f.traitValue.value, f.traitInstance.name, f.traitValue.mainImage()?.fileName, f.traitInstance.dataTypes.value()]
                 } else if(f.value && f.toValue) {
-                    traitIcons << [f.value+":"+f.toValue, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value+":"+f.toValue, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.fromDate && f.toDate) {
-                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.fromDate.toString()+":"+f.toDate.toString(), f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 } else if(f.value) {
-                    traitIcons << [f.value, f.trait.name, null, f.trait.dataTypes.value()]
+                    traitIcons << [f.value, f.traitInstance.name, null, f.traitInstance.dataTypes.value()]
                 }
             }
 
-            if(params.downloadFrom == 'matchingSpecies') {
+            String obvLink = utilsService.userGroupBasedLink([controller:"observation", action:"list", params:[taxon:it.taxonConcept.id]]);
+            if(params.downloadFrom == 'matchingspecies') {
                 //HACK: request not available as its from job scheduler
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath, traitIcons]
+                matchingList << [it.id, it.title, true, 0, link, imagePath, traitIcons, it.fetchOccurrence()]
             } else {
-                matchingSpeciesList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons]
+                matchingList << [it.id, it.title, true, 0, link, imagePath,  params.user, traitIcons, it.fetchOccurrence(), obvLink]
             }
         }
+        return [matchingList:matchingList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
+    }
 
-        Map queryParts = _getSpeciesListQuery(params);
-/*        String query = "select f.trait_id, extract (year from calendar_date) calendar_year, extract (month from calendar_date) calendar_month, count(*) "+queryParts.fromQuery+" , fact f, calendar "+queryParts.filterQuery+" and f.from_date is not null and f.to_date is not null and extract(month from calendar.calendar_date) between extract(month from f.from_date) and extract(month from f.to_date) group by f.trait_id, calendar_year, calendar_month order by calendar_year, calendar_month";
-        println "No of taxon per trait per month++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++"
-        println query
-        println "++++++++++++++++++++++++++"
-        println "++++++++++++++++++++++++++"
-        Sql sql = Sql.newInstance(dataSource);
-        List taxonPerTraitPerMonth =  sql.rows(query, queryParts.queryParams);
-println taxonPerTraitPerMonth;
-*/
-        return [matchingSpeciesList:matchingSpeciesList, totalCount:result.instanceTotal, queryParams:result.queryParams, next:result.queryParams.max+result.queryParams.offset];
+    File exportMatchingSpeciesList(params, DownloadLog dl) {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.offset = params.offset ? params.int('offset') : 0
+        //TODO: distinct reco can be from search also - not handled (ref - obvCont -line -1610)
+        def matchingListResult = getMatchingSpeciesList(params);
+        def totalCount = matchingListResult.totalCount;
+        def completeResult = matchingListResult.matchingList;
+        params.offset = params.offset + BATCH_SIZE
+        while(params.offset <= totalCount) {
+            Observation.withNewTransaction {
+                completeResult.addAll(getMatchingSpeciesList(params).matchingList);
+                params.offset = params.offset + BATCH_SIZE
+            }
+        }
+        matchingListResult.matchingList = completeResult;
+
+        if(!matchingListResult) {
+            return null;
+        } 
+        if(matchingListResult.totalCount == 0) {
+            return null;
+        }
+        File downloadDir = new File(grailsApplication.config.speciesPortal.species.speciesDownloadDir)
+		if(!downloadDir.exists()){
+			downloadDir.mkdirs()
+		} 
+		return exportMatchingSpeciesAsCSV(downloadDir, matchingListResult);
+    }
+	
+    private File exportMatchingSpeciesAsCSV(downloadDir, Map matchingListResult){
+        File csvFile = new File(downloadDir, "MatchingSpecies_" + new Date().getTime() + ".csv")
+        CSVWriter writer = utilsService.getCSVWriter(csvFile.getParent(), csvFile.getName())
+        
+        def header = ['Species Id', 'Species Title', 'URL', '#Observations', 'Traits'];
+        writer.writeNext(header.toArray(new String[0]))
+        def matchingList = matchingListResult.matchingList;
+        def dataToWrite = []
+        matchingList.each {
+            log.debug "Writting " + it
+            def temp = []
+            temp.add("" + it[0]);
+            temp.add("" + it[1]);
+            temp.add("" + it[4]);
+            temp.add("" + it[7]);
+            it[6].each { t ->
+                temp.add("" + t[1]+":"+t[0]);
+            }
+            dataToWrite.add(temp.toArray(new String[0]))
+        }
+        writer.writeAll(dataToWrite);
+        writer.flush()
+        writer.close()
+
+        return csvFile
     }
 
     private File downloadUserDetails(){

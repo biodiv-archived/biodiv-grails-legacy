@@ -5,10 +5,21 @@ import species.Field;
 import species.UtilsService;
 import species.auth.SUser;
 import species.License;
+import species.dataset.DataTable;
+import species.trait.Trait.DataTypes;
 
+import grails.converters.JSON
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="fact", include = "non-lazy")
+//@JsonIgnoreProperties([])
 class Fact {
 
-    Trait trait;
+    Trait traitInstance;
     TraitValue traitValue;
     String value;//default from value if trait type is range
     String toValue;
@@ -20,11 +31,12 @@ class Fact {
     TaxonomyDefinition pageTaxon;
     Long objectId;
     String objectType
-    
+    DataTable dataTable
+
     boolean isDeleted = false;
 
     static constraints = {
-      trait nullable:false, unique:['objectType', 'objectId','traitValue']
+      traitInstance nullable:false, unique:['objectType', 'objectId','traitValue']
       //attribution nullable:true
       //contributor nullable:true
       //license nullable:true
@@ -36,15 +48,23 @@ class Fact {
       objectId nullable:false
       objectType nullable:false
       pageTaxon nullable:true
+      dataTable nullable:true
     }
 
     static mapping = {
         description type:"text"
         attribution type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "fact_id_seq"] 
+        //cache include: 'non-lazy'
     }
     String getActivityDescription() {
-        return trait.name +':'+ traitValue.value;
+        if(this.traitValue) {
+            return traitInstance.name +':'+ traitValue.value;
+        } else if (traitInstance.dataTypes == DataTypes.DATE) {
+            return traitInstance.name +':'+ fromDate + (toDate ? "-" + toDate:'')
+        }else {
+            return traitInstance.name +':'+ value + (toValue ? "-" + toValue:'')
+        }
     }
 
     String getIcon() {
@@ -56,8 +76,19 @@ class Fact {
             return value + (toValue ? ":" + toValue:'')
         }
     }
+
+    def fetchChecklistAnnotation(){
+        def res = this as JSON;
+        res['id'] = objectId;
+        res['type'] = objectType;
+        def species = pageTaxon.findSpecies(); 
+        res['speciesid'] = species.id
+        res['title'] = getActivityDescription();
+        return res
+    }
+
     @Override
     String toString() {
-        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${trait.name}, ${traitValue?traitValue.value:value}-${toValue})>";
+        return "<${this.class} : ${id} - (${objectType}:${objectId}, ${traitInstance.name}, ${traitValue?traitValue.value:value}${toValue?'-'+toValue:''})>";
     }
 }

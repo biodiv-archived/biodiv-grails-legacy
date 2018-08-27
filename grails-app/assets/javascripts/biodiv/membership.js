@@ -217,7 +217,7 @@ function membership_actions() {
 		
 	$('#inviteMembers').click(function(){
 			$.ajax({ 
-	         	url:window.isLoggedInUrl,
+	         	url:window.params.isLoggedInUrl,
 				success: function(data, statusText, xhr, form) {
 					if(data === "true"){
 						$('#memberUserIds').val('');
@@ -229,7 +229,7 @@ function membership_actions() {
 						$('#inviteMembersDialog').modal('show');
 						return false;
 					}else{
-						window.location.href = window.loginUrl+"?spring-security-redirect="+window.location.href;
+						window.location.href = window.params.loginUrl+"?spring-security-redirect="+window.location.href;
 					}
 	            },
 	            error:function (xhr, ajaxOptions, thrownError){
@@ -240,7 +240,7 @@ function membership_actions() {
 	
 	$('#inviteExperts').click(function(){
 		$.ajax({ 
-         	url:window.isLoggedInUrl,
+         	url:window.params.isLoggedInUrl,
 			success: function(data, statusText, xhr, form) {
 				if(data === "true"){
 					$('#expertUserIds').val('');
@@ -252,9 +252,9 @@ function membership_actions() {
 					$('#inviteExpertsDialog').modal('show');
 					return false;
 				}else{
-					window.location.href = window.loginUrl+"?spring-security-redirect="+window.location.href;
-				}
-            },
+					window.location.href = window.params.loginUrl+"?spring-security-redirect="+window.location.href;
+			 	}
+            }, 
             error:function (xhr, ajaxOptions, thrownError){
             	return false;
 			} 
@@ -264,13 +264,13 @@ function membership_actions() {
 	$('#requestModerator').click(function(){
 		if($('#requestModerator').hasClass('disabled')) return false;
 		$.ajax({ 
-         	url:window.isLoggedInUrl,
+         	url:window.params.isLoggedInUrl,
 			success: function(data, statusText, xhr, form) {
 				if(data === "true"){
 					$('#requestModeratorDialog').modal('show');
 					return false;
 				}else{
-					window.location.href = window.loginUrl+"?spring-security-redirect="+window.location.href;
+					window.location.href = window.params.loginUrl+"?spring-security-redirect="+window.location.href;
 				}
             },
             error:function (xhr, ajaxOptions, thrownError){
@@ -388,13 +388,15 @@ function rating() {
 
 function last_actions() {
     console.log('last actions');
+    $('body[style]').attr('style', '');
     $(".ellipsis.multiline").trunk8({
         lines:4,
         tooltip:false,
+        parseHTML:true,
         fill: '&hellip; <a class="read-more" href="#">'+window.i8ln.species.util.mor+'</a>'
     });
 
-    $('.read-more').on('click', function (event) {
+    $(document).on('click', '.read-more', function (event) {
         $(this).parent().trunk8('revert').append(' <a class="read-less" href="#">'+window.i8ln.species.util.rles+'</a>');
 
         return false;

@@ -14,7 +14,7 @@
 <div class="thumbnail clearfix ${showDetails ? '' : 'signature'} traitIcon"
     data-image-url="${traitValue.thumbnailUrl(null)}"
     data-traitValue="${traitValue.value}"
-    data-trait="${traitValue.trait.name}"
+    data-trait="${traitValue.traitInstance.name}"
     style="margin-left: 0px; height: 32px;">
     <div class="snippet tablet"
         style="display: table; width:100%;height: ${showDetails ? '100px;':'40px;'}">

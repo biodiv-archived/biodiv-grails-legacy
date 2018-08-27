@@ -30,7 +30,7 @@ modules = {
 		resource url:'/css/tableSorter.css'
 		resource url:'/css/bootstrap-editable.css'
 		resource url:'/css/biodiv.css'
-		resource url:"/css/${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.app.siteCode}.css"
+		resource url:"/css/${grails.util.Holders.config.speciesPortal.app.siteCode}.css"
 
 
 		resource url:'/bootstrap/js/bootstrap.min.js'

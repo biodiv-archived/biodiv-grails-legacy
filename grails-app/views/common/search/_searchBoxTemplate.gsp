@@ -31,18 +31,19 @@ $(document).ready(function() {
         'isMediaFilter' : '${params.isMediaFilter}',
         'resDeleteUrl' : "${uGroup.createLink(controller:'resource', action: 'deleteUsersResourceById')}",
         'getSpeciesFieldMedia' : "${createLink(controller:'species',  action:'getSpeciesFieldMedia')}",
-        "queryParamsMax":"${queryParams?.max}",
+        'queryParamsMax':"${queryParams?.max}",
+        'filesutraURL':"${grailsApplication.config.speciesPortal.resources.filesutraURL}",
         'getProcessedImageUrl' : "${createLink(controller:'observation',  action:'getProcessedImageStatus')}",
         'curation':{
-        'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",
-        'getNameDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getNameDetails')}",
-        'searchExternalDbUrl' : "${uGroup.createLink('controller':'namelist', action:'searchExternalDb')}",
-        'getExternalDbDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getExternalDbDetails')}",
-        'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
-        'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
-        'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
-        'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}",
-        'editSpeciesPageURL' : "${uGroup.createLink(controller:'species', action:'editSpeciesPage')}"
+            'getNamesFromTaxonUrl' : "${uGroup.createLink('controller':'namelist', action:'getNamesFromTaxon')}",
+            'getNameDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getNameDetails')}",
+            'searchExternalDbUrl' : "${uGroup.createLink('controller':'namelist', action:'searchExternalDb')}",
+            'getExternalDbDetailsUrl' : "${uGroup.createLink('controller':'namelist', action:'getExternalDbDetails')}",
+            'searchIBPURL' : "${uGroup.createLink('controller':'namelist', action:'searchIBP')}",
+            'getOrphanRecoNamesURL' : "${uGroup.createLink('controller':'namelist', action:'getOrphanRecoNames')}",
+            'curateNameURL' : "${uGroup.createLink(controller:'namelist', action:'curateName')}",
+            'saveAcceptedNameURL' : "${uGroup.createLink(controller:'namelist', action:'saveAcceptedName')}",
+            'editSpeciesPageURL' : "${uGroup.createLink(controller:'species', action:'editSpeciesPage')}"
 
         },
         'speciesName':"${params.speciesName }",
@@ -68,7 +69,7 @@ $(document).ready(function() {
             'deleteUrl':"${uGroup.createLink(controller:'species', action:'delete')}",
             'hasPermissionToCreateSpeciesPageUrl':"${uGroup.createLink(controller:'species', action:'hasPermissionToCreateSpeciesPage')}"
         },
-        'loginUrl':"${createLink(controller:'login','userGroup':userGroupInstance)}",
+        'loginUrl':"${uGroup.createLink(controller:'login','userGroup':userGroupInstance)}",
         'isLoggedInUrl' : "${uGroup.createLink(controller:'user', action:'isLoggedIn')}",
         'login' : {
             'googleApiKey' : "${grailsApplication.config.grails.plugin.springsecurity.rest.oauth.google.apikey}",
@@ -80,8 +81,26 @@ $(document).ready(function() {
             channelUrl : "${Utils.getDomainServerUrl(request)}/channel.html",
             springOpenIdSecurityUrl : "${Utils.getDomainServerUrlWithContext(request)}/j_spring_openid_security_check", 
             authIframeUrl : "${uGroup.createLink(controller:'login', action:'authIframe', absolute:true)}",
-            logoutUrl : "${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress)}",
-            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}"
+            logoutUrl : "${uGroup.createLink(controller:'logout', action:'index')}",
+            defaultLogoutUrl : "${userGroupInstance?uGroup.createLink(mapping:'onlyUserGroup', controller:'userGroup', action:'index', 'userGroup':userGroupInstance):'/'}",
+            fbAppId : "${grailsApplication.config.speciesPortal.ibp.facebook.appId}",
+            api : {
+                loginUrl : "${grailsApplication.config.speciesPortal.api.loginURL}", 
+                tokenUrl : "${grailsApplication.config.speciesPortal.api.tokenURL}", 
+                logoutUrl : "${grailsApplication.config.speciesPortal.api.logoutURL}", 
+                cookie : {
+                    domain : "${grailsApplication.config.speciesPortal.api.cookie.domain}",
+                    path : "${grailsApplication.config.speciesPortal.api.cookie.path}"
+                },
+                facebook : {
+                    apiKey : "${grailsApplication.config.speciesPortal.api.facebook.apiKey}",
+                    redirect_uri : "${grailsApplication.config.speciesPortal.api.facebook.redirect_uri}"
+                },
+                google : {
+                    apiKey : "${grailsApplication.config.speciesPortal.api.google.apiKey}",
+                    redirect_uri : "${grailsApplication.config.speciesPortal.api.google.redirect_uri}"
+                }
+            }
         },
         'userTermsUrl' : "${uGroup.createLink(controller:'user', action: 'terms')}",
         'requestPermissionFormUrl' : "${uGroup.createLink(controller:'species', action: 'requestPermission','userGroup':userGroupInstance)}",
@@ -99,18 +118,17 @@ $(document).ready(function() {
             'url':"${uGroup.createLink('controller':'content')}"
         },
         'observation':{
-listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-        occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-        relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-        uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
-        distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
-        distinctIdentifiedRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctIdentifiedReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action,userGroup:userGroupInstance])}",
-        speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
-        'addRecommendationVoteURL' : "${uGroup.createLink(controller:'observation', action:'addRecommendationVote', 'userGroup':userGroupInstance )}",
-        'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}",
-        'customFieldsUrl':"${uGroup.createLink(controller:'observation', action: 'customFields', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-        'commentsUrl':"${uGroup.createLink(controller:'observation', action: 'comments', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
-
+            listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+            occurrencesUrl:"${uGroup.createLink(controller:'observation', action: 'occurrences', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+            relatedObservationsUrl:"${uGroup.createLink(controller:'observation', action: 'related', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+            uploadUrl:"${g.createLink(controller:'observation', action:'upload_resource')}",
+            distinctRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+            distinctIdentifiedRecoListUrl:"${uGroup.createLink(controller:'observation', action: 'distinctIdentifiedReco', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action,userGroup:userGroupInstance])}",
+            speciesGroupCountListUrl:"${uGroup.createLink(controller:'observation', action: 'speciesGroupCount', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+            'addRecommendationVoteURL' : "${uGroup.createLink(controller:'observation', action:'addRecommendationVote', 'userGroup':userGroupInstance )}",
+            'serverURL':"${grailsApplication.config.speciesPortal.observations.serverURL}",
+            'customFieldsUrl':"${uGroup.createLink(controller:'observation', action: 'customFields', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
+            'commentsUrl':"${uGroup.createLink(controller:'observation', action: 'comments', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
         },
         'recommendation': {
             'getRecos' : "${uGroup.createLink(controller:'recommendation', action:'getRecos', userGroup:userGroupInstance)}",
@@ -123,9 +141,6 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
             'domain':document.domain,
             'geoserverHost':document.domain,
             'serverURL':"${grailsApplication.config.speciesPortal.maps.serverURL}"
-        },
-        'ck':{
-
         },
         'taxon': {
             'classification': {
@@ -154,11 +169,16 @@ listUrl:"${uGroup.createLink(controller:'observation', action: 'list', 'userGrou
         },
         'trait' : {
             'matchingSpeciesListUrl':"${uGroup.createLink(controller:'trait', action: 'matchingSpecies', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress, params:[actionType:params.action])}",
+            'matchingObservationsListUrl':"${uGroup.createLink(controller:'trait', action: 'matchingObservations', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}",
             'listUrl':"${uGroup.createLink(controller:'trait', action: 'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
         },
         'fact' : {
             'updateFactUrl' : "${uGroup.createLink(controller:'fact', action:'update', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
         },
+        'dataset' : {
+            'listUrl' : "${uGroup.createLink(controller:'dataset', action:'list', 'userGroup':userGroupInstance, 'userGroupWebaddress':params.webaddress)}"
+        },
+
         'serverURL':"${grailsApplication.config.grails.serverURL.replace('/biodiv', '')}"
         <sUser:isAdmin>
         ,

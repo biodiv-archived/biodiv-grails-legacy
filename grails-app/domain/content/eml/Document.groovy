@@ -20,6 +20,13 @@ import species.groups.UserGroup.FilterRule;
 import com.vividsolutions.jts.geom.GeometryFactory
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="document", include = "non-lazy")
+//@JsonIgnoreProperties([])
 /**
  * eml-literature module
  * http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-literature.html
@@ -81,7 +88,7 @@ class Document extends DataObject implements Comparable {
 
 	DocumentType type
 	String title
-	
+
 	UFile uFile   //covers physical file formats
 	//String uri
 	
@@ -143,6 +150,7 @@ class Document extends DataObject implements Comparable {
         contributors type:"text"
         title type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "document_id_seq"] 
+        //cache include: 'non-lazy'
     }
 
     List fetchAllFlags(){
@@ -253,11 +261,14 @@ class Document extends DataObject implements Comparable {
         filterRule.each { fRule ->
             switch(fRule.fieldName) {
                 case 'topology' : 
-                if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
+                if(!this.latitude || !this.longitutde)
+                    isValid = false;
+                else if(fRule.ruleName.equalsIgnoreCase('dwithin')) {
                     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
                     def location = geometryFactory.createPoint(new Coordinate(this.longitude, this.latitude));
                     isValid = isValid && fRule.ruleValues[0].covers(location);
                 }
+
                 break;
                 case 'taxon' : 
                 if(fRule.ruleName.equalsIgnoreCase('scope')) {
@@ -277,5 +288,29 @@ class Document extends DataObject implements Comparable {
                 validUserGroups << uGroup;
         }
         return validUserGroups;
+    }
+
+    def fetchChecklistAnnotation(){
+        def res = [:]
+        res['id'] = this.id;
+        res['type'] = 'document';
+        res['title'] = this.title;
+        res['url'] = this.externalUrl;
+        if(uFile) {
+        res['uFile'] = this.uFile.path;
+        }
+        return res
+    }
+
+    static long countDocuments() {
+        def c = Document.createCriteria();
+        def count = c.count {
+            //cache true;
+        }
+        return count;
+    }
+
+    public void setType(type) {
+        this.type = type;
     }
 }

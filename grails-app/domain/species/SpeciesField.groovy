@@ -4,7 +4,7 @@ import org.grails.rateable.*
 import species.auth.SUser
 import species.NamesSorucedata;
 import species.Language;
-
+import species.dataset.DataTable;
 import org.springframework.context.MessageSourceResolvable;
 class SpeciesField extends NamesSorucedata implements Rateable {
 
@@ -84,6 +84,7 @@ class SpeciesField extends NamesSorucedata implements Rateable {
     List<Contributor> attributors;
 	// Language
     Language language;
+    DataTable dataTable;
 
 	static hasMany = [licenses:License, audienceTypes:AudienceType, resources:Resource, references:Reference, attributors:Contributor];
 	static belongsTo = [species:Species];
@@ -110,6 +111,7 @@ class SpeciesField extends NamesSorucedata implements Rateable {
 				return ['species.field.empty', 'licenses',  obj.field.concept, obj.field.category, obj.field.subCategory, obj.species.taxonConcept.name]
 			}
 		}
+        dataTable nullable:true
 	}
 	
 	def beforeDelete(){

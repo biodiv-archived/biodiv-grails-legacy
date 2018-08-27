@@ -19,8 +19,9 @@ import species.utils.ImageType;
 import species.groups.SpeciesGroup;
 import species.CommonNames;
 import org.apache.commons.lang.time.DateUtils;
+import species.dataset.DataTable;
 
-import org.springframework.context.i18n.LocaleContextHolder as LCH; 
+import org.springframework.context.i18n.LocaleContextHolder as LCH;
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 
@@ -51,6 +52,11 @@ import java.text.SimpleDateFormat;
 
 import java.text.Format;
 
+import org.hibernate.cache.redis.util.RedisCacheUtil;
+import org.hibernate.cache.redis.client.RedisClientFactory;
+import org.hibernate.cache.CacheException;
+import org.hibernate.cache.redis.client.RedisClient;
+
 class UtilsService {
 
     static transactional = false
@@ -75,6 +81,7 @@ class UtilsService {
     static final String OBSERVATION_FLAGGED = "observationFlagged";
     static final String OBSERVATION_DELETED = "observationDeleted";
     static final String CHECKLIST_DELETED= "checklistDeleted";
+    static final String DATATABLE_DELETED= "dataTableDeleted";
     static final String DOWNLOAD_REQUEST = "downloadRequest";
     static final String IMPORT_REQUEST = "importRequest";
     //static final int MAX_EXPORT_SIZE = -1;
@@ -86,7 +93,7 @@ class UtilsService {
 
     static final String DIGEST_MAIL = "digestMail";
     static final String DIGEST_PRIZE_MAIL = "digestPrizeMail";
-    
+
     static final String OBV_LOCKED = "obv locked";
     static final String OBV_UNLOCKED = "obv unlocked";
 
@@ -96,6 +103,12 @@ class UtilsService {
 
     private Map bannerMessageMap;
     private Map filterMap;
+
+    private RedisClient redisClient;
+
+    UtilsService() {
+       redisClient = RedisClientFactory.createRedisClient(RedisCacheUtil.getRedissonConfigPath());
+    }
 
     public void cleanUpGorm() {
         cleanUpGorm(true)
@@ -133,7 +146,7 @@ class UtilsService {
     }
 
     public createHardLink(controller, action, id){
-        return "" + Utils.getIBPServerDomain() + "/" + controller + "/" + action + "/" + id 
+        return "" + Utils.getIBPServerDomain() + "/" + controller + "/" + action + "/" + id
     }
 
     def userGroupBasedLink(attrs) {
@@ -155,22 +168,25 @@ class UtilsService {
             def userGroup = attrs.remove('userGroup');
             attrs.remove('userGroupWebaddress');
             boolean absolute = attrs.remove('absolute');
+            String fragment = attrs.remove('fragment')
+
+            fragment = fragment?:'';
             if(attrs.params) {
                 attrs.putAll(attrs.params);
                 attrs.remove('params');
             }
             if(base) {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs);
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, fragment:fragment, params:attrs);
                 String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
                 url = url.replace(onlyGroupUrl, "");
             } else {
 
-                if((userGroup?.domainName)) { 
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs);
+                if((userGroup?.domainName)) {
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName,  fragment:fragment, 'action':action, absolute:absolute, params:attrs);
                     String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
                     url = url.replace(onlyGroupUrl, "");
                 } else {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs);
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(),  fragment:fragment, 'action':action, absolute:absolute, params:attrs);
                 }
             }
 
@@ -183,6 +199,9 @@ class UtilsService {
             def userGroup = attrs.remove('userGroup');
             String userGroupWebaddress = attrs.remove('userGroupWebaddress');
             boolean absolute = attrs.remove('absolute');
+            String fragment = attrs.remove('fragment')
+
+            fragment = fragment?:'';
             def userGroupController = new UserGroupController();
             userGroup = userGroupController.findInstance(null, userGroupWebaddress, false);
             if(attrs.params) {
@@ -190,17 +209,17 @@ class UtilsService {
                 attrs.remove('params');
             }
             if(base) {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base, absolute:absolute, params:attrs)
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, 'base':base,  fragment:fragment, absolute:absolute, params:attrs)
                 String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+'/','/')
                 url = url.replace(onlyGroupUrl, "");
             } else {
 
-                if((userGroup?.domainName)) { 
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName, 'action':action, absolute:absolute, params:attrs)
+                if((userGroup?.domainName)) {
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:userGroup.domainName,  fragment:fragment, 'action':action, absolute:absolute, params:attrs)
                     String onlyGroupUrl = grailsLinkGenerator.link(mapping:'onlyUserGroup', params:['webaddress':attrs.webaddress]).replace("/"+grailsApplication.metadata['app.name']+"/",'/')
                     url = url.replace(onlyGroupUrl, "");
                 } else {
-                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(), 'action':action, absolute:absolute, params:attrs)
+                    url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, base:Utils.getIBPServerDomain(),  fragment:fragment, 'action':action, absolute:absolute, params:attrs)
                 }
             }
 
@@ -212,16 +231,20 @@ class UtilsService {
             attrs.remove('userGroupWebaddress');
             String mappingName = attrs.remove('mapping');
             boolean absolute = attrs.remove('absolute');
+
+            String fragment = attrs.remove('fragment')
+            fragment = fragment?:'';
             if(attrs.params) {
                 attrs.putAll(attrs.params);
                 attrs.remove('params');
             }
             if(base) {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                url = grailsLinkGenerator.link(mapping:mappingName, 'base':base, 'controller':controller, 'action':action, absolute:absolute,  fragment:fragment, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             } else {
-                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
+                url = grailsLinkGenerator.link(mapping:mappingName, 'controller':controller, 'action':action, absolute:absolute,  fragment:fragment, params:attrs).replace("/"+grailsApplication.metadata['app.name']+'/','/')
             }
         }
+        if(url.endsWith('#')) url = url.replaceAll('#','');
         return url;//.replace('/api/', '/');
     }
 
@@ -291,11 +314,9 @@ class UtilsService {
     }
 
     Language getCurrentLanguage(request = null,cuRLocale = null){
-       // println "====================================="+request
-        
         if(!defaultLanguage) defaultLanguage = Language.getLanguage(Language.DEFAULT_LANGUAGE);
         String langStr = (cuRLocale)?:LCH.getLocale()
-        def (twoLetterCode, lang1) = langStr.tokenize( '_' );       
+        def (twoLetterCode, lang1) = langStr.tokenize( '_' );
         def languageInstance = Language.findByTwoLetterCode(twoLetterCode);
         return languageInstance ? languageInstance : defaultLanguage;
     }
@@ -352,12 +373,12 @@ class UtilsService {
                 break
 
                 case [FACT_UPDATE]:
-                    println "fact update mail"
-                    def user = springSecurityService.currentUser;
+                    def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
+//                    def user = springSecurityService.currentUser;
                     mailSubject = messageSource.getMessage("mail.fact.updated", null, LCH.getLocale())
                     templateMap["message"] = messageSource.getMessage("mail.update.fact", null, LCH.getLocale())
-                    templateMap["trait"] = otherParams["trait"]
-                    templateMap["traitValue"] = otherParams["traitValue"]
+                    templateMap["traitInstance"] = otherParams["trait"]
+                    templateMap["traitValueStr"] = otherParams["traitValueStr"]
                     bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/factUpdate"
                     populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                     toUsers.add(user)
@@ -376,8 +397,8 @@ class UtilsService {
 				toUsers.add(getOwner(obv))
 				break
 
-	
-				
+
+
                 case [ActivityFeedService.CHECKLIST_CREATED, ActivityFeedService.CHECKLIST_UPDATED]:
                 if( notificationType == ActivityFeedService.CHECKLIST_CREATED ) {
                     mailSubject = messageSource.getMessage("mail.list.added", null, LCH.getLocale())
@@ -410,8 +431,9 @@ class UtilsService {
                 mailSubject = "Species uploaded"
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/speciesContributor"
                 templateMap["link"] = otherParams["link"]
-                def user = springSecurityService.currentUser;                
-                templateMap["contributor"] = user.name
+                def user = feedInstance ? feedInstance.author : springSecurityService.currentUser
+//                def user = springSecurityService.currentUser;
+                templateMap["contributor"] = user?.name
                 templateMap["speciesCreated"] = otherParams["speciesCreated"]
                 templateMap["speciesUpdated"] = otherParams["speciesUpdated"]
                 templateMap["stubsCreated"] = otherParams["stubsCreated"]
@@ -442,7 +464,7 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
-                case CHECKLIST_DELETED :
+                case [CHECKLIST_DELETED,DATATABLE_DELETED] :
                 mailSubject = messageSource.getMessage("grails.plugin.springsecurity.ui.checklistDeleted.emailSubject", null, LCH.getLocale())
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["actionObject"] = messageSource.getMessage("default.checklist.label", null, LCH.getLocale())
@@ -494,7 +516,7 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
-                case ActivityFeedService.COMMENT_ADDED:				
+                case ActivityFeedService.COMMENT_ADDED:
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 templateMap["userGroupWebaddress"] = userGroupWebaddress
@@ -550,16 +572,16 @@ class UtilsService {
                 toUsers.add(getOwner(obv))
                 break
 
-			
+
                 case [ActivityFeedService.FEATURED, ActivityFeedService.UNFEATURED]:
-                boolean a = (notificationType == ActivityFeedService.FEATURED)               
+                boolean a = (notificationType == ActivityFeedService.FEATURED)
                 mailSubject = getDescriptionForFeature(obv, null , a)
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 def ug = getDomainObject(feedInstance.activityHolderType, feedInstance.activityHolderId)
                 def groupName
                 if(obv == ug){
-                    groupName = grailsApplication.config.speciesPortal.app.siteName 
+                    groupName = grailsApplication.config.speciesPortal.app.siteName
                 }
                 else{
                     groupName = getUserGroupHyperLink(ug)
@@ -597,7 +619,7 @@ class UtilsService {
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(otherParams["usersEmailList"]);
                 break
-                
+
                 case [ActivityFeedService.SPECIES_CREATED, ActivityFeedService.SPECIES_UPDATED]:
                 mailSubject = notificationType;
                 if(otherParams['resURLs']){
@@ -630,7 +652,7 @@ class UtilsService {
                 mailSubject = notificationType;
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
                 templateMap["message"] = Introspector.decapitalize(otherParams['info']);
-                templateMap['spFDes'] = otherParams['spFDes']; 
+                templateMap['spFDes'] = otherParams['spFDes'];
                 populateTemplate(obv, templateMap, userGroupWebaddress, feedInstance, request)
                 toUsers.addAll(getParticipants(obv))
                 break
@@ -653,14 +675,14 @@ class UtilsService {
                 toUsers.addAll(getParticipants(obv))
                 break
 
-                case NEW_SPECIES_PERMISSION : 
+                case NEW_SPECIES_PERMISSION :
                 mailSubject = notificationType
                 bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/grantedPermission"
                 def user = otherParams['user'];
                 templateMap.putAll(otherParams);
                 toUsers.add(user)
                 break
-				
+
 				case ActivityFeedService.CUSTOM_FIELD_EDITED :
 				mailSubject = messageSource.getMessage("custom.field.edited", null, LCH.getLocale())
 				bodyView = "/emailtemplates/"+userLanguage.threeLetterCode+"/addObservation"
@@ -704,7 +726,7 @@ class UtilsService {
                 templateMap["message"] = messageSource.getMessage("mail.observationspeciesgroupupdate.message", null, LCH.getLocale())
                 toUsers.addAll(getParticipants(obv))
                 break
-                
+
                 default:
                 log.debug "invalid notification type"
             }
@@ -773,7 +795,7 @@ class UtilsService {
             def mainImage = obv.mainImage()
             def imagePath;
 
-            if(mainImage?.fileName == speciesGroupIcon.fileName) { 
+            if(mainImage?.fileName == speciesGroupIcon.fileName) {
                 imagePath = mainImage.thumbnailUrl(null, '.png');
             } else {
                 imagePath = mainImage?mainImage.thumbnailUrl():null;
@@ -783,20 +805,20 @@ class UtilsService {
             templateMap["groups"] = obv.userGroups
         }
         if(obv.instanceOf(Species) && obv.id) {
-            templateMap["obvSName"] = obv.taxonConcept.normalizedForm 
-            templateMap["obvCName"] = CommonNames.findWhere(taxonConcept:obv.taxonConcept, language:Language.findByThreeLetterCode('eng'), isDeleted:false)?.name    
-            def imagePath = ''; 
-            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL) 
-            def mainImage = obv.mainImage(); 
-            if(mainImage?.fileName == speciesGroupIcon.fileName) {  
-                imagePath = mainImage.thumbnailUrl(null, '.png'); 
-            } else 
-                imagePath = mainImage?mainImage.thumbnailUrl():null; 
+            templateMap["obvSName"] = obv.taxonConcept.normalizedForm
+            templateMap["obvCName"] = CommonNames.findWhere(taxonConcept:obv.taxonConcept, language:Language.findByThreeLetterCode('eng'), isDeleted:false)?.name
+            def imagePath = '';
+            def speciesGroupIcon =  obv.fetchSpeciesGroup().icon(ImageType.ORIGINAL)
+            def mainImage = obv.mainImage();
+            if(mainImage?.fileName == speciesGroupIcon.fileName) {
+                imagePath = mainImage.thumbnailUrl(null, '.png');
+            } else
+                imagePath = mainImage?mainImage.thumbnailUrl():null;
 
-            templateMap["obvImage"] = imagePath.replaceAll(' ','%20'); 
-            //get All the UserGroups a species is part of 
-            templateMap["groups"] = obv.userGroups 
-        }   
+            templateMap["obvImage"] = imagePath.replaceAll(' ','%20');
+            //get All the UserGroups a species is part of
+            templateMap["groups"] = obv.userGroups
+        }
 
         if(feed) {
             templateMap['actor'] = feed.author;
@@ -807,9 +829,9 @@ class UtilsService {
             def domainObject = getDomainObject(feed.rootHolderType, feed.rootHolderId);
             templateMap['domainObjectTitle'] = getTitle(domainObject);
             templateMap['domainObjectType'] = feed.rootHolderType.split('\\.')[-1].toLowerCase()
-			templateMap['domainObject'] = domainObject 
+			templateMap['domainObject'] = domainObject
         }
-		
+
     }
 
     private List getParticipants(observation) {
@@ -833,7 +855,7 @@ class UtilsService {
         }else{
             //XXX for user only sending founders and current user as list members list is too large have to decide on this
             List userList = observation.getFounders(100, 0)
-            userList.addAll(observation.getExperts(100, 0)) 
+            userList.addAll(observation.getExperts(100, 0))
             def currUser = springSecurityService.currentUser
             if(!userList.contains(currUser)){
                 userList << currUser
@@ -855,7 +877,7 @@ class UtilsService {
             author = springSecurityService.currentUser;
         }
         return author;
-    } 
+    }
 
     private String getTitle(observation) {
         if(observation.metaClass.hasProperty(observation, 'title')) {
@@ -925,24 +947,28 @@ class UtilsService {
 
     }
 
-    //XXX for new checklists doamin object and controller name is not same as grails convention so using this method 
+    //XXX for new checklists doamin object and controller name is not same as grails convention so using this method
     // to resolve controller name
     static getTargetController(domainObj){
         if(domainObj.instanceOf(Checklists)){
             return "checklist"
         } else if(domainObj.instanceOf(SUser)){
             return "user"
+        } else if(domainObj.instanceOf(UserGroup)){
+            return "userGroup"
+        } else if(domainObj.instanceOf(DataTable)){
+            return "dataTable"
         } else {
             return domainObj.class.getSimpleName().toLowerCase()
         }
     }
 
     /**
-     * 
+     *
      * @param groupId
      * @return
      */
-    Object getSpeciesGroupIds(groupId){
+    Object getSpeciesGroupIds(Long groupId){
         def groupName = SpeciesGroup.read(groupId)?.name
         //if filter group is all
         if(!groupName || (groupName == grailsApplication.config.speciesPortal.group.ALL)){
@@ -954,30 +980,31 @@ class UtilsService {
     //////////////////////TIME LOGGING/////////////////////
 
     def benchmark(String blockName, Closure closure) {
-        def start = System.currentTimeMillis()  
-        closure.call()  
-        def now = System.currentTimeMillis()  
-        log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"  
-    }  
+        def start = System.currentTimeMillis()
+        closure.call()
+        def now = System.currentTimeMillis()
+        log.debug "%%%%%%%%%%%% execution time for ${blockName} took ${now- start} ms"
+    }
 
     static def logSql(Closure closure, String blockName="") {
         Logger sqlLogger = Logger.getLogger("org.hibernate.SQL");
         Level currentLevel = sqlLogger.level
         if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
-            println "%%%%%%%%%%%% logging sql ${blockName}"  
+            println "%%%%%%%%%%%% logging sql ${blockName}"
             sqlLogger.setLevel(Level.TRACE)
+            println "%%%%%%%%%%%% END logging sql ${blockName}"
         }
         def result = closure.call()
 
         if(Environment.getCurrent().getName().equalsIgnoreCase("development")) {
-            println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"  
+            println "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             sqlLogger.setLevel(currentLevel)
         }
         result
     }
 
     ///////////// FILE PICKER SECURITY /////////////////////
-    
+
     def filePickerSecurityCodes() {
         def codes = [:]
         Integer expiry = (System.currentTimeMillis()/1000).toInteger() + 60*60*2;  //expiry = 2 hours
@@ -999,7 +1026,7 @@ class UtilsService {
             throw new RuntimeException("Invalid key exception while converting to HMac SHA256")
         }
     }
-    
+
     ///////////////////////PERMISSIONS//////////////////////
 
     boolean permToReorderPages(uGroup){
@@ -1037,13 +1064,13 @@ class UtilsService {
 		if(!user) return false
 		return SUserRole.get(user.id, Role.findByAuthority('ROLE_SPECIES_ADMIN').id) != null
 	}
-	
+
 
 	boolean isAdmin(SUser user) {
 		if(!user) return false
 		return SUserRole.get(user.id, Role.findByAuthority('ROLE_ADMIN').id) != null
 	}
-	
+
 	boolean isCEPFAdmin(id) {
 		if(!id) return false
 		return SpringSecurityUtils.ifAllGranted('ROLE_CEPF_ADMIN')
@@ -1052,8 +1079,8 @@ class UtilsService {
     ////////////////////////RESPONSE FORMATS//////////////////
 
     Map getErrorModel(String msg, domainObject, int status=500, def errors=null) {
-        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
-        String acceptHeader = request.getHeader('Accept');
+//        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest();
+//        String acceptHeader = request.getHeader('Accept');
 
         if(!errors) errors = [];
         if(domainObject) {
@@ -1063,20 +1090,25 @@ class UtilsService {
             }
         }
 
-        (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        try {
+            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+        } catch(Exception e) {
+            log.error "Error setting status in response"
+        }
+
         def result = [success:false, status:status, msg:msg, errors:errors];
-        if(domainObject) 
+        if(domainObject)
             result['instance'] = domainObject;
         return result;
     }
 
     Map getSuccessModel(String msg, domainObject, int status=200, Map model = null) {
-        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+//        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
 //        println "+++++++++++++++++++++++++++++++++++++++"
-        String acceptHeader = request.getHeader('Accept');
+//        String acceptHeader = request.getHeader('Accept');
 //        println acceptHeader
         def result = [success:true, status: status, msg:msg]
-        //HACK to handle previous version of api for mobile app 
+        //HACK to handle previous version of api for mobile app
 /*        boolean isMobileApp = true;// need to check using user agent
         if(acceptHeader.contains('application/json') && !acceptHeader.contains('application/json;v=1.0') && isMobileApp) {
             if(domainObject) {
@@ -1102,9 +1134,13 @@ class UtilsService {
         } else {
 */            if(domainObject) result['instance'] = domainObject;
             if(model) result['model'] = model;
-            (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            try {
+                (WebUtils.retrieveGrailsWebRequest()?.getCurrentResponse()).setStatus(status);
+            } catch(Exception e) {
+                log.error "Error setting status in response"
+            }
             return result;
-//        } 
+//        }
     }
 
 	static Date parseDate(date, sendNew = true){
@@ -1112,7 +1148,7 @@ class UtilsService {
             if(!sendNew) {
                 Date d;
                 if(date) {
-                    d = DateUtils.parseDateStrictly(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date) 
+                    d = DateUtils.parseDateStrictly(date, DATE_PATTERNS);//Date.parse("dd/MM/yyyy", date)
                     d.set(['hourOfDay':23, 'minute':59, 'second':59]);
                 }else {
                     d = null
@@ -1166,36 +1202,50 @@ class UtilsService {
 		return "custom_fields_group_" + ug.id
 	}
 
-    def getFromCache(String cacheName, String cacheKey) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
-        if(!cache) return null;
-        log.debug "Returning from cache ${cache.name}" 
-        return cache.get(cacheKey)?.get();
+    def getFromCache(final String cacheName, final String cacheKey) {
+/*        def cache = grailsCacheManager.getCache(cacheName);
+        println "CACHE CACHE CACHE CACHE ${cacheName}================================================"
+        if(!cacheName || !cacheKey) return null;
+        //return cache.get(cacheKey)?.get();
+*/
+        log.debug "Get from cache ${cacheName} ${cacheKey}"
+        return redisClient.get(cacheName, cacheKey);
     }
 
-    def putInCache(String cacheName, String cacheKey, value) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+    def putInCache(final String cacheName, final String cacheKey, value) {
+/*        def cache = grailsCacheManager.getCache(cacheName);
+        println "CACHE CACHE CACHE CACHE ${cacheName}================================================"
+        println cache
+
         if(!cache) return null;
-        log.debug "Putting result in cache ${cache.name} at key ${cacheKey}"
         cache.put(cacheKey,value);
-    }  
-    
-    Map getBannerMessages() {  
+*/
+        if(cacheKey && value) {
+            log.debug "Putting result in cache ${cacheName} at key ${cacheKey} ${value?.class}"
+            redisClient.set(cacheName, cacheKey, value);
+        }
+    }
+
+    void shutdownRedisClient() {
+        redisClient.shutdown();
+    }
+
+    Map getBannerMessages() {
         return bannerMessageMap;
     }
 
-    String getBannerMessage(String userGroupWebaddress,request=null,cuRLocale=null) {  
+    String getBannerMessage(String userGroupWebaddress,request=null,cuRLocale=null) {
         //def request = (request) ?:(WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest())
         return bannerMessageMap ? bannerMessageMap[userGroupWebaddress+"_"+getCurrentLanguage(request,cuRLocale).threeLetterCode]:'';
     }
 
-    String getIbpBannerMessage(request=null,cuRLocale=null) {   
+    String getIbpBannerMessage(request=null,cuRLocale=null) {
         return bannerMessageMap ? bannerMessageMap["ibp"+"_"+getCurrentLanguage(request,cuRLocale).threeLetterCode]:'';
     }
 
-    void loadBannerMessageMap() {  
+    void loadBannerMessageMap() {
         log.debug "Loading bannerMessageMap from ${grailsApplication.config.speciesPortal.bannerFilePath}"
-        File bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);        
+        File bannerMessageFile = new File(grailsApplication.config.speciesPortal.bannerFilePath);
         bannerMessageMap = [:];
         if(bannerMessageFile.exists()) {
             bannerMessageFile.eachLine { line ->
@@ -1203,11 +1253,11 @@ class UtilsService {
                 gname = gname?.trim();
                 bmessage = (bmessage?.replaceAll("</?p>", ''))?.trim();
                 if(gname && bmessage) {
-                    bannerMessageMap[gname?.replaceAll("<(.|\n)*?>", '')] = bmessage;   
+                    bannerMessageMap[gname?.replaceAll("<(.|\n)*?>", '')] = bmessage;
                 }
             }
         }
-      
+
         /*
         def content_array=gapp
         def rvalue = ''
@@ -1220,30 +1270,29 @@ class UtilsService {
         return rvalue;*/
     }
 
-    def getModuleFilters(mod){        
+    def getModuleFilters(mod){
         if(mod && filterMap?.size() >0){
             return filterMap[mod];
         }
         return [];
     }
 
-    Map getFilters() {  
+    Map getFilters() {
         return filterMap;
     }
 
-    void loadFilterMap() {  
+    void loadFilterMap() {
         log.debug "Loading bannerMessageMap from ${grailsApplication.config.speciesPortal.filterFilePath}"
-        File filterFile = new File(grailsApplication.config.speciesPortal.filterFilePath);        
+        File filterFile = new File(grailsApplication.config.speciesPortal.filterFilePath);
         filterMap = [:];
         if(filterFile.exists()) {
             filterFile.eachLine { line ->
-                println line;
                 def (level,filter) = line.tokenize('-');
                 level = level?.replaceAll("<(.|\n)*?>", '')?.trim();
                 filter = (filter?.replaceAll("</?p>", ''))?.trim();
                 if(level && filter) {
                     if(filterMap[level]){
-                        filterMap[level].push(filter);   
+                        filterMap[level].push(filter);
                     }else{
                          filterMap[level]=[filter]
                     }
@@ -1253,17 +1302,23 @@ class UtilsService {
     }
 
     def evictInCache(String cacheName, String cacheKey) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+        /*org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
         log.debug "Evict result in cache ${cache.name} at key ${cacheKey}"
         return cache.evict(cacheKey);
+        */
+        log.debug "Evict result in cache ${cacheName} at key ${cacheKey}"
+        redisClient.del(cacheName, cacheKey)
     }
 
     def clearCache(String cacheName) {
-        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
+/*        org.springframework.cache.ehcache.EhCacheCache cache = grailsCacheManager.getCache(cacheName);
         if(!cache) return null;
-        log.debug "Clearing Cache ${cache.name}"
+        log.debug "Clearing Cache ${cacheName}"
         return cache.clear();
+*/
+        log.debug "Clearing Cache ${cacheName}"
+        redisClient.flushDb();
     }
 
     def CSVWriter getCSVWriter(def directory, def fileName) {
@@ -1275,9 +1330,9 @@ class UtilsService {
         return new CSVWriter(new FileWriter("$directory/$fileName")) //, separator );
     }
 
-    def writeLog = { String content, Level level=Level.DEBUG -> 
-            switch(level) { 
-                case Level.INFO : 
+    def writeLog = { String content, Level level=Level.DEBUG ->
+            switch(level) {
+                case Level.INFO :
                 log.info content;
                 break;
                 case Level.WARN :
@@ -1286,15 +1341,15 @@ class UtilsService {
                 case Level.ERROR :
                 log.error content;
                 break;
-                default : 
+                default :
                 log.debug content;
             }
         }
 
     /**
-     * 
+     *
      * @param colorStr e.g. "#FFFFFF"
-     * @return 
+     * @return
      */
     public static String hex2Rgb(String colorStr) {
         try {
@@ -1319,10 +1374,25 @@ class UtilsService {
 
     public static String getMonthName(String dateStr) {
         Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateStr)
-        Format formatter = new SimpleDateFormat("MMMM"); 
+        Format formatter = new SimpleDateFormat("MMMM");
             String s = formatter.format(date);
-                System.out.println(s);
                 return s;
     }
-}
 
+    public Map getTraits(String t) {
+        Map traits = [:];
+        if(t) {
+            t.split(';').each {
+                if(it) {
+                    String[] x = it.split(':');
+                    if(x.size() == 2)
+                        traits[x[0]] = x[1].trim();
+                    else if(x.size() == 3) //for range
+                        traits[x[0]] = x[1].trim()+':'+x[2].trim();
+
+                }
+            }
+        }
+        return traits;
+    }
+}

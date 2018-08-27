@@ -1,7 +1,5 @@
 package utils
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList;
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import org.springframework.security.acls.domain.BasePermission;
 
@@ -291,7 +289,6 @@ class NewsletterController {
     	
 		def userGroupInstance = findInstance(null, params.webaddress, false)
 		//if (!userGroupInstance) return;
-		println userGroupInstance
 		def currentLanguage = utilsService.getCurrentLanguage(request);
 		def newsletters = userGroupService.getNewsLetters(userGroupInstance, params.max, params.offset, params.sort, params.order,currentLanguage);		 
 

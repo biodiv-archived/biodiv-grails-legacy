@@ -11,9 +11,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
-
 import species.auth.SUser;
 import species.participation.Observation;
 import species.utils.Utils;
@@ -72,6 +69,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 		def user = UserDomainClass.newInstance(propsMap);
         if(!userLanguage) userLanguage = utilsService.getCurrentLanguage();
+        user.email = propsMap.email.toLowerCase();
         user.language = userLanguage;
 		user.enabled = true;
 		return user;
@@ -91,7 +89,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
 			return null
 		}
-		SUserSearchService.publishSearchIndex(user, true);
+		//SUserSearchService.publishSearchIndex(user, true);
 		return user
 	}
 
@@ -162,7 +160,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 				if (mailSubject.contains('$')) {
 					mailSubject = evaluate(mailSubject, [domain: Utils.getDomainName(request)])
 				}
-
+println templateMap;
 					try {
 						def userLanguage = utilsService.getCurrentLanguage();
 						mailService.sendMail {
@@ -306,7 +304,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 		def model;
 		try {
 		    model = getFilteredUsersFromSearch(params, max, offset);
-		} catch(SolrException e) {
+		} catch(Exception e) {
 		    e.printStackTrace();
 		}
 		return model;
@@ -318,11 +316,11 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 	   * offset: offset results: if offset = -1 its not passed to the
 	   * executing query
 	   */
+/*
 	 Map getFilteredUsersFromSearch(params, max, offset){
-	 	def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+	 	def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 		//Store all teh parameter list here
 		NamedList paramsList = new NamedList();
-		//Check for the parameters passed by user and convert them to solr queries
 		def queryParams = [:]
 		queryParams["query"] = params.query
 		queryParams["max"]  = max
@@ -364,7 +362,7 @@ class SUserService extends SpringSecurityUiService implements ApplicationContext
 
 		return [responseHeader:responseHeader, userInstanceList:userList, resultType:'user', instanceTotal:noOfResults, searchQuery:queryParams, totalUserIdList:totalUserList, searched:true, isSearch:true ] 
 	}
-        
+*/ 
 	private boolean isValidSortParam(String sortParam) {
 	    if(sortParam.equalsIgnoreCase("score") || sortParam.equalsIgnoreCase("name")  || sortParam.equalsIgnoreCase("lastLoginDate") )
 	          return true;

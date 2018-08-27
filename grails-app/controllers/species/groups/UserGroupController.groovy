@@ -49,7 +49,7 @@ class UserGroupController {
 	def activityFeedService;
     def digestService;
 	def customFieldService;
-	
+def dataSource;	
     def messageSource;
 	
     static allowedMethods = [show:'GET', index:'GET', list:'GET', save: "POST", update: ["POST","PUT"], delete: ["POST", "DELETE"]]
@@ -103,7 +103,6 @@ class UserGroupController {
 
 	def filteredList = {
 		def result;
-		//TODO: Dirty hack to feed results through solr if the request is from search
 		if(params.action == 'search') {
 			result = userGroupService.getUserGroupFromSearch(params)
 		} else {
@@ -171,7 +170,7 @@ class UserGroupController {
 	@Secured(['ROLE_USER'])
 	def create() {
 		def userGroupInstance = new UserGroup()
-		userGroupInstance.properties = params
+		//userGroupInstance.properties = params
 		return [userGroupInstance: userGroupInstance, currentUser:springSecurityService.currentUser]
 	}
 
@@ -281,7 +280,7 @@ class UserGroupController {
 			render(view: "create", model: [userGroupInstance: userGroupInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'userGroup.label', default: 'UserGroup'), userGroupInstance.name])}"
-			redirect  url: uGroup.createLink(mapping: 'userGroupGeneric', action: "list")
+			redirect  url: uGroup.createLink(action: "list")
 		}
 	}
 
@@ -381,9 +380,7 @@ class UserGroupController {
 
 	def user() {
 		def userGroupInstance = findInstance(params.id, params.webaddress, !params.format?.equalsIgnoreCase('json'))
-        println "11111111111111111111111"
 		if (!userGroupInstance) return
-println "2222222222222222222"
 		params.max = Math.min(params.max ? params.int('max') : 12, 100)
 		params.offset = params.offset ? params.int('offset') : 0
 
@@ -1440,39 +1437,84 @@ println "2222222222222222222"
    */
    @Secured(['ROLE_USER'])
    def addUserToGroup() {
+/* Use following for bulk acl permissions.
+create table acl_tmp(user_id bigint, name varchar(255));
+copy acl_tmp from '/tmp/abp_users21may.tsv' WITH (FORMAT csv);
+
+#creating sids
+insert into acl_sid select nextval('hibernate_sequence'), 't', email from (select id,email from suser u, acl_tmp at where u.id=at.user_id) suser_acl_tmp left join acl_sid on acl_sid.sid=suser_acl_tmp.email where acl_sid.sid is null; 
+
+#assam acl_entries
+select * from acl_entry where acl_object_identity=4087142;
+CREATE SEQUENCE ace_order_sql_tmp START 1;
+SELECT setval('ace_order_sql_tmp', max(x.ace_order)) from (select * from acl_entry where acl_object_identity=4087142) x;
+
+#users who already have role in this group
+select * from user_group_member_role ugmr, acl_tmp where ugmr.s_user_id=acl_tmp.user_id and ugmr.user_group_id=4087136;
+
+# users who do not have any role in the usergroup 
+select * from acl_tmp left join user_group_member_role ugmr on ugmr.s_user_id=acl_tmp.user_id and ugmr.user_group_id=4087136 where ugmr.s_user_id is null;
+
+#insert users with member role
+insert into user_group_member_role (user_group_id, role_id, s_user_id) select 4087136, 267837, x.user_id from (select acl_tmp.user_id from acl_tmp left join user_group_member_role ugmr on ugmr.s_user_id=acl_tmp.user_id and ugmr.user_group_id=4087136, suser  where suser.id=acl_tmp.user_id and ugmr.s_user_id is null) x;
+
+#granting acl permissions 
+insert into acl_entry select nextval('hibernate_sequence'), nextval('ace_order_sql_tmp'), 4087142, 'f', 'f', 't', 2, x.id from (select acl_sid.id from acl_tmp join suser on user_id=suser.id join acl_sid on acl_sid.sid=suser.email left join acl_entry on acl_entry.acl_object_identity=4087142 and acl_sid.id=acl_entry.sid where acl_entry.id is null) x;
+
+drop sequence ace_order_sql_tmp;
+drop table acl_tmp;
+
+
+*/
+
 	   log.debug params
 	   UserGroup ug = UserGroup.read(params.groupId.toLong())
 	   boolean sendMail = (params.sendMail ? params.sendMail.toBoolean() : false)
 	   boolean postObs = (params.postObs ? params.postObs.toBoolean() : false)
-	   def res = createFromFile("/tmp/users.tsv")
+	   boolean areIds = (params.areIds ? params.areIds.toBoolean() : false)
+	   def res = createFromFile(params.file, areIds)
 	   def oldUsers = res[0]
 	   def newUsers = res[1]
-	   
-	   SUser.withTransaction(){
-		   log.debug "adding new uesr " + user
-		   newUsers.each{ user ->
-			   ug.addMember(user);
-			   if(sendMail){
-				   sendNotificationMail(user, request, params, true, ug)
-			   }
-		   }
-		   oldUsers.each{ user ->
-			   log.debug "======== adding old user " + user
-			   ug.addMember(user);
-			   if(sendMail){
-				   sendNotificationMail(user, request, params, false, ug)
-			   }
-		   } 
-	   }
-	   
-	   SUser.withTransaction(){
-		   oldUsers.each{ user ->
-			   if(postObs){
-				   postObvToGroup(ug, user)
-			   }
-		   }
-	   }
-	   
+//       int unreturnedConnectionTimeout = dataSource.getUnreturnedConnectionTimeout();
+//       dataSource.setUnreturnedConnectionTimeout(100000);
+       int i=0;
+       SUser.withTransaction() { 
+           //UserGroup.withSession { session ->
+               newUsers.each { user ->
+                   i++;
+                   println "adding new uesr " + user
+                   ug.addMember(user);
+                   if(sendMail) { 
+                       sendNotificationMail(user, request, params, true, ug)
+                   }
+                   if(i%10 == 0) 
+                       utilsService.cleanUpGorm(false);
+               }
+               i=0;
+               oldUsers.each { user ->
+                   i++;
+                   println "======== adding old user " + user
+                   ug.addMember(user);
+                   if(sendMail){
+                       sendNotificationMail(user, request, params, false, ug)
+                   }
+                   if(i%10 == 0) 
+                       utilsService.cleanUpGorm(false);
+               }
+               utilsService.cleanUpGorm(false);
+           //}
+       }
+
+       SUser.withTransaction(){
+           oldUsers.each{ user ->
+               if(postObs){
+                   postObvToGroup(ug, user)
+               }
+           }
+       }
+//       log.debug "Reverted UnreturnedConnectionTimeout to ${unreturnedConnectionTimeout}";
+//       dataSource.setUnreturnedConnectionTimeout(unreturnedConnectionTimeout);
+        println "addUserToGroup done"
 	   render "== done"
    }
    
@@ -1541,22 +1583,31 @@ println "2222222222222222222"
 	   new SimpleTemplateEngine().createTemplate(s).make(binding)
    }
    
-   private createFromFile(String fileName){
+   private createFromFile(String fileName, boolean areIds=false){
+       if(!fileName) return;
+
+       File f = new File(fileName)
+       if(!f.exists()) return;
 	   Set emailList = new HashSet()
 	   new File(fileName).splitEachLine("\\t") {
 		   def fields = it;
 		   def email = fields[0].trim()
 		   emailList.add(email)
 	   }
-	   return createUserByEmail(emailList)
+	   return createUserByEmail(emailList, areIds)
 	}
    
-   private createUserByEmail(emailList){
+   private createUserByEmail(emailList, boolean areIds=false){
 	   Set oldUsers = new HashSet()
 	   Set newUsers = new HashSet() 
 	   def defaultRoleNames = ['ROLE_USER']
-	   emailList.each { email ->
-		   def user = SUser.findByEmail(email)
+	   emailList.each { email -> 
+		   def user;
+           if(areIds) {
+               user = SUser.get(Long.parseLong(email));
+           } else {
+               user = SUser.findByEmail(email);
+           }
 		   if(user){
 			   oldUsers.add(user)
 		   }else{
@@ -1693,14 +1744,14 @@ println "2222222222222222222"
         if(userGroupInstance.filterRule) {
             def filterRuleJson = JSON.parse(userGroupInstance.filterRule);
             JSON.parse(userGroupInstance.filterRule).each {
-                def rule = JSON.parse(it);
+                def rule = it;
                 rules << rule
             }
         }
         render rules as JSON
     }
 }
-
+/*
 class UserGroupCommand {
 	String name
 	String webaddress
@@ -1712,5 +1763,6 @@ class UserGroupCommand {
 		name nullable: false, blank:false
 		webaddress nullable: false, blank:false, validator: UserGroupController.webaddressValidator
 		description nullable: false, blank:false
+
 	}
-}
+}*/

@@ -16,6 +16,7 @@ import species.groups.CustomField;
 import species.auth.SUser;
 import species.License;
 import species.Species;
+import species.trait.Trait.DataTypes;
 
 class FactController extends AbstractObjectController {
 
@@ -77,78 +78,105 @@ class FactController extends AbstractObjectController {
     def update() {
         boolean success=false;
         Map model = [:], result=[:];
-        Trait trait;
+        Trait traitInstance;
         try {
         if(params.traitId) {
-            trait = Trait.read(params.long('traitId'));
+            traitInstance = Trait.read(params.long('traitId'));
         }
-        if(trait) {
+        if(traitInstance) {
             if(params.objectId && params.objectType) {
                 def object;
                 switch(params.objectType) {
-                    case 'species.Species': 
+                    case 'species.Species':
                     object = Species.read(Long.parseLong(params.objectId));
                     break;
-                    case 'species.participation.Observation': 
+                    case 'species.participation.Observation':
                     object = Observation.read(Long.parseLong(params.objectId));
                     break;
                 }
                 if(object) {
                     println params;
-                    params['contributor'] = springSecurityService.currentUser.email;
-                    params['attribution'] = springSecurityService.currentUser.email;
-                    params['license'] = License.LicenseType.CC_BY.value();
-                    if(params.traits) {
-                    params.putAll(factService.getTraits(params.remove('traits')));
-                    params['replaceFacts'] = 'true';
-                    Map r = factService.updateFacts(params, object, null, true);
-                    //TODO: to update this from approprite result from factService.update
-                    success = r.success;
-                    result = [success:success, msg:success?'Successfully updated fact':'Error updating fact'];
-                    def activityFeed;
-                    if(success) {
-                        r.facts_updated.each { fact ->
-                            activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_UPDATED, fact.getActivityDescription());
-                        }
-                        r.facts_created.each { fact ->
-                            activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
-                        }
-                        
-                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
-                        Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
-                        queryParams.trait[trait.id] = '';
-                        facts.each { fact ->
-                            queryParams.trait[trait.id] += fact.traitValue.id+',';
-                            if(!factInstance[trait.id]) {
-                                factInstance[trait.id] = [];
+                    Map p = [:];
+                    p['contributor'] = springSecurityService.currentUser.email;
+                    p['attribution'] = springSecurityService.currentUser.email;
+                    p['license'] = License.LicenseType.CC_BY.value();
+                    p['traitInstance'] = traitInstance;
+                    Map traits = factService.getTraits(params.traits);
+                    if(traits && traits[traitInstance.id+'']) {
+                        p.putAll(traits);
+                        p['replaceFacts'] = 'true';
+                        print (p)
+                        Map r = factService.updateFacts(p, object, null, true);
+                        //TODO: to update this from approprite result from factService.update
+                        success = r.success;
+                        result = [success:success, msg:success?'Successfully updated fact':'Error updating fact'];
+                        def activityFeed;
+                        if(success) {
+                            r.facts_updated.each { fact ->
+                                activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_UPDATED, fact.getActivityDescription());
                             }
-                            factInstance[trait.id] << fact.traitValue;
-                            otherParams["trait"] = trait.name
-                            otherParams["traitValue"] = fact.traitValue
-                            utilsService.sendNotificationMail(utilsService.FACT_UPDATE,object,null,null,null,otherParams)
-                        }
-                        println "======================"
-                        println queryParams
-                        model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
-                    } else {
+                            r.facts_created.each { fact ->
+                                activityFeed = activityFeedService.addActivityFeed(object, fact, fact.contributor, activityFeedService.FACT_CREATED, fact.getActivityDescription());
+                            }
 
-                    }
-                }else{
-                        // if no traitValue selected 
-                        List<Fact> facts = Fact.findAllByTraitAndObjectIdAndObjectType(trait, object.id, object.class.getCanonicalName());
+                            List<Fact> facts = Fact.findAllByTraitInstanceAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
+                            Map queryParams = ['trait':[:]], factInstance = [:], otherParams = [:];
+                            queryParams.trait[traitInstance.id] = '';
+                            facts.each { fact ->
+                                String tvStr = '';
+                                if(fact.traitValue) {
+                                    tvStr = fact.traitValue.id;
+                                } else if (traitInstance.dataTypes == DataTypes.DATE) {
+                                    tvStr = fact.fromDate.format('dd/MM/yyyy') + (fact.toDate ? ";" + fact.toDate.format('dd/MM/yyyy'):'')
+                                }else {
+                                    tvStr = fact.value + (fact.toValue ? ":" + fact.toValue:'')
+                                }
+
+                                queryParams.trait[traitInstance.id] += tvStr+',';
+                                if(!factInstance[traitInstance.id]) {
+                                    factInstance[traitInstance.id] = [];
+                                }
+                                factInstance[traitInstance.id] << (fact.traitValue ?: tvStr);
+
+                                otherParams["trait"] = traitInstance.name
+                                otherParams["traitValueStr"] = fact.getActivityDescription()
+                                utilsService.sendNotificationMail(utilsService.FACT_UPDATE,object,null,null,null,otherParams)
+                            }
+                            if(queryParams.trait) {
+                                queryParams.trait.each {k,v->
+                                    println k
+                                    println queryParams.trait[k]
+                                    if(queryParams.trait[k]) {
+                                        println v[0..-2]
+                                        queryParams.trait[k] = v[0..-2];
+                                    }
+                                }
+                            }
+
+                            println "======================"
+                            println queryParams
+
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':traitInstance, 'traitInstance':traitInstance, 'factInstance':factInstance, 'object':object, 'queryParams':queryParams, displayAny:false, editable:true]);
+                        } else {
+
+                        }
+                    } else {
+                        // if no traitValue selected
+                        log.debug "No trait value .. so deleting all facts for this trait ${traitInstance}"
+                        List<Fact> facts = Fact.findAllByTraitInstanceAndObjectIdAndObjectType(traitInstance, object.id, object.class.getCanonicalName());
 
                         facts.each { fact ->
                             fact.isDeleted = true;
                             fact.save();
                             result = [success:true, msg:'Successfully deleted fact']
-                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':trait, 'queryParams':'', displayAny:false, editable:true]);
+                            model['traitHtml'] = g.render(template:"/trait/showTraitTemplate", model:['trait':traitInstance, 'object':object, 'queryParams':'', displayAny:false, editable:true]);
                         }
 
-                }
+                    }
 
                 } else {
-                    result['msg'] = 'Not a valid object'; 
-                }               
+                    result['msg'] = 'Not a valid object';
+                }
             } else {
                 result['msg'] = 'Not a valid object';
             }
@@ -170,7 +198,7 @@ class FactController extends AbstractObjectController {
         }
 
     }
-    
+
     private saveAndRender(params, sendMail=true) {
         println "saveAndRender==============="+params
         params.locale_language = utilsService.getCurrentLanguage(request);
@@ -181,7 +209,7 @@ class FactController extends AbstractObjectController {
             }
             json {
                 result.remove('instance');
-                render result as JSON 
+                render result as JSON
             }
             xml {
                 result.remove('instance');
@@ -191,20 +219,44 @@ class FactController extends AbstractObjectController {
     }
 
 
-    @Secured(['ROLE_USER'])
+    @Secured(['ROLE_ADMIN'])
     def upload() {
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);          
+
+        if(!params.fFile?.path) {
+            flash.message = "Facts file is required";
+            render (view:'upload', model:[fFile:['path':params.fFile?.path,'size':params.fFile?.size]]);
+            return;
+        }
+
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir);
         if(!contentRootDir.exists()) {
             contentRootDir.mkdir();
         }
-        
-        params.file = contentRootDir.getAbsolutePath()+File.separator+params.file;
-        def r = factService.upload(params);
-        redirect(action: "list")
+
+        params.fFile = contentRootDir.getAbsolutePath() + File.separator + params.fFile.path;
+        params.file = params.fFile;
+
+        def fFileValidation = factService.validateFactsFile(params.fFile, new UploadLog());
+
+        if(fFileValidation.success) {
+            log.debug "Validation of fact file is done. Proceeding with upload"
+            def r = factService.upload(params);
+            if(r.success) {
+                flash.message = r.msg;
+                redirect(controller:'trait', action: "list")
+            } else {
+                flash.message = r.msg;
+                render (view:'upload', model:[fFile:['path':params.fFile], errors:r.errors]);
+            }
+        } else {
+            String msg = g.message(code: 'newsletter.create.fix.error', default:'Please fix the errors before proceeding');
+            flash.message = msg;
+            render (view:'upload', model:[fFile:['path':params.fFile, errors:fFileValidation.errors]]);
+        }
     }
 
     def migrateCustomFields() {
-        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);          
+        File contentRootDir = new File(Holders.config.speciesPortal.content.rootDir+File.separator+params.controller);
         println "Loading 7";
         int noOfUpdatedFacts_7 = migrateCustomFieldsToFacts(contentRootDir.getAbsolutePath()+'/customfields_group/gp 7.tsv','7');
         println noOfUpdatedFacts_7;
@@ -225,14 +277,14 @@ class FactController extends AbstractObjectController {
         println noOfUpdatedFacts_13;
 
         render noOfUpdatedFacts_7+" "+noOfUpdatedFacts_38+" "+noOfUpdatedFacts_33+" "+noOfUpdatedFacts_30+" "+noOfUpdatedFacts_18+" "+noOfUpdatedFacts_13;
-    } 
+    }
 
     private int migrateCustomFieldsToFacts(tsvFile,groupNo) {
         int i=0;
         String[] headers;
         String l;
         int noOfUpdatedFacts = 0;
-        new File(tsvFile).withReader { l = it.readLine() }  
+        new File(tsvFile).withReader { l = it.readLine() }
         headers = l.split('\t');
         i=0;
         Observation obv;
@@ -268,26 +320,26 @@ class FactController extends AbstractObjectController {
                     if(tv_str) {
                         tv_str.split(',').each {v->
                         def tv = v.trim().split("\\|");
-                        def taxon,trait,traitValue;
+                        def taxon,traitInstance,traitValue;
                         if(cf_taxons[cf+' taxonID']) {
-                            taxon = TaxonomyDefinition.read(Long.parseLong(cf_taxons[cf+' taxonID'])); 
+                            taxon = TaxonomyDefinition.read(Long.parseLong(cf_taxons[cf+' taxonID']));
                             def traits = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [tv[0], taxon]);
-                            if(traits) trait = traits[0];
+                            if(traits) traitInstance = traits[0];
                         } else {
-                            trait = Trait.findByName(tv[0]);
+                            traitInstance = Trait.findByName(tv[0]);
                         }
-                        traitValue = TraitValue.findByTraitAndValue(trait, tv[1]);
-                        if(traitValue && trait) {
+                        traitValue = TraitValue.findByTraitAndValue(traitInstance, tv[1]);
+                        if(traitValue && traitInstance) {
                             //TODO:do get contri and attr from activity feed
                             def contributor;
                             def authors = ActivityFeed.executeQuery("select author from ActivityFeed where activity_holder_id=:oid and activity_type='Custom field edited' order by last_updated desc limit 1",[oid:obv.id]);
                             if(authors) contributor = authors[0];
                             if(!contributor) contributor = SUser.findByEmail('admin@strandls.com');
                             Map m = ['attribution':contributor.name, 'contributor':contributor.email, 'license':'BY'];
-                            if(!m[trait.id+''])  {
-                                m[trait.id+''] = traitValue.value
+                            if(!m[traitInstance.id+''])  {
+                                m[traitInstance.id+''] = traitValue.value
                             } else {
-                                m[trait.id+''] += ','+traitValue.value
+                                m[traitInstance.id+''] += ','+traitValue.value
                             }
                             println '=================='
                             println m;

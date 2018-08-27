@@ -31,7 +31,7 @@ class MigrationService {
 	String password = "postgres123";
 	
 	
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 
 	String contentRootDir = config.speciesPortal.content.rootDir
 

@@ -94,9 +94,10 @@
 
             <div class="observation_story_body ${showFeatured?'toggle_story':''}" style=" ${showFeatured?'display:none;':''}">
 
-                <g:if test="${observationInstance.dataset}">
-                <g:render template="/datasource/showDatasourceSignatureTemplate" model="['instance':observationInstance.dataset.datasource, 'showDetails':true]"/>
-                </g:if>
+                <%--g:if test="${observationInstance.dataTable}">
+                <g:render template="/dataset/showDatasetStoryTemplate" model="['datasetInstance':observationInstance.dataTable.dataset, 'showDetails':true, showTitleDetail:true ]"/>
+                </g:if--%>
+
 
                 <div class="prop">
                     <g:if test="${showDetails}">
@@ -141,6 +142,9 @@
                         datetime="${observationInstance.fromDate.getTime()}"></time>
                         <g:if test="${observationInstance.toDate && observationInstance.fromDate != observationInstance.toDate}">&nbsp;
                         <b>-</b>&nbsp; <time class="timeago" datetime="${observationInstance.toDate.getTime()}"></time>
+                        </g:if>
+                        <g:if test="${observationInstance.metaClass.hasProperty(observationInstance, 'dateAccuracy') && observationInstance.dateAccuracy}">
+                            (${observationInstance.dateAccuracy.value()})
                         </g:if>
                     </div>
                 </div>

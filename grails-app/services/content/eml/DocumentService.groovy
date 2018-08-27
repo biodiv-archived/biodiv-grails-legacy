@@ -14,11 +14,10 @@ import species.TaxonomyDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
-import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
-import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
+import species.participation.UploadLog;
 import content.eml.Document.DocumentType;
 import species.utils.Utils;
 import species.License
@@ -61,6 +60,10 @@ import species.Classification;
 import au.com.bytecode.opencsv.CSVWriter
 import static org.springframework.http.HttpStatus.*;
 
+import org.apache.log4j.Level;
+import species.dataset.DataTable;
+import static groovyx.net.http.ContentEncoding.Type.GZIP;
+
 class DocumentService extends AbstractMetadataService {
 
 	static transactional = false
@@ -86,9 +89,15 @@ class DocumentService extends AbstractMetadataService {
 	Document update(Document document, params, klass = null) {
 		params.remove('latitude')
 		params.remove('longitude')
+        
+        println params.uFile
+
 		def locationScale = params.remove('locationScale')
         
         document = super.update(document, params, Document.class);
+
+        if(!params.uFile.path)
+            document.uFile = null;
 
 		document.group = null
 		document.habitat = null
@@ -208,6 +217,7 @@ class DocumentService extends AbstractMetadataService {
 	 * @param params
 	 * @return
 	 */
+/*
 	def search(params) {
 		def result;
 		def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
@@ -301,14 +311,14 @@ class DocumentService extends AbstractMetadataService {
             }
 			log.debug "result returned from search: "+ result
 			return result;
-		} catch(SolrException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		result = [queryParams:queryParams, activeFilters:activeFilters, instanceTotal:0, speciesInstanceList:[]];
 		return result;
 	}
-
+*/
 	private boolean isValidSortParam(String sortParam) {
 		if(sortParam.equalsIgnoreCase('createdOn'))
 			return true;
@@ -318,12 +328,12 @@ class DocumentService extends AbstractMetadataService {
 	def nameTerms(params) {
 		List result = new ArrayList();
 
-		def queryResponse = documentSearchService.terms(params.term, params.field, params.max);
+		/*def queryResponse = documentSearchService.terms(params.term, params.field, params.max);
 		NamedList tags = (NamedList) ((NamedList)queryResponse.getResponse().terms)[params.field];
 		for (Iterator iterator = tags.iterator(); iterator.hasNext();) {
 			Map.Entry tag = (Map.Entry) iterator.next();
 			result.add([value:tag.getKey().toString(), label:tag.getKey().toString(),  "category":"Documents"]);
-		}
+		}*/
 		return result;
 	}
 
@@ -451,7 +461,6 @@ println queryParts.queryParams
 			query += " join document.userGroups userGroup "
 			countQuery += " join document.userGroups userGroup "
             filterQuery += " and userGroup is null "
-            queryParams['userGroupId'] = Long.parseLong(params.notInUserGroup)
         }
 		
 		if(params.taxon) {
@@ -488,14 +497,16 @@ println queryParts.queryParams
 		switch(tagType){
 			case GrailsNameUtils.getPropertyName(Document.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Document)
+					//tags = TagCloudUtil.tags(Document)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.documents?.collect{it.id}, tagType)
 				}
 				break
 			case GrailsNameUtils.getPropertyName(Project.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Project)
+					//tags = TagCloudUtil.tags(Project)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.projects?.collect{it.id}, tagType)
 				}
@@ -503,7 +514,8 @@ println queryParts.queryParams
 			
 			case GrailsNameUtils.getPropertyName(Discussion.class).toLowerCase():
 				if(!userGroupInstance){
-					tags = TagCloudUtil.tags(Discussion)
+					//tags = TagCloudUtil.tags(Discussion)
+					tags = getTags(null, tagType)
 				}else{
 					tags = getTags(userGroupInstance.discussions?.collect{it.id}, tagType)
 				}
@@ -519,16 +531,24 @@ println queryParts.queryParams
 	private Map getTags(ids, tagType){
 		int tagsLimit = 1000;
 		LinkedHashMap tags = [:]
-		if(!ids){
-			return tags
-		}
 
 		def sql =  Sql.newInstance(dataSource);
-		String query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.tag_ref in " + getSqlInCluase(ids)  + " and  tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+		String query;
+        if(ids == null) {
+            query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+            sql.rows(query).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
+        } else {
+            query = "select t.name as name, count(t.name) as obv_count from tag_links as tl, tags as t, " + tagType + " obv where tl.tag_ref in " + getSqlInCluase(ids)  + " and  tl.type = '" + tagType +"' and t.id = tl.tag_id group by t.name order by count(t.name) desc, t.name asc limit " + tagsLimit;
+            sql.rows(query, ids).each{
+                tags[it.getProperty("name")] = it.getProperty("obv_count");
+            };
 
-		sql.rows(query, ids).each{
-			tags[it.getProperty("name")] = it.getProperty("obv_count");
-		};
+        }
+        println "#######################################tags"
+        log.debug query;
+
 		return tags;
 	}
 	
@@ -560,6 +580,16 @@ println queryParts.queryParams
             log.debug "================" + m
 
             if(m['file path'].trim() != "" || m['uri'].trim() != '' ){
+                if(params.paramsToPropagate?.dataTable) {
+                    m['dataTable'] = DataTable.read(Long.parseLong(params.paramsToPropagate.dataTable+''));
+                    DataTable.inheritParams(m, params.paramsToPropagate);
+                }
+                def tags = (m['tags'] && (m['tags'].trim() != "")) ? m['tags'].trim().split(",").collect{it.trim()} : new ArrayList();
+                m['tags'] = tags;
+
+                def userGroupIds = m['post to user groups'] ?   m['post to user groups'].split(",").collect { UserGroup.findByName(it.trim())?.id } : new ArrayList()
+                m['userGroupsList'] = userGroupIds.join(',');
+
                 uploadDoc(fileDir, m, resultObv)
                 i++
                 if(i > BATCH_SIZE){
@@ -576,7 +606,7 @@ println queryParts.queryParams
             }
         }
     }
-
+/*
     def processLinkBatch(params){
         File spreadSheet = new File(params.batchFileName)
         if(!spreadSheet.exists()){
@@ -614,18 +644,19 @@ println queryParts.queryParams
             }
         }
     }
-
+*/
     private uploadDoc(fileDir, Map m, resultObv){
         Document document = new Document()
 
         //setting ufile and uri
         File sourceFile = new File(fileDir, m['file path'])
         if(sourceFile.exists()){
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = grails.util.Holders.config
             String contentRootDir = config.speciesPortal.content.rootDir
-            File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents',contentRootDir)
+            File destinationFile = utilsService.createFile(sourceFile.getName(), 'documents', contentRootDir)
             try{
                 Files.copy(Paths.get(sourceFile.getAbsolutePath()), Paths.get(destinationFile.getAbsolutePath()), REPLACE_EXISTING);
+                println "++++++++++++UUUUUFFFFIIIILLLLEEEE++++++"
                 UFile f = new UFile()
                 f.size = destinationFile.length()
                 f.path = destinationFile.getAbsolutePath().replaceFirst(contentRootDir, "")
@@ -649,7 +680,7 @@ println queryParts.queryParams
             return
         }
         //other params
-        document.author = SUser.findByEmail(m['user email'].trim())
+        document.author = SUser.findByEmail(m[ObvUtilService.AUTHOR_EMAIL].trim())
         document.type = Document.fetchDocumentType(m['type'])
         document.license =  License.findByName(License.fetchLicenseType(("cc " + m[LICENSE]).toUpperCase()))
 
@@ -662,35 +693,60 @@ println queryParts.queryParams
         document.notes =  m['description']
 
         document.speciesGroups = []
-        m['species groups'].split(",").each {
+        m[ObvUtilService.SPECIES_GROUP] = m['species groups']
+        m[ObvUtilService.SPECIES_GROUP].split(",").each {
             def s = SpeciesGroup.findByName(it.trim())
             if(s)
                 document.addToSpeciesGroups(s);
         }
 
         document.habitats  = []
-        m['habitat'].split(",").each {
+        m[ObvUtilService.HABITAT] = m['habitat']
+        m[ObvUtilService.HABITAT].split(",").each {
             def h = Habitat.findByName(it.trim())
             document.addToHabitats(h);
         }
 
-        document.longitude = (m['longitude'] ?:76.658279)
-        document.latitude = (m['lattitude'] ?: 12.32112)
-        document.geoPrivacy = m["geoprivacy"]
+        //document.longitude = (m['longitude'] ?Double.parseDouble(m['longitude']).doubleValue():76.658279)
+        //document.latitude = (m['latitude'] ?Double.parseDouble(m['latitude']).doubleValue(): 12.32112)
+        //document.geoPrivacy = m["geoprivacy"]
+
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
+        println "populating topology"
+        println "${m.topology}"
+        if(!m.topology && m.latitude && m.longitude) {
+            println "constructing areas from lat lng ${m.latitude}"
+            m.areas = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(m.longitude?.toFloat(), m.latitude?.toFloat())));
+        } 
 
 
-        //		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
-        //		if(document.latitude && document.longitude) {
-        //			document.topology = Utils.GeometryAsWKT(geometryFactory.createPoint(new Coordinate(document.longitude?.toFloat(), document.latitude?.toFloat())));
-        //		}
-        //		
-        saveDoc(document, m)
+        m['locale_language'] = utilsService.getCurrentLanguage();
+        println "################################################&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+println m
+println m['topology']
+        println "################################################&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+        m.remove('group')
+        m.remove('habitat')
+        println document.externalUrl
+        document = super.update(document, m, Document.class);
+        document.externalUrl = m['externalurl']
+
+        if(m['dataTable']) {
+            document.dataTable = m['dataTable'];
+        }
+
+        saveDoc(document, m, false);
+        try {
+        runCurrentDocuments(document,m)
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         if(document.id){
             resultObv << document.id
         }
     }
-
+/*
     private uploadLinkDoc(Map m, resultObv,params, boolean sendMail=true){
         Document document = new Document()
         println "========================================================="
@@ -752,7 +808,7 @@ println queryParts.queryParams
             resultObv << document.id
         }
     }
-
+*/
     Map saveDocument(params, sendMail=true, boolean updateResources = true) {
         params.type = (params.type)?params.type.replaceAll(' ','_'):"Report";
 		params.author = springSecurityService.currentUser;
@@ -815,14 +871,27 @@ println queryParts.queryParams
         def url= m["externalurl"]
         def hostName = 'http://gnrd.globalnames.org' //url.getHost()
         HTTPBuilder http = new HTTPBuilder(hostName)
+        http.contentEncoding = GZIP;
+        println "***************************"
+        println "***************************"
+        println "***************************"
+        println "***************************"
+        println "***************************"
+        println "***************************"
         http.request( GET, JSON ) {
             uri.path = "/name_finder.json"
             uri.query = [ url:url ]     	
-            headers.Accept = '*/*'
+            headers.Accept = 'application/json'
             response.success = { resp,  reader ->
-            //println "========reader====="+reader;
-            //println "========reader====="+reader.token_url;
+            println "========reader====="+reader;
+            println "========reader====="+reader.token_url;
+            println resp;
             tokenUrl = reader.token_url;
+            }
+            response.failure = { resp, reader ->;
+                println reader
+                println resp
+                 println "Request failed : [URI : ${url}, Status: ${resp.status}]"
             }
             response.'404' = { status = ObvUtilService.FAILED }
         }
@@ -1031,6 +1100,14 @@ println queryParts.queryParams
          
         return model;
     }
+
+    Map upload(String file, Map params, UploadLog dl) {
+        dl.writeLog("============================================\n", Level.INFO);            
+        File ipFile = new File(params.file);
+		processBatch(['fileDir':ipFile.getParentFile().getAbsolutePath(), 'batchFileName':ipFile.getAbsolutePath(), 'paramsToPropagate':params]);
+        return ['success':true, 'msg':"Loaded documents."];
+    }
+
 
 }
 

@@ -14,7 +14,7 @@
 							dataType : 'json',
 							beforeSubmit : function(formData, jqForm, options) {
 								$('.loginMessage').html('Logging in ...')
-										.removeClass().addClass(
+										.removeClass('alert alert-error').addClass(
 												'alter alert-info').show();
 								return true;
 							},
@@ -33,7 +33,7 @@
 											} else {
 												$('.loginMessage')
 														.html(xhr.responseText)
-														.removeClass()
+														.removeClass('alert alert-info')
 														.addClass(
 																'alter alert-error')
 														.show();

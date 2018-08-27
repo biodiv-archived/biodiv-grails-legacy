@@ -7,13 +7,6 @@ import java.util.Date;
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
-
 import species.CommonNames
 import species.Habitat;
 import species.NamesParser
@@ -25,22 +18,21 @@ import species.participation.Observation;
 import species.participation.Recommendation;
 import species.participation.RecommendationVote.ConfidenceType;
 import utils.Newsletter;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 
 class NewsletterSearchService extends AbstractSearchService {
 
     static transactional = false
 
 	/**
-	 * 
+	 *
 	 */
 	def publishSearchIndex() {
 		log.info "Initializing publishing to newsletters search index"
-		
+
 		//TODO: change limit
 		int limit = BATCH_SIZE, offset = 0;
         int noIndexed = 0;
-		
+
 		def newsletters;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Newsletter.count()+1;
@@ -48,7 +40,7 @@ class NewsletterSearchService extends AbstractSearchService {
         while(noIndexed < INDEX_DOCS) {
             Newsletter.withNewTransaction([readOnly:true]) { status ->
                 newsletters = Newsletter.list(max:limit, offset:offset);
-                noIndexed += newsletters;
+                noIndexed += newsletters.size();
                 if(!newsletters) return;
                 publishSearchIndex(newsletters, true);
                 //newsletters.clear();
@@ -62,7 +54,7 @@ class NewsletterSearchService extends AbstractSearchService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param species
 	 * @return
 	 */
@@ -70,45 +62,48 @@ class NewsletterSearchService extends AbstractSearchService {
 		if(!obvs) return;
 		log.info "Initializing publishing to newsletters search index : "+obvs.size();
 
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+    List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
+
 		Map names = [:];
 		Map docsMap = [:]
 		obvs.each { obv ->
 			log.debug "Reading Newsletter : "+obv.id;
 
-				SolrInputDocument doc = new SolrInputDocument();
-                doc.setDocumentBoost(1.5);
+        Map<String,Object> doc=new HashMap<String,Object>();
+                //doc.setDocumentBoost(1.5);
                 println "=====ID======== " + obv.class.simpleName +"_"+obv.id.toString()
-				doc.addField(searchFieldsConfig.ID, obv.class.simpleName +"_"+ obv.id.toString());
-			    doc.addField(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
-				doc.addField(searchFieldsConfig.NAME, obv.title);
-				doc.addField(searchFieldsConfig.UPLOADED_ON, obv.date);
-				doc.addField(searchFieldsConfig.UPDATED_ON, obv.date);
+				doc.put(searchFieldsConfig.ID,  obv.id.toString());
+			    doc.put(searchFieldsConfig.OBJECT_TYPE, obv.class.simpleName);
+				doc.put(searchFieldsConfig.NAME, obv.title);
+				doc.put(searchFieldsConfig.UPLOADED_ON, obv.date);
+				doc.put(searchFieldsConfig.UPDATED_ON, obv.date);
 				if(obv.userGroup) {
-					doc.addField(searchFieldsConfig.USER_GROUP, obv.userGroup.id);
-					doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, obv.userGroup.webaddress);
+					doc.put(searchFieldsConfig.USER_GROUP, obv.userGroup.id);
+					doc.put(searchFieldsConfig.USER_GROUP_WEBADDRESS, obv.userGroup.webaddress);
 				}
 				if(obv.newsitem) {
-					
-					doc.addField(searchFieldsConfig.MESSAGE, obv.newsitem);
+
+					doc.put(searchFieldsConfig.MESSAGE, obv.newsitem);
 				}
-				
+
 //				obv.tags.each { tag ->
-//					doc.addField(searchFieldsConfig.TAG, tag);
+//					doc.put(searchFieldsConfig.TAG, tag);
 //				}
-					
-				docs.add(doc);
-			
+
+				eDocs.add(doc);
+
 		}
 
-        return commitDocs(docs, commit);
+    postToElastic(eDocs,"newsletter")
+        //return commitDocs(docs, commit);
+
 	}
 
     def delete(long id) {
-        super.delete(Newsletter.simpleName +"_"+id.toString());
+        super.delete("newsletter",id.toString());
     }
 
 }

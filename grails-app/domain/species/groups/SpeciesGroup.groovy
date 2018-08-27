@@ -10,7 +10,11 @@ import species.Resource;
 import species.utils.ImageType;
 import species.utils.ImageUtils;
 
-class SpeciesGroup {
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@Cache(region="species_group", usage = CacheConcurrencyStrategy.READ_ONLY, include = "non-lazy")
+class SpeciesGroup  implements Serializable {
 
 	String name;
 	SpeciesGroup parentGroup;

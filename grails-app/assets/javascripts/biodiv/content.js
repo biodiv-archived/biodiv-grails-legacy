@@ -1,5 +1,5 @@
 //bind click event on delete buttons using jquery live
-$('.del-document').live('click', function() {
+$(document).on('click', '.del-document', function() {
 	// find the parent div
 	var prnt = $(this).parents(".ufile-block");
 	// find the deleted hidden input

@@ -12,6 +12,7 @@ class SpeciesTagLib {
     def springSecurityService;
     def speciesService;
 	def speciesPermissionService;
+    def utilsService;
 
 	def showSpeciesImages = { attrs, body->
 		out << render(template:"/common/speciesImagesTemplate", model:attrs.model);
@@ -47,11 +48,15 @@ class SpeciesTagLib {
 				out << "<a href=\"http://www.ubio.org/browser/search.php?search_all=${attrs.model.taxonConcept.binomialForm}\" title=\"View on uBio\" target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/uBio.png', absolute:true)}\"/></a>";
 				break;
 			case "wikipedia" :
-				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm?:attrs.model.taxonConcept.name}\" title=\"View on Wikipedia\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/wiki.png', absolute:true)}\"/></a>";
+				out << "<a href=\"http://en.wikipedia.org/wiki/${attrs.model.taxonConcept.binomialForm?:attrs.model.taxonConcept.name}\" title=\"View on Wikipedia\"  target=\"_blank\"><img cl ass=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/wiki.png', absolute:true)}\"/></a>";
 				break;
 			case "frlhtUrl" :
 				out << "<a href=\"${extLink.frlhtUrl}\" title=\"View on FRLHT's ENVIS\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FRLHT32x32.gif', absolute:true)}\"/></a>";
 				break;
+            case "fishbaseUrl" :
+				out << "<a href=\"${extLink.fishbaseUrl}\" title=\"View on Fishbase\"  target=\"_blank\"><img class=\"group_icon pull_left\" src=\"${assetPath(src: '/all/icons/externalLinks/FB_logo.png', absolute:true)}\"/></a>";
+				break;
+
 
 		}
 	}
@@ -186,7 +191,7 @@ class SpeciesTagLib {
 
     def hasContent = {attrs, body ->
         def map = attrs.model.map;
-        if(map instanceof Map && (map.hasContent || map.isContributor)) {
+        if(map instanceof Map && (map.hasContent || map.isContributor || !map.field)) {
             out << body();
         }
     }
@@ -199,8 +204,10 @@ class SpeciesTagLib {
 	}
 
 	def noOfContributedSpecies={attrs,body->
-		def noOfSpecies=speciesService.totalContributedSpecies(attrs.model.user)
-
+		def noOfSpecies;
+        utilsService.logSql ({
+        noOfSpecies = speciesService.totalContributedSpecies(attrs.model.user)
+        }, 'noOfContributedSpecies');
 		out << "<td class=countvaluecontributed>"+noOfSpecies+"</td>"
 
 	}

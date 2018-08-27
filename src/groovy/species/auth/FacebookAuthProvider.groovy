@@ -33,6 +33,7 @@ public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.fa
         //HACK to accomodate registering new user from facebookCreateAccount
         if(token.uid > 0) {
             def user = facebookAuthDao.findUser(token.uid as Long)
+            println "Found user ..... ${user} for token ${token}"
             if (user == null && token.user != null && token.user.accessToken != null) {
                 throw new AuthenticationServiceException("Registering from Facebook ${token.user}");
             }
@@ -66,7 +67,7 @@ public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.fa
 
 			token.details = userDetails
 			token.principal = userDetails//facebookAuthDao.getPrincipal(user)
-			token.authorities = userDetails.getAuthorities()
+			token.authorities = userDetails.fetchAuthorities()
 
 			try {
 				preAuthenticationChecks.check(userDetails);
@@ -80,7 +81,8 @@ public class FacebookAuthProvider extends com.the6hours.grails.springsecurity.fa
 		}*/
 
         super.authenticate(authentication);
-
+println "++++++++++++++++++++++++++++++ : ${authentication}"
+println "****************************** : ${token}"
         if(token.authenticated != false) {
             token.authenticated = true;
         }

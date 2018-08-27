@@ -33,14 +33,11 @@ import species.Resource;
 import species.BlockedMails;
 import species.Resource.ResourceType;
 import species.auth.SUser;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.participation.ResourceRedirect
 
 
 import static org.springframework.http.HttpStatus.*;
-import grails.plugin.cache.Cacheable;
 
 abstract class AbstractObjectController {
     
@@ -54,11 +51,12 @@ abstract class AbstractObjectController {
             String cacheKey = "${params.webaddress?:'IBP'}-${params.controller}-${params.action}-${params.filterProperty}-${params.filterPropertyValue}-${params.max?:1}-${params.offset?:0}"
             String cacheName = 'featured';
 
-            result = utilsService.getFromCache(cacheName, cacheKey);
+            String resultStr = utilsService.getFromCache(cacheName, cacheKey);
+            result = resultStr ? JSON.parse(resultStr) : null;
             if(!result) {
                 def relatedObv = observationService.getRelatedObservations(params).relatedObv;
                 result = formatRelatedResults(relatedObv, params);
-                utilsService.putInCache(cacheName, cacheKey, result);
+                utilsService.putInCache(cacheName, cacheKey, (result as JSON).toString());
             }
         } else {
             def relatedObv = observationService.getRelatedObservations(params).relatedObv;
@@ -80,7 +78,7 @@ abstract class AbstractObjectController {
                 log.debug "no related observations"
             }
         } else {
-            def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+            def config = grails.util.Holders.config
             List urlList = []
             for(param in relatedObv.observations){
                 def res = param['observation'];
@@ -110,15 +108,15 @@ abstract class AbstractObjectController {
 	def getTargetInstance(Class clazz, id){
 		if( id instanceof String){
 			id = id.trim().toLong()
-		}
+	 	}
 		def instance = clazz.get(id)
 		
 		if(!instance || (instance.hasProperty('isDeleted') && instance.isDeleted)){
 			instance = new ResourceRedirect().fetchTargetInstance(clazz.canonicalName, id)
-		}
+	 	}
 		
 		return instance
-	}
+	} 
 
     def getObjResources(){
         def result = [:];
@@ -126,7 +124,10 @@ abstract class AbstractObjectController {
         String cacheKey = "${params.controller}-${params.id}"
         String cacheName = 'resources';
 
-        result = utilsService.getFromCache(cacheName, cacheKey);
+//        result = utilsService.getFromCache(cacheName, cacheKey);
+        String resultStr = utilsService.getFromCache(cacheName, cacheKey);
+        result = resultStr ? JSON.parse(resultStr) : null;
+
         if(!result) {
             result = [:];
             if(params.id){            
@@ -148,7 +149,7 @@ abstract class AbstractObjectController {
             }
 
             if(result)
-                utilsService.putInCache(cacheName, cacheKey, result);
+                utilsService.putInCache(cacheName, cacheKey,  (result as JSON).toString());
         }
 
 
@@ -158,4 +159,15 @@ abstract class AbstractObjectController {
         }
     }
 
+    def getUserGroups(Class clazz, id) {
+        return getTargetInstance(clazz, id).userGroups; 
+    }
+
+    public def userGroups() {
+        def result = [];
+        switch(params.controller.toLowerCase()) {
+            case 'observation' : result = getUserGroups(Observation.class, params.id);
+        }
+        render result as JSON;
+    }
 }

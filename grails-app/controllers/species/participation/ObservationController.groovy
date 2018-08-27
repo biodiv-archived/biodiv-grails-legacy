@@ -1,6 +1,7 @@
 package species.participation
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
@@ -34,10 +35,9 @@ import species.Habitat;
 import species.Species;
 import species.Resource;
 import species.BlockedMails;
+import species.Metadata;
 import species.Resource.ResourceType;
 import species.auth.SUser;
-import org.apache.solr.common.SolrException;
-import org.apache.solr.common.util.NamedList
 import species.participation.Featured
 import species.AbstractObjectController;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
@@ -54,7 +54,7 @@ import species.trait.TraitValue;
 import species.TaxonomyDefinition;
 
 class ObservationController extends AbstractObjectController {
-    
+
     public static final boolean COMMIT = true;
 
     //def observationService; //injected in AbstractObjectController
@@ -108,7 +108,7 @@ class ObservationController extends AbstractObjectController {
 //              tagsHtml = g.render(template:"/common/observation/showAllTagsTemplate", model:[count: count, tags:filteredTags, isAjaxLoad:true]);
             }
 //          def mapViewHtml = g.render(template:"/common/observation/showObservationMultipleLocationTemplate", model:[observationInstanceList:model.totalObservationInstanceList]);
-            
+
             def result = [obvListHtml:obvListHtml, obvFilterMsgHtml:obvFilterMsgHtml, tagsHtml:tagsHtml, instanceTotal:model.instanceTotal]
             render result as JSON
             return;
@@ -131,14 +131,14 @@ class ObservationController extends AbstractObjectController {
             def tagsHtml = "";
             model.remove('observationInstanceList');
         }
-        
+
         model = utilsService.getSuccessModel('', null, OK.value(), model);
 
         withFormat {
             html {
                 if(!model.model.recoVotes)
                     model.model.recoVotes = observationService.getRecommendationVotes(model.model.observationInstanceList, 3, 0);
-                if(params.loadMore?.toBoolean()){                    
+                if(params.loadMore?.toBoolean()){
                     render(template:"/common/observation/showObservationListTemplate", model:model.model);
                     return;
                 } else if(!params.isGalleryUpdate?.toBoolean()){
@@ -162,28 +162,28 @@ class ObservationController extends AbstractObjectController {
     }
 
     protected def getObservationList(params, List eagerFetchProperties=null) {
-        try { 
-            params.max = params.max?Integer.parseInt(params.max.toString()):12 
-        } catch(NumberFormatException e) { 
-            params.max = 12 
+        try {
+            params.max = params.max?Integer.parseInt(params.max.toString()):12
+        } catch(NumberFormatException e) {
+            params.max = 12
         }
-        try { 
-            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0; 
-        } catch(NumberFormatException e) { 
-            params.offset = 0 
+        try {
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0;
+        } catch(NumberFormatException e) {
+            params.offset = 0
         }
         if(params.parentId && params.parentId != '') {
-            try { 
-                params.parentId = Long.parseLong(params.parentId.toString()); 
-            } catch(NumberFormatException e) { 
-                params.parentId = null 
+            try {
+                params.parentId = Long.parseLong(params.parentId.toString());
+            } catch(NumberFormatException e) {
+                params.parentId = null
             }
         }
         def max = Math.min(params.max ? params.int('max') : 12, 100)
         def offset = params.offset ? params.int('offset') : 0
         def filteredObservation = observationService.getFilteredObservations(params, max, offset, false, eagerFetchProperties)
         def observationInstanceList = filteredObservation.observationInstanceList
-        println "Instance List====="+observationInstanceList            
+        println "Instance List====="+observationInstanceList
 //        //Because returning source Ids instead of actual obv ins
 //        if(params.filterProperty == 'speciesName') {
 //            //def fetchedCklCount = filteredObservation.checklistCount;
@@ -207,12 +207,12 @@ class ObservationController extends AbstractObjectController {
         def queryParams = filteredObservation.queryParams
         def activeFilters = filteredObservation.activeFilters
         activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
-        
+
 //      def queryResult = observationService.getFilteredObservations(params, -1, -1, false)
 //      def count = queryResult.observationInstanceList.size()
         def checklistCount =  filteredObservation.checklistCount
         def allObservationCount =  filteredObservation.allObservationCount
-    
+
         queryParams.remove('ranks')
         queryParams.remove('statuses')
         //storing this filtered obvs ids list in session for next and prev links
@@ -222,7 +222,7 @@ class ObservationController extends AbstractObjectController {
             if(params.append?.toBoolean() && session["obv_ids_list"]) {
                 session["obv_ids_list"].addAll(observationInstanceList.collect {
                     params.fetchField?it[0]:it.id
-                }); 
+                });
             } else {
                 session["obv_ids_list_params"] = params.clone();
                 session["obv_ids_list"] = observationInstanceList.collect {
@@ -233,7 +233,7 @@ class ObservationController extends AbstractObjectController {
         log.debug "Storing all observations ids list in session ${session['obv_ids_list']} for params ${params}";
         return [observationInstanceList: observationInstanceList, instanceTotal: allObservationCount, checklistCount:checklistCount, observationCount: allObservationCount-checklistCount, speciesGroupCountList:filteredObservation.speciesGroupCountList, speciesCount:filteredObservation.speciesCount,  subSpeciesCount:filteredObservation.subSpeciesCount, acceptedSpeciesCount:filteredObservation.acceptedSpeciesCount, synonymSpeciesCount:filteredObservation.synonymSpeciesCount, queryParams: queryParams, activeFilters:activeFilters, resultType:'observation', geoPrivacyAdjust:Utils.getRandomFloat(), canPullResource:userGroupService.getResourcePullPermission(params)]
     }
-    
+
     def occurrences() {
         def result;
         result = observationService.getObservationOccurences(params)
@@ -249,6 +249,7 @@ class ObservationController extends AbstractObjectController {
         def observationInstance = new Observation()
         observationInstance.properties = params;
         observationInstance.habitat = Habitat.findByName(Habitat.HabitatType.ALL.value())
+        observationInstance.dateAccuracy = Metadata.DateAccuracy.ACCURATE;
         def author = springSecurityService.currentUser;
         def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted and obv.id = obv.sourceId and obv.isChecklist = false order by obv.createdOn desc ",[author:author, isDeleted:false]);
         def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
@@ -309,14 +310,22 @@ class ObservationController extends AbstractObjectController {
 
         }
     }
-    
+
     private saveAndRender(params, sendMail=true){
 
         println "saveAndRender==============="+params
+
         params.locale_language = utilsService.getCurrentLanguage(request);
-        def result = observationService.saveObservation(params, sendMail)
+        def result;
+        Observation.withSession { session ->
+          result = observationService.saveObservation(params, sendMail)
+          session.flush();
+          session.clear();
+        }
+
+        // result.instance.save(flush:true);
         if(result.success){
-            //if(params.format?.equalsIgnoreCase("json") || params.format?.equalsIgnoreCase("xml") ) 
+            //if(params.format?.equalsIgnoreCase("json") || params.format?.equalsIgnoreCase("xml") )
             //    params.isMobileApp = true;
             forward (action: 'addRecommendationVote', params:params);
         } else {
@@ -327,7 +336,7 @@ class ObservationController extends AbstractObjectController {
                 }
                 json {
                     result.remove('instance');
-                    render result as JSON 
+                    render result as JSON
                 }
                 xml {
                     result.remove('instance');
@@ -370,7 +379,7 @@ class ObservationController extends AbstractObjectController {
                     withFormat {
                         html {
                             redirect(controller:'checklist', action:'show', params: params)
-                        } 
+                        }
                         json { render model as JSON }
                         xml { render model as XML }
                     }
@@ -378,20 +387,20 @@ class ObservationController extends AbstractObjectController {
                 }
 
                 observationInstance.incrementPageVisit()
-                def userLanguage = utilsService.getCurrentLanguage(request);   
+                def userLanguage = utilsService.getCurrentLanguage(request);
                 int pos = params.pos?params.int('pos'):0;
                 def prevNext = getPrevNextObservations(pos, params.webaddress);
 
                 def model = utilsService.getSuccessModel("", observationInstance, OK.value());
 
                 withFormat {
-                    html { 
+                    html {
                         if(prevNext) {
-                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false];
+                            model = [observationInstance: observationInstance, prevObservationId:prevNext.prevObservationId, nextObservationId:prevNext.nextObservationId, lastListParams:prevNext.lastListParams,'userLanguage':userLanguage, traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, displayAny:false, customFields : customFieldService.fetchAllCustomFields(observationInstance)];
                         } else {
-                            model = [observationInstance: observationInstance,'userLanguage':userLanguage,  traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams];
+                            model = [observationInstance: observationInstance,'userLanguage':userLanguage,  traitInstanceList:t.traitList, factInstanceList:t.traitFactMap, queryParams:t.queryParams, customFields : customFieldService.fetchAllCustomFields(observationInstance)];
                         }
-                    } 
+                    }
                     json  { render model as JSON }
                     xml { render model as JSON }
                 }
@@ -410,7 +419,7 @@ class ObservationController extends AbstractObjectController {
     }
 
     /**
-     * 
+     *
      * @param pos
      * @return
      */
@@ -423,18 +432,18 @@ class ObservationController extends AbstractObjectController {
             listParamsKey = userGroupWebaddress + listParamsKey;
         }
         def lastListParams = session[listParamsKey]?.clone();
-        
+
         if(lastListParams) {
             if(!session[listKey]) {
                 log.debug "Fetching observations list as its not present in session "
                 runLastListQuery(lastListParams);
             }
-    
+
             long noOfObvs = session[listKey].size();
-            
+
             log.debug "Current ids list in session ${session[listKey]} and position ${pos}";
             def nextObservationId = (pos+1 < session[listKey].size()) ? session[listKey][pos+1] : null;
-            if(nextObservationId == null) {         
+            if(nextObservationId == null) {
                 lastListParams.put("append", true);
                 def max = Math.min(lastListParams.max ? lastListParams.int('max') : 12, 100)
                 def offset = lastListParams.offset ? lastListParams.int('offset') : 0
@@ -452,7 +461,7 @@ class ObservationController extends AbstractObjectController {
             return ['prevObservationId':prevObservationId, 'nextObservationId':nextObservationId, 'lastListParams':lastListParams];
         }
     }
-    
+
     private def runLastListQuery(Map params) {
 /*      if(params.webaddress) {
             def userGroupController = new UserGroupController();
@@ -464,11 +473,11 @@ class ObservationController extends AbstractObjectController {
         return getObservationList(params, Observation.eagerFetchProperties);
 //      }
     }
-    
+
     @Secured(['ROLE_USER'])
     def edit() {
         def observationInstance = Observation.findWhere(id:params.id?.toLong(), isDeleted:false)
-       
+
         def t = observationInstance.getTraits();
         if (!observationInstance) {
             flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'observation.label', default: 'Observation'), params.id])}"
@@ -514,7 +523,7 @@ class ObservationController extends AbstractObjectController {
         if(params.ajax_login_error == "1") {
             String msg1 = messageSource.getMessage("default.login.continue", null, RCU.getLocale(request))
             message = [status:401, error:msg1]
-            render message as JSON 
+            render message as JSON
             return;
         } else if(!params.resources && !params.videoUrl) {
             message = g.message(code: 'no.file.attached', default:'No file is attached')
@@ -525,7 +534,7 @@ class ObservationController extends AbstractObjectController {
             }
             return;
         }
-        
+
         try {
                 def rs = [:]
                 if(ServletFileUpload.isMultipartContent(request)) {
@@ -547,23 +556,32 @@ class ObservationController extends AbstractObjectController {
                         rootDir = grailsApplication.config.speciesPortal.usersResource.rootDir
                     break;
                 }
-                File obvDir 
+                File obvDir
+
                 if(!params.resources && !params.videoUrl) {
                     message = g.message(code: 'no.file.attached', default:'No file is attached')
                 }
-                
+
                 if(params.resources instanceof String) {
                         params.resources = [params.resources]
                 }
-                params.resources.each { f ->                    
+                params.resources.each { f ->
+                    def parsedVal;
                     String mimetype,filename;
                     if(f instanceof String) {
                         f = JSON.parse(f);
                         if(f.size instanceof String) {
                             f.size = Integer.parseInt(f.size)
                         }
-                        mimetype = f.mimetype
-                        filename = f.filename
+                       if(f.containsKey('contentType')){
+                            mimetype = f.contentType
+                            filename = f.originalFilename
+                            parsedVal = true;
+                        }else{
+                            mimetype = f.mimetype
+                            filename = f.filename
+                            parsedVal = false;
+                        }
                         log.debug "Saving observation file ${f.filename}"
                     } else {
                         mimetype = f.contentType
@@ -575,9 +593,9 @@ class ObservationController extends AbstractObjectController {
                     //TODO Move to config
 
                     def resourcetype = mimetype.substring(0, mimetype.indexOf('/')).toLowerCase()
-                    def resourceTypeAudio = ResourceType.AUDIO.value().toLowerCase()                    
-                    def resourceTypeImage = ResourceType.IMAGE.value().toLowerCase()        
-                    
+                    def resourceTypeAudio = ResourceType.AUDIO.value().toLowerCase()
+                    def resourceTypeImage = ResourceType.IMAGE.value().toLowerCase()
+
                     def okcontents
                     def maxSizeAllow
                     if(resourcetype == resourceTypeImage){
@@ -590,7 +608,7 @@ class ObservationController extends AbstractObjectController {
                                         ]
                         maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
 
-                    } else if(resourcetype == resourceTypeAudio){                       
+                    } else if(resourcetype == resourceTypeAudio){
                         okcontents = [
                                         'audio/mp4','audio/m4a',
                                         'audio/mpeg','audio/mp1','audio/mp2','audio/mp3','audio/mpg',
@@ -602,7 +620,7 @@ class ObservationController extends AbstractObjectController {
                         maxSizeAllow = grailsApplication.config.speciesPortal.observations.MAX_IMAGE_SIZE
 
                     }
-                    
+
                     if (!okcontents.contains(mimetype)) {
                         message = g.message(code: 'resource.file.invalid.extension.message', args: [
                             okcontents,
@@ -637,67 +655,79 @@ class ObservationController extends AbstractObjectController {
                             }
                         }
 
-                
+
                         File file = utilsService.getUniqueFile(obvDir, Utils.generateSafeFileName(filename));
 
                         if(f instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
                             def url = f.url;
                             def fp = utilsService.filePickerSecurityCodes();
                             //modifying url to give permissions.
-                            url += '?signature=' + fp.signature +'&policy='+fp.policy
-                            download(url, file );                       
+                            //url += '?signature=' + fp.signature +'&policy='+fp.policy
+						    if(parsedVal == true){
+                                log.debug "AntBuilder().copy";
+                                new AntBuilder().copy( file:url,tofile:file)
+                            }else{
+                                log.debug "download"
+                                download(url, file);
+                            }
                         } else {
+                            log.debug "file transfer"
                             f.transferTo( file );
                         }
                         String obvDirPath = obvDir.absolutePath.replace(rootDir, "")
                         def thumbnail
                         def type
                         def pi
-                        if(resourcetype == resourceTypeImage){
-                                pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
+						if(resourcetype == resourceTypeImage){
+								pi = ProcessImage.createLog(file.getAbsolutePath(), obvDir.toString());
                                 //ImageUtils.createScaledImages(new File(pi.filePath), new File(pi.directory));
                                 def res = new Resource(fileName:obvDirPath+"/"+file.name, type:ResourceType.IMAGE);
                                 //context specific baseUrl for location picker script to work
                                 def baseUrl = Utils.getDomainServerUrlWithContext(request) + rootDir.substring(rootDir.lastIndexOf("/") , rootDir.size())
-                                thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);   
-                                type = ResourceType.IMAGE   
-                                                        
+                                thumbnail = res.thumbnailUrl(baseUrl, null, ImageType.LARGE);
+                                type = ResourceType.IMAGE
+
                         }else if(resourcetype == resourceTypeAudio){
                                 thumbnail = grailsApplication.config.grails.serverURL+"/images/audioicon.png"
-                                type = ResourceType.AUDIO   
-                                
+                                type = ResourceType.AUDIO
+
 
                         }
                         if(pi)
                             resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:pi.id]);
-                        else 
-                            resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type]);
-                    }
-                }
-                
-                if(params.videoUrl) {
-                    //TODO:validate url;
-                    def videoUrl = params.videoUrl;
-                    if(videoUrl && Utils.isURL(videoUrl)) {
-                        String videoId = Utils.getYouTubeVideoId(videoUrl);
-                        if(videoId) {
-                        def res = new Resource(fileName:'v', type:ResourceType.VIDEO);      
-                        res.setUrl(videoUrl);               
-                        resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
-                        } else {
-                        message = messageSource.getMessage("default.valid.video.url", ['youtube'] as Object[] , RCU.getLocale(request))
-                        }
-                    } else {
-                        message = messageSource.getMessage("default.valid.video.url", [''] as Object[] , RCU.getLocale(request))
-                    }
-                }
+                        else
+						    resourcesInfo.add([fileName:obvDirPath+"/"+file.name, url:'', thumbnail:thumbnail ,type:type, jobId:'dummyJobId']);
 
-            
-                log.debug resourcesInfo
-                // render some XML markup to the response
-                if(resourcesInfo) {
+                        if(parsedVal == true){
+                            def deleteFile = new File(f.url)
+                            deleteFile.delete()  //deleting the file from fileops folder
+                        }
+                    }
+				}
+
+				if(params.videoUrl) {
+					//TODO:validate url;
+					def videoUrl = params.videoUrl;
+					if(videoUrl && Utils.isURL(videoUrl)) {
+						String videoId = Utils.getYouTubeVideoId(videoUrl);
+						if(videoId) {
+						def res = new Resource(fileName:'v', type:ResourceType.VIDEO);
+						res.setUrl(videoUrl);
+						resourcesInfo.add([fileName:'v', url:res.url, thumbnail:res.thumbnailUrl(), type:res.type]);
+						} else {
+						message = messageSource.getMessage("default.valid.video.url", ['youtube'] as Object[] , RCU.getLocale(request))
+						}
+					} else {
+						message = messageSource.getMessage("default.valid.video.url", [''] as Object[] , RCU.getLocale(request))
+					}
+				}
+
+
+				log.debug resourcesInfo
+				// render some XML markup to the response
+				if(resourcesInfo) {
                     withFormat {
-                        json {    
+                        json {
                             def resourcesList = [];
                             for(r in resourcesInfo) {
                                 def res = ['fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId]
@@ -706,7 +736,7 @@ class ObservationController extends AbstractObjectController {
                             def model = [observations:['dir':(obvDir?obvDir.absolutePath.replace(rootDir, ""):''), resources:resourcesList]]
                             model = utilsService.getSuccessModel("", null, OK.value(), model)
                             render model as JSON
-                        } 
+                        }
                         xml {
                             render(contentType:"text/xml") {
                                 response {
@@ -714,7 +744,7 @@ class ObservationController extends AbstractObjectController {
                                     status(OK.value())
                                     msg('Successfully uploaded the resource')
                                     model {
-                                        dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')                         
+                                        dir(obvDir?obvDir.absolutePath.replace(rootDir, ""):'')
                                         resources {
                                             for(r in resourcesInfo) {
                                                 res('fileName':r.fileName, 'url':r.url,'thumbnail':r.thumbnail, type:r.type, 'jobId':r.jobId){}
@@ -746,7 +776,7 @@ class ObservationController extends AbstractObjectController {
             }
         }
     }
-    
+
     private def download(url, File file)
     {
         def out = new BufferedOutputStream(new FileOutputStream(file))
@@ -762,9 +792,9 @@ class ObservationController extends AbstractObjectController {
     @Secured(['ROLE_USER'])
     def addRecommendationVote() {
         params.author = springSecurityService.currentUser;
-        
-        //boolean isMobileApp = params.format?.equalsIgnoreCase("json") || params.isMobileApp; 
-        String msg; 
+
+        //boolean isMobileApp = params.format?.equalsIgnoreCase("json") || params.isMobileApp;
+        String msg;
         try {
             params.obvId = params.obvId?.toLong()?:(params.id?.toLong());
         } catch(e) {
@@ -781,7 +811,7 @@ class ObservationController extends AbstractObjectController {
                 recommendationVoteInstance = recVoteResult?.recVote;
                 msg = recVoteResult?.msg;
             }
-            
+
             def observationInstance = Observation.get(params.obvId);
             def mailType
             try {
@@ -793,7 +823,9 @@ class ObservationController extends AbstractObjectController {
                     observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
                     if(params["createNew"] && (params.oldAction == "save" || params.oldAction == "bulkSave")) {
                         mailType = utilsService.OBSERVATION_ADDED;
+                        log.debug "send mail start"
                         utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress);
+                        log.debug "send mail finished"
                     }
 
                     if(!params["createNew"]){
@@ -818,6 +850,7 @@ class ObservationController extends AbstractObjectController {
                         } else {
                             //def output = [:]
                             def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
+
                             def model = utilsService.getSuccessModel(msg, null, OK.value(), ['miniObvCreateHtml':miniObvCreateHtml,statusComplete : true]);
                             //output = [statusComplete : true, 'miniObvCreateHtml':miniObvCreateHtml]
                             withFormat {
@@ -837,10 +870,10 @@ class ObservationController extends AbstractObjectController {
                     observationInstance.calculateMaxVotedSpeciesName();
                     def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, activityFeedService.SPECIES_RECOMMENDED, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
                     observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-                    
+
                     //just updates species time stamp on recommendation
-                    recommendationVoteInstance.updateSpeciesTimeStamp();            
-                    
+                    recommendationVoteInstance.updateSpeciesTimeStamp();
+
                     //sending email
                     if( params["createNew"] && ( params.oldAction == "save" || params.oldAction == "bulkSave" ) ) {
                         mailType = utilsService.OBSERVATION_ADDED;
@@ -849,7 +882,7 @@ class ObservationController extends AbstractObjectController {
                     }
                     utilsService.sendNotificationMail(mailType, observationInstance, request, params.webaddress, activityFeed);
                     commentService.addRecoComment(recommendationVoteInstance.recommendation, observationInstance, params.recoComment);
-                    
+
                     if(!params["createNew"]) {
                         def model = utilsService.getSuccessModel(msg, recommendationVoteInstance, OK.value());
                         withFormat {
@@ -865,7 +898,7 @@ class ObservationController extends AbstractObjectController {
                             withFormat {
                                 html {
                                     redirect (url:uGroup.createLink(action:'show', controller:"observation", id:observationInstance.id, 'userGroupWebaddress':params.webaddress, postToFB:(params.postToFB?:false)))
-                                } 
+                                }
                                 json { render model as JSON }
                                 xml { render model as XML }
                             }
@@ -937,8 +970,8 @@ class ObservationController extends AbstractObjectController {
                             html {
                                 render(view: "show", model: [observationInstance:observationInstance, recommendationVoteInstance: recommendationVoteInstance], params:[postToFB:(params.postToFB?:false)])
                             }
-                            json { render model as JSON; } 
-                            xml { render model as XML; } 
+                            json { render model as JSON; }
+                            xml { render model as XML; }
                         }
                     } else {
                         def miniObvCreateHtml = g.render(template:"/observation/miniObvCreateTemplate", model:[observationInstance: observationInstance]);
@@ -988,8 +1021,8 @@ class ObservationController extends AbstractObjectController {
     def addAgreeRecommendationVote() {
         def msg;
         params.author = springSecurityService.currentUser;
-    
- 
+
+
         try {
             params.obvId = params.obvId?.toLong()?:(params.id?.toLong());
         } catch(e) {
@@ -1007,7 +1040,7 @@ class ObservationController extends AbstractObjectController {
                 recommendationVoteInstance = recVoteResult?.recVote;
                 msg = recVoteResult?.msg;
             }
-            
+
             def observationInstance = Observation.get(params.obvId);
             try {
                 if(!recommendationVoteInstance){
@@ -1026,9 +1059,9 @@ class ObservationController extends AbstractObjectController {
                     observationInstance.calculateMaxVotedSpeciesName();
                     def activityFeed = activityFeedService.addActivityFeed(observationInstance, recommendationVoteInstance, recommendationVoteInstance.author, ActivityFeedService.SPECIES_AGREED_ON, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
                     observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-                
+
                     //just updates species time stamp on recommendation
-                    recommendationVoteInstance.updateSpeciesTimeStamp();            
+                    recommendationVoteInstance.updateSpeciesTimeStamp();
 
                     //sending mail to user
                     utilsService.sendNotificationMail(ActivityFeedService.SPECIES_AGREED_ON, observationInstance, request, params.webaddress, activityFeed);
@@ -1068,7 +1101,7 @@ class ObservationController extends AbstractObjectController {
             }
         }
     }
-    
+
     /**
     * Deletes recommendation vote
     */
@@ -1076,14 +1109,14 @@ class ObservationController extends AbstractObjectController {
    def removeRecommendationVote() {
 
        def author = springSecurityService.currentUser;
- 
+
        try {
            params.obvId = params.obvId?.toLong()?:(params.id?.toLong());
        } catch(e) {
            e.printStackTrace();
            params.obvId = null;
        }
-    
+
        if(params.obvId) {
            def observationInstance = Observation.get(params.obvId);
            def recommendationVoteInstance = RecommendationVote.findWhere(recommendation:Recommendation.read(params.recoId.toLong()), author:author, observation:observationInstance)
@@ -1102,10 +1135,10 @@ class ObservationController extends AbstractObjectController {
                observationInstance.calculateMaxVotedSpeciesName();
                def activityFeed = activityFeedService.addActivityFeed(observationInstance, observationInstance, author, activityFeedService.RECOMMENDATION_REMOVED, activityFeedService.getSpeciesNameHtmlFromRecoVote(recommendationVoteInstance, null));
                observationsSearchService.publishSearchIndex(observationInstance, COMMIT);
-        
+
                 //just updates species time stamp on recommendation
-                recommendationVoteInstance.updateSpeciesTimeStamp();                
-    
+                recommendationVoteInstance.updateSpeciesTimeStamp();
+
                //sending mail to user
                utilsService.sendNotificationMail(activityFeedService.RECOMMENDATION_REMOVED, observationInstance, request, params.webaddress, activityFeed);
                def r = utilsService.getSuccessModel("${message(code: 'recommendations.deleted.message', args: [recommendationVoteInstance.recommendation.name])}", null, OK.value());
@@ -1136,7 +1169,7 @@ class ObservationController extends AbstractObjectController {
 
 
     /**
-     * 
+     *
      */
     def getRecommendationVotes = {
         params.max = params.max ? params.int('max') : 1
@@ -1221,7 +1254,7 @@ class ObservationController extends AbstractObjectController {
     }
 
     /**
-     * 
+     *
      */
     def voteDetails = {
         def votes = RecommendationVote.findAll("from RecommendationVote as recoVote where recoVote.recommendation.id = :recoId and recoVote.observation.id = :obvId order by recoVote.votedOn desc", [recoId:params.long('recoId'), obvId:params.long('obvId')]);
@@ -1229,7 +1262,7 @@ class ObservationController extends AbstractObjectController {
     }
 
     /**
-     * 
+     *
      */
 
     def listRelated = {
@@ -1243,7 +1276,7 @@ class ObservationController extends AbstractObjectController {
         model['parentId'] = parentId;
 
         def inGroupMap = [:]
-        result.relatedObv.observations.each { m-> 
+        result.relatedObv.observations.each { m->
             inGroupMap[(m.observation.id)] = m.inGroup == null ?'false':m.inGroup
         }
 
@@ -1255,12 +1288,12 @@ class ObservationController extends AbstractObjectController {
     }
 
     /**
-     * 
+     *
      */
     def tags = {
         render Tag.findAllByNameIlike("${params.term}%")*.name as JSON
     }
-        
+
     @Secured(['ROLE_USER'])
     def deleteRecoVoteComment() {
         def recoVote = RecommendationVote.get(params.id.toLong());
@@ -1288,12 +1321,12 @@ class ObservationController extends AbstractObjectController {
         }
     }
 
-    
+
 
 //  def participants = {
 //      render getParticipants(Observation.read(params.long('id')))
 //  }
-    
+
     def unsubscribeToIdentificationMail = {
         log.debug "$params"
         def user
@@ -1330,10 +1363,10 @@ class ObservationController extends AbstractObjectController {
      */
     private Map getRecommendationVote(Long obvId, SUser author, String conf, Long recoId, String recoName, String commonName, String languageName) {
         def observation = params.observation?:Observation.get(obvId);
-        
+
         ConfidenceType confidence = observationService.getConfidenceType(conf?:ConfidenceType.CERTAIN.name());
         RecommendationVote existingRecVote = RecommendationVote.findByAuthorAndObservation(author, observation);
-        
+
         def reco, commonNameReco, isAgreeRecommendation = false;
         if(recoId && !(recoName || commonName)) {
             //user presses on agree button so getting reco from id and creating new recoVote without additional common name
@@ -1345,7 +1378,7 @@ class ObservationController extends AbstractObjectController {
             reco = recoResultMap.mainReco;
             commonNameReco =  recoResultMap.commonNameReco;
         }
-        
+
         RecommendationVote newRecVote = new RecommendationVote(observation:observation, recommendation:reco, commonNameReco:commonNameReco, author:author, confidence:confidence, givenSciName:recoName, givenCommonName:commonName);
 
         if(!reco){
@@ -1361,8 +1394,8 @@ class ObservationController extends AbstractObjectController {
                  *  if old recommendation is same as new recommendation then
                  *  case 1 : user might want to update(add new common name or delete existing one) the common name
                  *  case 2 : if user gave sn and cn earlier and the by mistake clicks on agree then this case should not affect any thing on recovote
-                 *          so added boolean flag before updating common name                  
-                 *  if old reco and new reco not same then deleting old reco vote 
+                 *          so added boolean flag before updating common name
+                 *  if old reco and new reco not same then deleting old reco vote
                  */
                 if(existingRecVote.recommendation.id == reco.id){
                     log.debug " Same recommendation already made by user " + author.id +  " reco name " + reco.name + " leaving as it is"
@@ -1394,9 +1427,9 @@ class ObservationController extends AbstractObjectController {
         }
         return;
     }
-   
+
     /**
-     * Count   
+     * Count
      */
     def count = {
         render chartService.getObservationCount(params)
@@ -1465,7 +1498,7 @@ class ObservationController extends AbstractObjectController {
 /*  def search = {
         def searchFieldsConfig = grailsApplication.config.speciesPortal.searchFields
         def model = observationService.getObservationsFromSearch(params);
-        
+
         if(params.append?.toBoolean() && session["obv_ids_list"]) {
             session["obv_ids_list"].addAll(model.totalObservationIdList);
         } else {
@@ -1503,11 +1536,11 @@ class ObservationController extends AbstractObjectController {
      */
     def terms = {
         params.field = params.field?params.field.replace('aq.',''):"autocomplete";
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         if(params.field == searchFieldsConfig.CONTRIBUTOR) {
             params.field = searchFieldsConfig.USERNAME +"_exact"
         }
-        
+
         List result = observationService.nameTerms(params)
 
         render result.value as JSON;
@@ -1518,24 +1551,24 @@ class ObservationController extends AbstractObjectController {
     ///////////////////////////////////////////////////////////////////////////////
 
     def getFilteredLanguage = {
-        render species.Language.filteredList() 
+        render species.Language.filteredList()
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////
     ////////////////////////////// json API ////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
-    
+
     @Secured(['ROLE_USER'])
     def getObv() {
         render Observation.read(params.id.toLong()) as JSON
-    } 
-    
+    }
+
     @Secured(['ROLE_USER'])
     def getList() {
         def result = getObservationList(params)
         render result as JSON
     }
-    
+
     @Secured(['ROLE_USER'])
     def getHabitatList() {
         def res = new HashMap()
@@ -1544,25 +1577,25 @@ class ObservationController extends AbstractObjectController {
         }
         render res as JSON
     }
-    
+
     @Secured(['ROLE_USER'])
     def getGroupList() {
         def res = new HashMap()
         SpeciesGroup.list().each {
             res[it.id] = it.name
-        
+
         }
         render res as JSON
     }
-    
+
     @Secured(['ROLE_USER'])
     def getThumbObvImage() {
         def baseUrl = grailsApplication.config.speciesPortal.observations.serverURL
         def mainImage = Observation.read(params.id.toLong()).mainImage()
         def imagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.thumbnail.suffix): null
-        render baseUrl + imagePath 
+        render baseUrl + imagePath
     }
-    
+
     @Secured(['ROLE_USER'])
     def getFullObvImage() {
         if(!params.id ) {
@@ -1574,12 +1607,12 @@ class ObservationController extends AbstractObjectController {
         def gallImagePath = mainImage?mainImage.fileName.trim().replaceFirst(/\.[a-zA-Z]{3,4}$/, grailsApplication.config.speciesPortal.resources.images.gallery.suffix):null
         render baseUrl + gallImagePath
     }
-    
+
     @Secured(['ROLE_USER'])
     def getUserImage() {
-        render SUser.read(params.id.toLong()).icon() 
+        render SUser.read(params.id.toLong()).icon()
     }
-    
+
     @Secured(['ROLE_USER'])
     def getUserInfo() {
         def res = new HashMap()
@@ -1589,36 +1622,36 @@ class ObservationController extends AbstractObjectController {
         res["dateCreated"] =  u.dateCreated
         res["email"] = u.email
         res["lastLoginDate"] = u.lastLoginDate
-        res["location"] = u.location 
+        res["location"] = u.location
         res["name"] = u.name
         res["username"] = u.username
         res["website"] = u.website
         render res as JSON
     }
-    
+
     private getSpeciesCallPermission(obvId){
         return customsecurity.hasPermissionToMakeSpeciesCall([id:obvId, className:species.participation.Observation.class.getCanonicalName(), permission:org.springframework.security.acls.domain.BasePermission.WRITE]).toBoolean()
     }
-    
+
     @Secured(['ROLE_ADMIN'])
     def batchUpload() {
         obvUtilService.batchUpload(request, params)
         render "== done"
     }
-    
+
     @Secured(['ROLE_USER'])
     def requestExport() {
         def r = obvUtilService.requestExport(params)
         render r as JSON
     }
-    
+
     @Secured(['ROLE_USER'])
     def downloadFile() {
         log.debug(params)
         def dl = DownloadLog.read(params.id.toLong())
-        if(dl && dl.author == springSecurityService.currentUser){
+        if(dl && (dl.author == springSecurityService.currentUser || utilsService.isAdmin())){
             File file = new File(dl.filePath)
-            response.contentType  = 'text/csv' 
+            response.contentType  = 'text/csv'
             response.setHeader("Content-disposition", "filename=${file.getName()}")
             response.outputStream << file.getBytes()
             response.outputStream.flush()
@@ -1645,7 +1678,7 @@ class ObservationController extends AbstractObjectController {
             }
             if(distinctRecoListResult.distinctRecoList.size() > 0) {
                 result = [distinctRecoList:distinctRecoListResult.distinctRecoList, totalRecoCount:distinctRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]
-                
+
             } else {
                 def message = "";
                 if(params.offset  > 0) {
@@ -1687,7 +1720,7 @@ class ObservationController extends AbstractObjectController {
 
             if(speciesGroupCountListResult.speciesGroupCountList.size() > 0) {
                 result = ['speciesGroupCountList':speciesGroupCountListResult.speciesGroupCountList, status:'success', msg:'success']
-                
+
             } else {
                 def message = g.message(code: 'speciesGroup.count.zero.message', default:'No data');
                 result = [msg:message]
@@ -1708,7 +1741,7 @@ class ObservationController extends AbstractObjectController {
             }
         }
     }
-    
+
     //    @Secured(['ROLE_ADMIN','ROLE_SPECIES_ADMIN'])
     def lock() {
         def msg = ""
@@ -1732,7 +1765,7 @@ class ObservationController extends AbstractObjectController {
                         recVo.delete(flush: true, failOnError:true)
             newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:givenSciName, givenCommonName:givenCommonName )
             if(!newRecVo.save(flush:true)){
-                newRecVo.errors.allErrors.each { log.error it } 
+                newRecVo.errors.allErrors.each { log.error it }
             }
             } else {
                 //user locking his own reco
@@ -1744,10 +1777,10 @@ class ObservationController extends AbstractObjectController {
                 if(!recVo) {
                     newRecVo = new RecommendationVote(recommendation: reco, observation:obv, author: currentUser, confidence: confidence, givenSciName:params.recoName, givenCommonName:params.commonName);
                     if(!newRecVo.save(flush:true)){
-                        newRecVo.errors.allErrors.each { log.error it } 
+                        newRecVo.errors.allErrors.each { log.error it }
                     }
                 }
-                obv.maxVotedReco = reco; 
+                obv.maxVotedReco = reco;
                 obv.isLocked = true;
                 msg = messageSource.getMessage("default.observation.locked", null, RCU.getLocale(request))
                 mailType = utilsService.OBV_LOCKED;
@@ -1763,10 +1796,13 @@ class ObservationController extends AbstractObjectController {
                     activityFeed = activityFeedService.addActivityFeed(obv, recommendationVoteInstance, currentUser, mailType, activityFeedService.getSpeciesNameHtmlFromReco(recommendationVoteInstance.recommendation, null));
             }
             if(!obv.save(flush:true)){
-                obv.errors.allErrors.each { log.error it } 
+                obv.errors.allErrors.each { log.error it }
             }
-            utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
+            List<Observation> validobvs=new ArrayList<Observation>();
+            validobvs.add(obv);
+            observationsSearchService.publishSearchIndex(validobvs,true);
 
+            utilsService.sendNotificationMail(mailType, obv, request, params.webaddress, activityFeed);
             def result = ['msg': msg]
             render result as JSON
         } else {
@@ -1774,6 +1810,9 @@ class ObservationController extends AbstractObjectController {
             render result as JSON
             return;
         }
+
+
+
     }
 
     @Secured(['ROLE_USER'])
@@ -1783,7 +1822,7 @@ class ObservationController extends AbstractObjectController {
         def author = springSecurityService.currentUser;
         def lastCreatedObv = Observation.find("from Observation as obv where obv.author=:author and obv.isDeleted=:isDeleted order by obv.createdOn desc ",[author:author, isDeleted:false]);
         def filePickerSecurityCodes = utilsService.filePickerSecurityCodes();
-        return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature] 
+        return [observationInstance: observationInstance, 'lastCreatedObv':lastCreatedObv, 'springSecurityService':springSecurityService, 'userInstance':author, 'policy' : filePickerSecurityCodes.policy, 'signature': filePickerSecurityCodes.signature]
     }
 
     @Secured(['ROLE_USER'])
@@ -1865,9 +1904,23 @@ def filterChain() {
 @Secured(['ROLE_USER'])
     def updateSpeciesGrp(){
         log.debug params
-        def observationInstance =  Observation.read(params.observationId);        
-        def result = observationService.updateSpeciesGrp(params,observationInstance)
-        def model = utilsService.getSuccessModel('success', observationInstance, OK.value(),result);
+        def observationInstance =  Observation.read(params.observationId);
+        def id=observationInstance.id;
+        if(!observationInstance) {
+            def model = utilsService.getErrorModel("No observation instance with id ${observationId}", null, OK.value(), null);
+            render model as JSON
+            return;
+        }
+        def result = observationService.updateSpeciesGrp(params, observationInstance);
+
+        observationInstance.save(flush:true);
+      	utilsService.cleanUpGorm(true)
+        Observation obvser = Observation.get(id);
+        List<Observation> obj=new ArrayList<Observation>();
+        obj.add(obvser);
+        observationsSearchService.publishSearchIndex(obj, COMMIT);
+
+        def model = utilsService.getSuccessModel('success', obvser, OK.value(),result);
         render model as JSON
         return;
     }
@@ -1875,7 +1928,7 @@ def filterChain() {
 @Secured(['ROLE_ADMIN'])
 def caches() {
     def statistics = sessionFactory.statistics
-    //            render "simple = ${SpeciesGroup.findByName('Others')}, 
+    //            render "simple = ${SpeciesGroup.findByName('Others')},
     render "hits: ${statistics.secondLevelCacheHitCount}, misses: ${statistics.secondLevelCacheMissCount} ${statistics}"
     render grailsApplication.mainContext.eventTriggeringInterceptor.datastores
     render '<br/><br/>                            '
@@ -1923,7 +1976,7 @@ private printCacheEntries(cache) {
             def distinctIdentifiedRecoListResult;
             distinctIdentifiedRecoListResult = observationService.getDistinctIdentifiedRecoList(params, max, offset);
             if(distinctIdentifiedRecoListResult.distinctIdentifiedRecoList.size() > 0) {
-            result = [distinctIdentifiedRecoList:distinctIdentifiedRecoListResult.distinctIdentifiedRecoList, totalRecoCount:distinctIdentifiedRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]               
+            result = [distinctIdentifiedRecoList:distinctIdentifiedRecoListResult.distinctIdentifiedRecoList, totalRecoCount:distinctIdentifiedRecoListResult.totalCount, status:'success', msg:'success', next:offset+max]
             } else {
                 def message = "";
                 if(params.offset  > 0) {
@@ -1963,11 +2016,104 @@ private printCacheEntries(cache) {
             }
             if(objectIdL) {
                 model['observationInstance'] = Observation.read(objectIdL);
+                if(model['observationInstance']) {
                 model['customFields'] = model.observationInstance.getCustomFields();
                 if(model['customFields'].size() > 0)
                     m['html'] =  g.render(template:"/observation/showCustomFieldsTemplate", model:model);
+                    m['customFields'] = model['customFields'];
+                }
             }
         }
         render m as JSON
     }
+
+    def traits() {
+        def model = getTraitsList(params);
+        model.userLanguage = utilsService.getCurrentLanguage(request);
+        if(params.displayAny) model.displayAny = params.displayAny?.toBoolean();
+        else model.displayAny = true;
+        if(params.editable) model.editable = params.editable?.toBoolean();
+        else model.editable = false;
+        if(params.filterable) model.filterable = params.filterable?.toBoolean();
+        else model.filterable = true;
+        if(params.fromObservationShow) model.fromObservationShow = params.fromObservationShow;
+        if(params.ifOwns) model.ifOwns = params.ifOwns.toBoolean();
+        //HACK
+        if(params.trait) {
+            model.queryParams = ['trait':[:]];
+            params.trait.each { t,v ->
+                model.queryParams.trait[Long.parseLong(t)] = v
+            }
+        }
+        if(!params.loadMore?.toBoolean() && !!params.isGalleryUpdate?.toBoolean()) {
+            model.resultType = params.controller;
+            model.hackTohideTraits = true;
+            //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
+            model['obvListHtml'] =  g.render(template:"/observation/showTraitListTemplate", model:model);
+            model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model.remove('instanceList');
+        }
+
+        model = utilsService.getSuccessModel('', null, OK.value(), model);
+        withFormat {
+            html {
+                if(params.loadMore?.toBoolean()){
+                    render(template:"/observation/showTraitsListTemplate", model:model.model);
+                    return;
+                } else if(!params.isGalleryUpdate?.toBoolean()){
+                    model.model.hackTohideTraits = true;
+                    model.model['width'] = 300;
+                    model.model['height'] = 200;
+                    render (view:"traits", model:model.model)
+                    return;
+                } else {
+
+                    return;
+                }
+            }
+            json { render model as JSON }
+            xml { render model as XML }
+        }
+    }
+
+    protected def getTraitsList(params) {
+        try {
+            params.max = params.max?Integer.parseInt(params.max.toString()):100;
+        } catch(NumberFormatException e) {
+            params.max = 100;
+        }
+
+        try {
+            params.offset = params.offset?Integer.parseInt(params.offset.toString()):0;
+        } catch(NumberFormatException e) {
+            params.offset = 0
+        }
+
+        def max = Math.min(params.max ? params.int('max') : 100, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        params.isObservationTrait = true;
+
+        def filteredList = traitService.getFilteredList(params, max, offset)
+        def instanceList = filteredList.instanceList
+
+        def queryParams = filteredList.queryParams
+        def activeFilters = filteredList.activeFilters
+        def count = filteredList.instanceTotal
+
+        activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
+
+        if(params.append?.toBoolean() && session["${params.controller}_ids_list"]) {
+            session["${params.controller}_ids_list"].addAll(instanceList.collect {
+                params.fetchField?it[0]:it.id
+            });
+        } else {
+            session["${params.controller}_ids_list_params"] = params.clone();
+            session["${params.controller}_ids_list"] = instanceList.collect {
+                params.fetchField?it[0]:it.id
+            };
+        }
+        log.debug "Storing all ${params.controller} ids list in session ${session[params.controller+'_ids_list']} for params ${params}";
+        return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:params.controller, 'factInstance':filteredList.traitFactMap, instance:filteredList.object, numericTraitMinMax:filteredList.numericTraitMinMax];
+    }
+
 }

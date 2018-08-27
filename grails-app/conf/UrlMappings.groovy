@@ -14,11 +14,6 @@ class UrlMappings {
 		'500'(view:'/error')
 		'403'(view:'/error')
 		'404'(view:'/notfound')
-/*		"403"(controller: "errors", action: "error403")
-		"500"(controller: "errors", action: "error500")
-		"500"(controller: "errors", action: "error403", exception: AccessDeniedException)
-		"500"(controller: "errors", action: "error403", exception: NotFoundException)
-*/		
 
 		"/login/auth" {
 			controller = 'openId'
@@ -44,21 +39,9 @@ class UrlMappings {
             action = [GET:"show", POST:"update", POST:"delete", POST:"save"]
         }
         "/user/$action/$id?"(controller:"SUser")
-/*		"/api/user/$action?/$id?" { 
-            controller = 'SUser' 
-            format = 'json'
-            constraints { id matches: /\d+/ }
-        }
-*/		
 
         group('/api') {
 //          "/user"(resources:'SUser')
-/*          "/api/user/create"(controller: 'user', action: 'create', method: 'GET')
-            "/api/user/edit"(controller: 'user', action: 'edit', method: 'GET')
-            "/api/user(.(*))?"(controller: 'user', action: 'delete', method: 'DELETE')
-            "/api/user(.(*))?"(controller: 'user', action: 'update', method: 'PUT')
-            "/api/user(.(*))?"(controller: 'user', action: 'save', method: 'POST')
-*/
             "/observation/$id"(controller : 'observation', action : 'flagDeleted', method:'DELETE')
 
             "/user"( controller : 'SUser', action:'index', method:'GET')
@@ -116,19 +99,6 @@ class UrlMappings {
             }
 
 
-/*            "/login" {
-                      format = 'json'
-
-            }
-
-            "/validate" {
-            format = 'json'
-            }
-
-            "/logout" {
-            format = 'json'
-            }
-*/
             name oauth: "/oauth/${action}/${provider}"(controller: 'restOauth')
 
             "/register/forgotPassword" {

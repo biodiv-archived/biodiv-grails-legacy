@@ -6,13 +6,6 @@ import java.text.SimpleDateFormat
 import java.util.List
 import java.util.Map
 
-import org.apache.solr.client.solrj.SolrQuery
-import org.apache.solr.client.solrj.SolrServer
-import org.apache.solr.client.solrj.SolrServerException
-import org.apache.solr.common.SolrException
-import org.apache.solr.common.SolrInputDocument
-import org.apache.solr.common.params.SolrParams
-import org.apache.solr.common.params.TermsParams
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,23 +15,22 @@ import species.Species
 import species.SpeciesField
 import species.Synonyms
 import species.TaxonomyDefinition
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import species.auth.SUser;
 
 class SpeciesSearchService extends AbstractSearchService {
-	
+
     def resourceSearchService;
     static transactional = false
-	
+
 	/**
-	 * 
+	 *
 	 */
 	def publishSearchIndex() {
 		log.info "Initializing publishing to search index"
-		
+
 		//TODO: change limit
 		int limit=5, offset = 0, noIndexed = 0;
-		
+
 		def species;
 		def startTime = System.currentTimeMillis()
         INDEX_DOCS = INDEX_DOCS != -1?INDEX_DOCS:Species.count()+1;
@@ -59,14 +51,14 @@ class SpeciesSearchService extends AbstractSearchService {
 		}
 		log.info "Time taken to publish search index is ${System.currentTimeMillis()-startTime}(msec)";
 	}
-	
+
 	def listSpecies(id, params) {
 			//return Species.findAllByIdGreaterThanAndPercentOfInfoGreaterThan(id,0, params);
 			return Species.findAllByIdGreaterThan(id, params);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param species
 	 * @return
 	 */
@@ -74,47 +66,47 @@ class SpeciesSearchService extends AbstractSearchService {
 		if(!species) return;
 		log.info "Initializing publishing to search index for species : "+species.size();
 
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
-		Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+		List<Map<String,Object>> eDocs=new ArrayList<Map<String,Object>>();
 		Map names = [:];
 		Map docsMap = [:]
 
 		species.each { s ->
 			log.debug "Reading Species : "+s.id;
-			SolrInputDocument doc = new SolrInputDocument();
-            doc.setDocumentBoost(2);
-			doc.addField(searchFieldsConfig.ID, s.class.simpleName +"_"+s.id.toString());
-			doc.addField(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
-			doc.addField(searchFieldsConfig.GUID, s.guid);
-			addNameToDoc(doc, s.taxonConcept);
+			Map<String,Object> doc=new HashMap<String,Object>();
+          //  doc.setDocumentBoost(2);
+			doc.put(searchFieldsConfig.ID, s.id.toString());
+			doc.put(searchFieldsConfig.OBJECT_TYPE, s.class.simpleName);
+			doc.put(searchFieldsConfig.GUID, s.guid);
+			//addNameToDoc(docsa, s.taxonConcept);
 
 			def syns = s.taxonConcept.fetchSynonyms()
 			syns.each { syn ->
-				doc.addField(searchFieldsConfig.NAME, syn.name);
+				doc.put(searchFieldsConfig.NAME, syn.name);
 			}
 
 			def commonNames = CommonNames.findAllByTaxonConceptAndIsDeleted(s.taxonConcept, false);
 			commonNames.each { commonName ->
-				doc.addField(searchFieldsConfig.NAME, commonName.name);
+				doc.put(searchFieldsConfig.NAME, commonName.name);
 			}
 
 			s.globalDistributionEntities.each {
-				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+				doc.put(searchFieldsConfig.LOCATION, it.country.countryName);
 			}
 			s.globalEndemicityEntities.each {
-				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+				doc.put(searchFieldsConfig.LOCATION, it.country.countryName);
 			}
 			s.indianDistributionEntities.each {
-				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+				doc.put(searchFieldsConfig.LOCATION, it.country.countryName);
 			}
 			s.indianEndemicityEntities.each {
-				doc.addField(searchFieldsConfig.LOCATION, it.country.countryName);
+				doc.put(searchFieldsConfig.LOCATION, it.country.countryName);
 			}
 			s.fetchTaxonomyRegistry().each { classification, taxonDefinitionsList ->
 				taxonDefinitionsList.each { taxonDefinition ->
-					doc.addField(searchFieldsConfig.TAXON, taxonDefinition.canonicalForm);
+					doc.put(searchFieldsConfig.TAXON, taxonDefinition.canonicalForm);
 				}
 			}
 
@@ -126,7 +118,7 @@ class SpeciesSearchService extends AbstractSearchService {
 				String subcategory = field.field.subCategory;
 
                 field.licenses.each { l ->
-    				doc.addField(searchFieldsConfig.LICENSE, l.name.name());
+    				doc.put(searchFieldsConfig.LICENSE, l.name.name());
                 }
 
 				field.contributors.each { contributor ->
@@ -135,48 +127,48 @@ class SpeciesSearchService extends AbstractSearchService {
                         userInfo = " ### "+contributor.email+" "+contributor.username+" "+contributor.id.toString()
                     }
 					if(contributor.name)
-						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
+						doc.put(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
 				}
 				field.attributors.each { attribution ->
 					if(attribution.name)
-						doc.addField(searchFieldsConfig.ATTRIBUTION, attribution.name);
+						doc.put(searchFieldsConfig.ATTRIBUTION, attribution.name);
 				}
 
 				field.references.each { reference ->
 					if(reference.title)
-						doc.addField(searchFieldsConfig.REFERENCE, reference.title)
+						doc.put(searchFieldsConfig.REFERENCE, reference.title)
 				}
 				if(field.description && copyDesc) {
 					message += field.description+" ";
 				}
-                
+
                 switch(concept) {
                     case ["Overview","Généralités"] :
-						doc.addField(searchFieldsConfig.SP_OVERVIEW, field.description);
+						doc.put(searchFieldsConfig.SP_OVERVIEW, field.description);
                     break
 
                     case ["Nomenclature and Classification","Nomenclature et Classification"] :
-						doc.addField(searchFieldsConfig.SP_NC, field.description);
+						doc.put(searchFieldsConfig.SP_NC, field.description);
                     break
 
                     case ["Natural History","Histoire Naturelle"] :
-						doc.addField(searchFieldsConfig.SP_NH, field.description);
+						doc.put(searchFieldsConfig.SP_NH, field.description);
                     break
 
                     case ["Habitat and Distribution","Habitat et Distribution"] :
-						doc.addField(searchFieldsConfig.SP_HD, field.description);
+						doc.put(searchFieldsConfig.SP_HD, field.description);
                     break
 
                     case ["Demography and Conservation","Démographie et Conservation"] :
-						doc.addField(searchFieldsConfig.SP_DC, field.description);
+						doc.put(searchFieldsConfig.SP_DC, field.description);
                     break
 
                     case ["Uses and Management","Usages et Gestion"] :
-						doc.addField(searchFieldsConfig.SP_UM, field.description);
+						doc.put(searchFieldsConfig.SP_UM, field.description);
                     break
 
                     case ["Information Listing","Liste d'Information"] :
-						doc.addField(searchFieldsConfig.SP_IL, field.description);
+						doc.put(searchFieldsConfig.SP_IL, field.description);
                     break
 
                     default:
@@ -184,67 +176,64 @@ class SpeciesSearchService extends AbstractSearchService {
 
                 }
 
-                List resourceDocs = getResourcesDocs(field);
-			    docs.addAll(resourceDocs);
+              //  List resourceDocs = getResourcesDocs(field);
+			    //eDocs.addAll(resourceDocs);
 			}
 
-			s.resources.each { resource -> 
+			s.resources.each { resource ->
 
-				doc.addField(resource.type.value().toLowerCase(), resource.description);
+				doc.put(resource.type.value().toLowerCase(), resource.description);
 
                 resource.contributors.each  { contributor ->
                     String userInfo = ""
-                    if(contributor.user) { 
+                    if(contributor.user) {
                         userInfo = " ### "+contributor.user.email+" "+contributor.user.username+" "+contributor.user.id.toString()
                     }
 					if(contributor.name)
-						doc.addField(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
+						doc.put(searchFieldsConfig.CONTRIBUTOR, contributor.name + userInfo);
 				}
 				resource.attributors.each {  attributor ->
 					if(attributor.name)
-						doc.addField(searchFieldsConfig.ATTRIBUTION, attributor.name);
+						doc.put(searchFieldsConfig.ATTRIBUTION, attributor.name);
 				}
 			}
-			
-			doc.addField(searchFieldsConfig.PERCENT_OF_INFO, s.percentOfInfo);
-			doc.addField(searchFieldsConfig.MESSAGE, message);
-			
-			doc.addField(searchFieldsConfig.UPLOADED_ON, s.dateCreated);
-			doc.addField(searchFieldsConfig.UPDATED_ON, s.lastUpdated);
-			doc.addField(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id.longValue());
-			//doc.addField(searchFieldsConfig.HABITAT, s.);
-		    
+
+			doc.put(searchFieldsConfig.PERCENT_OF_INFO, s.percentOfInfo);
+			doc.put(searchFieldsConfig.MESSAGE, message);
+
+			doc.put(searchFieldsConfig.UPLOADED_ON, s.dateCreated);
+			doc.put(searchFieldsConfig.UPDATED_ON, s.lastUpdated);
+			doc.put(searchFieldsConfig.SGROUP, s.fetchSpeciesGroup().id.longValue());
+			//doc.put(searchFieldsConfig.HABITAT, s.);
+
             String memberInfo = ""
             List allMembers = utilsServiceBean.getParticipants(s)
             allMembers.each { mem ->
 				if(mem){
 					memberInfo = mem.name + " ### " + mem.email +" "+ mem.username +" "+mem.id.toString()
-					doc.addField(searchFieldsConfig.MEMBERS, memberInfo);
+					doc.put(searchFieldsConfig.MEMBERS, memberInfo);
 				}
             }
-            
+
             s.userGroups.each { userGroup ->
-                doc.addField(searchFieldsConfig.USER_GROUP, userGroup.id);
-                doc.addField(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
+                doc.put(searchFieldsConfig.USER_GROUP, userGroup.id);
+                doc.put(searchFieldsConfig.USER_GROUP_WEBADDRESS, userGroup.webaddress);
             }
 
-            List resourceDocs = getResourcesDocs(s);
-			docs.add(doc);
-			docs.addAll(resourceDocs);
+            //List resourceDocs = getResourcesDocs(s);
+
+
+			eDocs.add(doc);
+			//eDocs.addAll(resourceDocs);
 		}
 
 		//log.debug docs;
-
-        return commitDocs(docs, commit);
+		postToElastic(eDocs,"species")
+        //return commitDocs(docs, commit);
 	}
-
-	/**
-	 * 
-	 * @param doc
-	 * @param name
-	 */
+/*
 	private void addNameToDoc(SolrInputDocument doc, TaxonomyDefinition name) {
-		def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+		def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
 
 		if(name.name) doc.addField(searchFieldsConfig.TITLE, name.name);
 		if(name.canonicalForm) doc.addField(searchFieldsConfig.CANONICAL_NAME, name.canonicalForm);
@@ -264,11 +253,6 @@ class SpeciesSearchService extends AbstractSearchService {
 		}
 	}
 
-	/**
-	 * 
-	 * @param names
-	 * @return
-	 */
 	private Map fetchParsedNames(names) {
 		def nameParser = new NamesParser();
 		def parsedNamesMap = [:];
@@ -279,7 +263,7 @@ class SpeciesSearchService extends AbstractSearchService {
 	}
 
     List getResourcesDocs(Species species) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         List resourcesDocs = [];
         def resourceDoc;
         species.resources.each { resource ->
@@ -294,7 +278,7 @@ class SpeciesSearchService extends AbstractSearchService {
     }
 
     List getResourcesDocs(SpeciesField speciesField) {
-        def searchFieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.searchFields
+        def searchFieldsConfig = grails.util.Holders.config.speciesPortal.searchFields
         List resourcesDocs = [];
         def resourceDoc;
         speciesField.resources.each { resource ->
@@ -307,8 +291,8 @@ class SpeciesSearchService extends AbstractSearchService {
         }
         return resourcesDocs;
     }
-
+*/
     def delete(long id) {
-        super.delete(Species.simpleName +"_"+id.toString());
+        super.delete("species",id.toString());
     }
 }

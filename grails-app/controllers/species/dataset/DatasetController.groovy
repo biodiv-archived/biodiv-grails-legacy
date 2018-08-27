@@ -10,6 +10,12 @@ import species.AbstractObjectController;
 import grails.plugin.springsecurity.annotation.Secured
 import static org.springframework.http.HttpStatus.*;
 import species.participation.Observation;
+import species.participation.Checklists;
+import species.dataset.DataPackage.DataTableType;
+import species.dataset.DataTable;
+import species.groups.CustomField;
+import species.groups.UserGroup;
+import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 
 class DatasetController extends AbstractObjectController {
 	
@@ -18,6 +24,7 @@ class DatasetController extends AbstractObjectController {
 	def messageSource;
 
     def datasetService;
+    def dataPackageService;
 
 	static allowedMethods = [show:'GET', index:'GET', list:'GET',  update: ["POST","PUT"], delete: ["POST", "DELETE"], flagDeleted: ["POST", "DELETE"]]
     static defaultAction = "list"
@@ -26,70 +33,87 @@ class DatasetController extends AbstractObjectController {
 		redirect(action: "list", params: params)
 	}
     
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
 	def create() {
-		def datasetInstance = new Dataset()
+		def datasetInstance = new Dataset1()
 		
         datasetInstance.properties = params;
 
-		def author = springSecurityService.currentUser;
+		//def author = springSecurityService.currentUser;
 
-        return [datasetInstance: datasetInstance]
+        if(params.dataPackage) {
+            datasetInstance.dataPackage = DataPackage.read(params.long('dataPackage'));  
+        }
+        datasetInstance.clearErrors();
+
+        if(!datasetInstance.dataPackage || dataPackageService.hasPermission(datasetInstance.dataPackage, springSecurityService.currentUser)) {
+			render(view: "create", model: [datasetInstance: datasetInstance])
+		} else {
+			flash.message = "${message(code: 'default.not.permitted.message', args: [params.action, message(code: 'dataset.label', default: 'Dataset'), datasetInstance.dataPackage.title])}"
+			redirect  url: uGroup.createLink(action: "list")
+		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_USER'])
 	def save() {
 	    saveAndRender(params, false)
 	}
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_USER'])
 	def edit() {
-		def datasetInstance = Dataset.findWhere(id:params.id?.toLong(), isDeleted:false)
+		def datasetInstance = Dataset1.findWhere(id:params.id?.toLong(), isDeleted:false)
+
+        datasetInstance.clearErrors();
 		if (!datasetInstance) {
 			flash.message = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
-			redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
 			//redirect(action: "list")
-		} else if(utilsService.ifOwns(datasetInstance.author)) {
-            String dir = (new File(grailsApplication.config.speciesPortal.content.rootDir + datasetInstance.uFile.path).parentFile).getAbsolutePath().replace(grailsApplication.config.speciesPortal.content.rootDir, '');
-            String multimediaFile = dir + '/multimediaFile.tsv';
-            String mappingFile = dir + '/mappingFile.tsv';
-            String multimediaMappingFile = dir +'/multimediaMappingFile.tsv';
-			render(view: "create", model: [datasetInstance: datasetInstance, multimediaFile:multimediaFile, mappingFile:mappingFile, multimediaMappingFile:multimediaMappingFile, 'springSecurityService':springSecurityService])
+		} else if(datasetService.hasPermission(datasetInstance, springSecurityService.currentUser)) {
+			render(view: "create", model: [datasetInstance: datasetInstance, 'springSecurityService':springSecurityService])
 		} else {
 			flash.message = "${message(code: 'edit.denied.message')}"
-			redirect (url:uGroup.createLink(action:'show', controller:"datasource", id:datasetInstance.datasource.id, 'userGroupWebaddress':params.webaddress))
+			redirect (url:uGroup.createLink(action:'show', controller:"dataset", id:datasetInstance.id, 'userGroupWebaddress':params.webaddress))
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
+	@Secured(['ROLE_USER'])
 	def update() {
-		def datasetInstance = Dataset.get(params.long('id'))
+		def datasetInstance = Dataset1.get(params.long('id'))
         def msg;
 		if(datasetInstance)	{
-			saveAndRender(params, true)
+            if(datasetService.hasPermission(datasetInstance, springSecurityService.currentUser)) {
+                saveAndRender(params, true)
+		    } else {
+			    flash.message = "${message(code: 'edit.denied.message')}"
+			    redirect (url:uGroup.createLink(action:'show', controller:"dataset", id:datasetInstance.id, 'userGroupWebaddress':params.webaddress))
+		    }
 		} else {
-			msg = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
+	 		msg = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
             def model = utilsService.getErrorModel(msg, null, OK.value());
             withFormat {
                 html {
                     flash.message = msg;
 			        redirect (url:uGroup.createLink(action:'list', controller:"datasource"))
-                }
+                 }
                 json { render model as JSON }
                 xml { render model as XML }
-            }
-		}
-	}
+             }
+	 	}
+	} 
 		
 	private saveAndRender(params, sendMail=true){
 		params.locale_language = utilsService.getCurrentLanguage(request);
 		def result = datasetService.save(params, sendMail)
+        log.debug "#######DATASET SAVE RESULT######"
+        log.debug result;
+        log.debug "################################"
 		if(result.success){
             withFormat {
                 html {
-			        redirect(controller:'datasource', action: "show", id: result.instance.datasource.id)
+			        redirect(controller:'dataset', action: "show", id: result.instance.id)
                 }
                 json {
+                    result.url = uGroup.createLink(action:'show', controller:"dataset", id:result.instance.id, 'userGroupWebaddress':params.webaddress);
                     render result as JSON 
                 }
                 xml {
@@ -115,19 +139,18 @@ class DatasetController extends AbstractObjectController {
 		}
 	}
 
-	@Secured(['ROLE_ADMIN'])
 	def show() {
         params.id = params.long('id');
         def msg;
         if(params.id) {
-			def datasetInstance = Dataset.findByIdAndIsDeleted(params.id, false)
+			def datasetInstance = Dataset1.findByIdAndIsDeleted(params.id, false)
 			if (!datasetInstance) {
                 msg = "${message(code: 'default.not.found.message', args: [message(code: 'dataset.label', default: 'Dataset'), params.id])}"
                 def model = utilsService.getErrorModel(msg, null, OK.value());
                 withFormat {
                     html {
 				        flash.message = model.msg;
-				        redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
+				        redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
                     }
                     json { render model as JSON }
                     xml { render model as XML }
@@ -138,12 +161,9 @@ class DatasetController extends AbstractObjectController {
 				def userLanguage = utilsService.getCurrentLanguage(request);   
 
                 def model = utilsService.getSuccessModel("", datasetInstance, OK.value());
-                model['observations'] = Observation.findAllByDataset(datasetInstance, [max:10, offset:0]);
-                model['observationsCount'] = Observation.countByDataset(datasetInstance);
-
                 withFormat {
                     html {
-                            return [datasetInstance: datasetInstance, observations:model.observations, observationsCount:model.observationsCount, 'userLanguage':userLanguage, max:10]
+                            return [datasetInstance: datasetInstance, 'userLanguage':userLanguage, max:10]
                     } 
                     json  { render model as JSON }
                     xml { render model as JSON }
@@ -154,7 +174,7 @@ class DatasetController extends AbstractObjectController {
             def model = utilsService.getErrorModel(msg, null, OK.value());
             withFormat {
                 html {
-			        redirect (url:uGroup.createLink(action:'list', controller:"datasource", 'userGroupWebaddress':params.webaddress))
+			        redirect (url:uGroup.createLink(action:'list', controller:"dataset", 'userGroupWebaddress':params.webaddress))
                 }
                 json { render model as JSON }
                 xml { render model as XML }
@@ -175,7 +195,6 @@ class DatasetController extends AbstractObjectController {
 		render(template:"/common/checklist/showChecklistDataTemplate", model:model);
 	}
 
-	@Secured(['ROLE_ADMIN'])
 	def list() {
 		def model = getDatasetList(params);
         model.userLanguage = utilsService.getCurrentLanguage(request);
@@ -185,6 +204,7 @@ class DatasetController extends AbstractObjectController {
             //model['userGroupInstance'] = UserGroup.findByWebaddress(params.webaddress);
             model['obvListHtml'] =  g.render(template:"/dataset/showDatasetListTemplate", model:model);
             model['obvFilterMsgHtml'] = g.render(template:"/common/observation/showObservationFilterMsgTemplate", model:model);
+            model['obvListHtml'] = model['obvListHtml'].replaceAll('\u002f','/');
             model.remove('datasetInstanceList');
         }
         
@@ -232,18 +252,6 @@ class DatasetController extends AbstractObjectController {
         def count = filteredDataset.instanceTotal	
 
         activeFilters.put("append", true);//needed for adding new page obv ids into existing session["obv_ids_list"]
-
-        if(params.append?.toBoolean() && session["obv_ids_list"]) {
-            session["dataset_ids_list"].addAll(instanceList.collect {
-                params.fetchField?it[0]:it.id
-            }); 
-        } else {
-            session["dataset_ids_list_params"] = params.clone();
-            session["dataset_ids_list"] = instanceList.collect {
-                params.fetchField?it[0]:it.id
-            };
-        }
-        log.debug "Storing all dataset ids list in session ${session['dataset_ids_list']} for params ${params}";
         return [instanceList: instanceList, instanceTotal: count, queryParams: queryParams, activeFilters:activeFilters, resultType:'dataset']
 	}
 
@@ -255,6 +263,14 @@ class DatasetController extends AbstractObjectController {
         datasetService.importGBIFObservations(Dataset.read(params.id), new File(params.dwcArchivePath), uploadLog);
         render ""
     }
+
+    @Secured(['ROLE_USER'])
+	def flagDeleted() {
+        println "00000000000000000000000000";
+		def result = datasetService.delete(params)
+		flash.message = result.message
+		redirect (url:result.url)
+	}
 
     @Secured(['ROLE_USER'])
 	def delete() {
@@ -270,4 +286,74 @@ class DatasetController extends AbstractObjectController {
             xml { render result as XML }
         }
 	}
+
+    @Secured(['ROLE_USER'])
+    def dataPackageChangedForDataset() {
+        DataPackage dataPackage = DataPackage.read(params.long('dataPackageId'));
+		def datasetInstance = new Dataset1()
+        datasetInstance.dataPackage = dataPackage
+        datasetInstance.clearErrors();
+
+        if(dataPackageService.hasPermission(datasetInstance.dataPackage, springSecurityService.currentUser)) {
+            String tmpl = g.render(template:"/dataset/collectionMetadataTemplate", model:[instance:datasetInstance, 'autofillUserComp':'contributor_id']);
+            def model = utilsService.getSuccessModel("", datasetInstance, OK.value(), [tmpl:tmpl]);
+            render model as JSON;
+		} else {
+            String msg = "Sorry, you dont have permission to create a dataset";//g.message(code:"default.not.permitted.message", args:["create", 'dataset', '']);// as Object[], RCU.getLocale(request))
+            println msg
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            render model as JSON;
+		}
+    }
+    
+    @Secured(['ROLE_USER'])
+    def dataTableTypeChanged() {
+        Dataset1 datasetInstance;
+        DataTable dataTableInstance;
+        
+        if(params.datasetId) { 
+            datasetInstance = Dataset1.read(params.long('datasetId'));
+        }
+            
+        if(params.dataTableId) {
+            dataTableInstance = DataTable.read(params.long('dataTableId'));
+        } else {
+            dataTableInstance = new DataTable();
+            if(datasetInstance) {
+                dataTableInstance.dataset = datasetInstance;
+                dataTableInstance.properties = datasetInstance.properties;
+                dataTableInstance.uFile = null;
+                dataTableInstance.description = null; // not propagating dataset description
+            }
+        }
+        if(!datasetInstance) {
+            datasetInstance = new Dataset1();
+            datasetInstance.dataPackage = DataPackage.findByTitle('Checklist');
+            dataTableInstance.dataset = datasetInstance;
+        }
+
+
+        if(dataPackageService.hasPermission(dataTableInstance.dataset.dataPackage, springSecurityService.currentUser)) {
+            dataTableInstance.dataTableType = DataTableType.list()[params.int('dataTableTypeId')]; 
+
+
+            def userGroupInstance = UserGroup.findByWebaddress(params.webaddress);
+            def customFieldList = CustomField.fetchCustomFields(userGroupInstance)
+            println customFieldList
+            println "###############################"
+            println "###############################"
+            println "###############################"
+            println "###############################"
+            println "###############################"
+            String tmpl = g.render(template:"/dataTable/add${dataTableInstance.dataTableType.value()}DataTable", model:['dataTableInstance':dataTableInstance, 'customFieldList':(customFieldList as JSON)]);
+            def model = utilsService.getSuccessModel("", dataTableInstance, OK.value(), [tmpl:tmpl]);
+            render model as JSON;
+
+        } else {
+            String msg = "Sorry, you dont have permission to create a datatable";//g.message(code:"default.not.permitted.message", args:["create", 'dataset', '']);// as Object[], RCU.getLocale(request))
+            println msg
+            def model = utilsService.getErrorModel(msg, null, OK.value());
+            render model as JSON;
+		}
+    }       
 }

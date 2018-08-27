@@ -9,7 +9,7 @@ package species
  * @author sravanthi
  *
  */
-class License {
+class License  implements Serializable {
 
 	public enum LicenseType {
 		CC_PUBLIC_DOMAIN("Public Domain"),
@@ -124,5 +124,8 @@ class License {
         }
     } 
 
+    public void setName(name) {
+        this.name = name;
+    }
 }
 

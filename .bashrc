@@ -38,5 +38,16 @@ cadb () {
 
 
 export BIODIV_CONFIG_LOCATION=~/.grails/additional-config.groovy
-export GRAILS_OPTS="-Xms1024M -Xmx3G -XX:MaxPermSize=512m -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
-export JAVA_OPTS="$JAVA_OPTS -Dsolr.solr.home=/home/sandeept/git/biodiv/app-conf/solr -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator "
+export GRAILS_OPTS="-Xms1024M -Xmx2G -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator"
+export JAVA_OPTS="$JAVA_OPTS -Dlog4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator "
+
+
+alias cdgb='cd /usr/local/src/biodiv'
+alias tstart='/opt/tomcat/biodiv/bin/catalina.sh start'
+alias tstop='/opt/tomcat/biodiv/bin/catalina.sh stop'
+alias tlog='tail -f /var/log/tomcat/biodiv/catalina.out'
+alias nstart='service nginx restart'
+alias nstop='service nginx stop'
+alias nedit='vim /etc/nginx/sites-enabled/biodiv-main.conf'
+alias nlog='tail -f /var/log/nginx/access.log /var/log/nginx/error.log'
+

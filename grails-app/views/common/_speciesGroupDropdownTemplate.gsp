@@ -20,7 +20,7 @@
         def message_selected_group = (observationInstance?.group?.name) ? observationInstance?.group?.name : g.message(code:'default.select.group.label');
         %>
 
-        <div class="groups_div dropdown" style="z-index:15;">
+        <div class="groups_div dropdown" style="z-index:14;">
             <div class="dropdown-toggle btn selected_group selected_value " data-toggle="dropdown">
                 <span style="float:left;"
                     class="group_icon species_groups_sprites active ${SpeciesGroup.findByName(selected_group).iconClass()}"

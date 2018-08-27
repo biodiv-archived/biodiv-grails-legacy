@@ -3,9 +3,8 @@ package speciespage
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.social.facebook.api.FacebookProfile
+import org.springframework.social.facebook.api.User
 import org.springframework.social.facebook.api.impl.FacebookTemplate
-import org.springframework.social.oauth2.Spring30OAuth2RequestFactory
 import org.springframework.social.support.ClientHttpRequestFactorySelector
 
 import species.auth.SUser
@@ -26,9 +25,16 @@ class FacebookAuthService {
 		if(token.accessToken) {
             String accessToken = token.accessToken.accessToken;
 			FacebookTemplate facebook = new FacebookTemplate(accessToken);
-			facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), accessToken, facebook.getOAuth2Version()));
+			//TODO:enable facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), accessToken, facebook.getOAuth2Version()));
+			User fbProfile = facebook.userOperations().getUserProfile();
+			/*facebook.setRequestFactory(new Spring30OAuth2RequestFactory(ClientHttpRequestFactorySelector.getRequestFactory(), accessToken, facebook.getOAuth2Version()));
 			FacebookProfile fbProfile = facebook.userOperations().getUserProfile();
-
+            */
+println "+++++++++++++++++++++++++"
+println "+++++++++++++++++++++++++"
+log.debug "fbProfile : ${fbProfile}";
+println token;
+println "+++++++++++++++++++++++++"
 			def securityConf = SpringSecurityUtils.securityConfig
 			Class<?> UserDomainClass = grailsApplication.getDomainClass(userDomainClassName).clazz
 
@@ -130,14 +136,14 @@ class FacebookAuthService {
 	 * @param appUser
 	 * @param fbProfile
 	 */
-	void mergeFacebookUserDetails(SUser appUser, FacebookProfile fbProfile) {
+	void mergeFacebookUserDetails(SUser appUser, User fbProfile) {
 		copyFromFacebookProfile(appUser, fbProfile);
 	}
 
 	/**
 	 *
 	 */
-	void copyFromFacebookProfile(appUser, FacebookProfile fbProfile) {
+	void copyFromFacebookProfile(appUser, User fbProfile) {
 		def securityConf = SpringSecurityUtils.securityConfig
 		if(!appUser['username'] && fbProfile.username) {
 			appUser['username'] = fbProfile.username

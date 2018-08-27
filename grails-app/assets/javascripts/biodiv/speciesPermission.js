@@ -40,10 +40,15 @@ function getNextRelatedObvImages(speciesId, url, resourceListType, context){
                 $(context).replaceWith('<a class="btn disabled" style="margin-right: 5px;">No More</a>');
                 $(context).remove();
                 return;
-            } 
-            imagesListWrapper.find(".imagesList" ).append(addPhotoHtmlData);
+            }
+            var $appendContext = imagesListWrapper.find(".uploaded_files_list" );
+            if($appendContext.length == 0) {
+                $appendContext =  imagesListWrapper.find(".imagesList" );
+            }
+            $appendContext.append(addPhotoHtmlData);
             imagesListWrapper.find(".relatedImagesOffset").val(parseInt(offset) + parseInt(data.relatedObvCount));
             imagesListWrapper.append($(context));
+            
         }, error: function(xhr, status, error) {
             alert(xhr.responseText);
         }
@@ -99,6 +104,7 @@ $(document).ready(function() {
                 }
             },
             error:function (xhr, ajaxOptions, thrownError){
+                console.log(xhr);
                 return false;
             } 
         });
@@ -220,6 +226,7 @@ $(document).ready(function() {
         uploadResource = new $.fn.components.UploadResource($('#speciesImage-tab1'));
         uploadResource.POLICY = $("input[name='policy']").val();
         uploadResource.SIGNATURE = $("input[name='signature']").val();
+        $('.filePicker').data('uploadResource', uploadResource);
         $(".speciesImage-wrapper").toggle();
         $('html, body').animate({
             scrollTop: $(".speciesImage-wrapper").offset().top
@@ -262,13 +269,14 @@ function getSpeciesFieldMedia(spId, spFieldId, resourceListType, url){
         success: function(data) {
             if(data.statusComplete){
                 var addPhotoHtmlData = $(data.addPhotoHtml);
-                $("#speciesFieldImage-tab1 .imagesList .addedResource").remove();
-                $("#speciesFieldImage-tab1 .imagesList").append(addPhotoHtmlData);
+                $("#speciesFieldImage-tab1 .uploaded_files_list .addedResource").remove();
+                $("#speciesFieldImage-tab1 .uploaded_files_list").append(addPhotoHtmlData);
                 $("#addSpFieldResourcesModal").modal("toggle");
                 $("#addSpFieldResourcesModal").data("spfieldid", spFieldId);
                 uploadResource = new $.fn.components.UploadResource($('#speciesFieldImage-tab1'));
                 uploadResource.POLICY = $("input[name='policy']").val();
                 uploadResource.SIGNATURE = $("input[name='signature']").val();
+                $('.filePicker').data('uploadResource', uploadResource);
                 $("input[name='speciesFieldId']").val(spFieldId);
             }
         }, error: function(xhr, status, error) {

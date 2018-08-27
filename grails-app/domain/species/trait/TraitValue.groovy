@@ -9,10 +9,19 @@ import species.utils.ImageType;
 import species.utils.ImageUtils;
 import species.Language;
 import org.springframework.context.i18n.LocaleContextHolder;
+import species.dataset.DataTable;
+import grails.converters.JSON
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+//@Cache(region="traitValue", include = "non-lazy")
+//@JsonIgnoreProperties([])
 class TraitValue {
 
-    Trait trait;
+    Trait traitInstance;
     String value;
     String description;
     String icon;
@@ -21,19 +30,33 @@ class TraitValue {
 	
     def grailsApplication;
     boolean isDeleted = false;
-    
+   
+    DataTable dataTable;
+
     static constraints = {
-        trait nullable:false, blank:false, unique:['value']
-        value nullable:false
+        traitInstance nullable:false, blank:false, unique:['value']
+        value nullable:false, validator : { val, obj ->
+            println obj.trait.dataTypes
+            switch(obj.trait.dataTypes) {
+                case Trait.DataTypes.STRING : return true;
+                case Trait.DataTypes.DATE : return utilsService.parseDate(val)?true:false;
+                case Trait.DataTypes.NUMERIC : println val; println val.isNumber(); return val.isNumber();
+                case Trait.DataTypes.BOOLEAN : return Boolean.parseBoolean(val) ;
+                case Trait.DataTypes.COLOR:return true;
+            }
+            return true;
+		}
 		description nullable:true
         icon nullable:true
-        source nullable:false
+        source nullable:true
         //taxon nullable:false
+        dataTable nullable:true
     }
 
     static mapping = {
         description type:"text"
         id  generator:'org.hibernate.id.enhanced.SequenceStyleGenerator', params:[sequence_name: "trait_value_id_seq"] 
+        //cache include: 'non-lazy'
     }
     static hasMany = [traitValueTranslations:TraitValueTranslation]
 
@@ -73,6 +96,10 @@ class TraitValue {
         }
         return thumbnailUrl;
     }
-
-    
+ 
+    def fetchChecklistAnnotation(){
+        def res = this as JSON;
+        res['values'] = values();
+        return res
+    }   
 }

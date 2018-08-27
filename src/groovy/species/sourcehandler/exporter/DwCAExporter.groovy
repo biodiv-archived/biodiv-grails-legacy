@@ -1,6 +1,6 @@
 package species.sourcehandler.exporter
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder;
+import grails.util.Holders;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -25,7 +25,7 @@ class DwCAExporter {
 
 	private static log = LogFactory.getLog(this);
 	
-	def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+	def config = grails.util.Holders.config
 	def fieldsConfig = config.speciesPortal.fields
 	def grailsApplication
 
@@ -236,7 +236,7 @@ class DwCAExporter {
 
 		//		furtherInformationURL  #TODO
 		//      speciespage url
-		taxonRow[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
+		taxonRow[10] = "${grails.util.Holders.config.grails.serverURL}/species/show/" + species.id
 		taxonRow[10] = taxonRow[10].replace(":8080", "");
 		taxonRow[10] = taxonRow[10].replace("/biodiv", "");
 
@@ -286,7 +286,7 @@ class DwCAExporter {
 
 			//		furtherInformationURL  #TODO
 			//      speciespage url
-			taxonRow[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
+			taxonRow[10] = "${grails.util.Holders.config.grails.serverURL}/species/show/" + species.id
 			taxonRow[10] = taxonRow[10].replace(":8080", "");
 			taxonRow[10] = taxonRow[10].replace("/biodiv", "");
 			//		taxonomicStatus   #TODO
@@ -351,13 +351,13 @@ class DwCAExporter {
 			//row[7] = ""
 
 			//AccessURI  -- get absolute url by appending domain name and base path(/biodiv/images/)
-			row[8] = ""+org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.resources.serverURL+media.fileName
+			row[8] = ""+grails.util.Holders.config.speciesPortal.resources.serverURL+media.fileName
 			row[8] = row[8].replace(":8080", "");
 			//ThumbnailURL - get thumbnail url-- there must be some function
 			//row[9] =""
 
 			//FurtherInformationURL #TODO - put thumbnail url
-				row[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
+				row[10] = "${grails.util.Holders.config.grails.serverURL}/species/show/" + species.id
 				row[10] = row[10].replace(":8080", "");
 				row[10] = row[10].replace("/biodiv", "");
 
@@ -461,7 +461,7 @@ class DwCAExporter {
 				//row[9] = ""
 
 				//FurtherInformationURL #TODO - put thumbnail url
-				row[10] = "${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.grails.serverURL}/species/show/" + species.id
+				row[10] = "${grails.util.Holders.config.grails.serverURL}/species/show/" + species.id
 				row[10] = row[10].replace(":8080", "");
 				row[10] = row[10].replace("/biodiv", "");
 				//DerivedFrom
@@ -793,7 +793,7 @@ class DwCAExporter {
      *
      */
     private void cleanUpGorm() {
-        def ctx = ApplicationHolder.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getApplication().getMainContext();
         SessionFactory sessionFactory = ctx.getBean("sessionFactory")
         def hibSession = sessionFactory?.getCurrentSession()
         if(hibSession) {

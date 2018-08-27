@@ -50,8 +50,8 @@ class KeyStoneDataConverter extends SourceConverter {
 		def sql = Sql.newInstance(connectionUrl, userName,
 				password, "com.mysql.jdbc.Driver");
 
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.search
-		def fieldsConfig = org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.fields
+		def config = grails.util.Holders.config.speciesPortal.search
+		def fieldsConfig = grails.util.Holders.config.speciesPortal.fields
 
 		List<Species> species = new ArrayList<Species>();
 
@@ -252,7 +252,7 @@ class KeyStoneDataConverter extends SourceConverter {
 
 	private void createImages(Node speciesElement, sql, postId) {
 		Node images = new Node(speciesElement, "images");
-		def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+		def config = grails.util.Holders.config
 
 		List imagesData = sql.rows("select post_content from wp_posts where id="+postId+" and post_status = 'publish'");
 		def xmlParser = new XmlParser();

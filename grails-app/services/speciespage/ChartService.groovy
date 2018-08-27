@@ -702,7 +702,7 @@ def messageSource;
         result.each { r ->
             def link = utilsService.generateLink("SUser", "show", ["id": r.user.id], request)
             link =  "" + '<a  href="' +  link +'"><i>' + r.user.name + "</i></a>"
-            finalResult.add([ getUserImage(r.user), link, getHyperLinkForUser(r.user.id, startDate, r.recoCount, request)])
+            finalResult.add([ getUserImage(r.user), link, r.recoCount]);//getHyperLinkForUser(r.user.id, startDate, r.recoCount, request)])
         }
 
         return [data : result, htmlData:finalResult, columns : [

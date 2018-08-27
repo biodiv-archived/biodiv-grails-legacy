@@ -16,6 +16,7 @@ class Field {
 	static mapping = {
 		description type:'text';
 		version false;
+        cache usage: 'read-only', include: 'non-lazy'
 	}
 	
     static constraints = {

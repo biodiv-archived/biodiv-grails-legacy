@@ -14,9 +14,7 @@ import species.TaxonomyDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
 import grails.util.GrailsNameUtils
-import org.apache.solr.common.SolrException;
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
-import org.apache.solr.common.util.NamedList;
 
 import species.participation.Observation;
 import content.eml.Document.DocumentType;
@@ -56,7 +54,10 @@ import java.net.URL;
 import java.lang.Boolean;
 import species.NamesParser;
 import species.Metadata
+import species.Metadata.DateAccuracy;
 import species.Classification;
+import species.participation.Flag;
+import species.participation.Flag.FlagType;
 
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
@@ -64,7 +65,7 @@ class AbstractMetadataService extends AbstractObjectService {
 
     private static final String GBIF_SITE = 'http://api.gbif.org'
 	private static final String GBIF_DWCA_VALIDATOR = 'http://tools.gbif.org/dwca-validator/validatews.do'
- 
+
     def create(klass, params) {
         def instance = klass.newInstance();
         instance = update(instance, params, klass)
@@ -99,13 +100,42 @@ class AbstractMetadataService extends AbstractObjectService {
         if(params.habitat instanceof String || params.habitat_id)
             instance.habitat = params.habitat?:Habitat.get(params.habitat_id);
 
-        if( params.fromDate != ""){
-            log.debug "Parsing date ${params.fromDate}"
-            instance.fromDate = parseDate(params.fromDate);
-            log.debug "got ${instance.fromDate}"
-            instance.toDate = params.toDate ? parseDate(params.toDate) : instance.fromDate
-
+        def dateAccuracy =  Metadata.DateAccuracy.getEnum(params.dateAccuracy)
+        if(dateAccuracy) {
+            switch(dateAccuracy) {
+                case DateAccuracy.UNKNOWN :
+                instance.fromDate = new Date(0);
+                //TODO:add flag
+                break;
+                case DateAccuracy.APPROXIMATE :
+                //TODO:add flag
+                break;
+            }
+            instance.dateAccuracy = dateAccuracy?:(params.toDate?Metadata.DateAccuracy.APPROXIMATE:Metadata.DateAccuracy.ACCURATE);
         }
+
+        if( params.fromDate != ""){
+            if(params.fromDate && (params.fromDate instanceof Date)) {
+                instance.fromDate = params.fromDate;
+            } else if(params.fromDate) {
+                instance.fromDate = parseDate(params.fromDate);
+            }
+            log.debug "Parsing date ${params.fromDate}"
+            log.debug "got ${instance.fromDate}"
+
+            if(params.toDate && (params.toDate instanceof Date)) {
+                if(params.toDate == new Date(0)) {
+                    instance.toDate = instance.fromDate;
+                } else {
+                    instance.toDate = params.toDate;
+                }
+            } else if(params.toDate) {
+                instance.toDate = parseDate(params.toDate);
+            } else {
+                instance.toDate = instance.fromDate;
+            }
+       }
+
 
         String licenseStr = params.license_0?:params.license
         if(licenseStr) {
@@ -116,7 +146,7 @@ class AbstractMetadataService extends AbstractObjectService {
             instance.license = (new XMLConverter()).getLicenseByType(LicenseType.CC_BY, false)
         }
         instance.language = params.locale_language;
-        
+
         instance.externalId = params.externalId;
         instance.externalUrl = params.externalUrl;
         instance.viaId = params.viaId;
@@ -135,8 +165,10 @@ class AbstractMetadataService extends AbstractObjectService {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), grailsApplication.config.speciesPortal.maps.SRID);
         //        if(params.latitude && params.longitude) {
         //            instance.topology = geometryFactory.createPoint(new Coordinate(params.longitude?.toFloat(), params.latitude?.toFloat()));
-        //        } else 
-        if(params.areas) {
+        //        } else
+        if(params.topology) {
+            instance.topology = params.topology;
+        } else if(params.areas) {
             log.debug "Setting topology ${params.areas}"
             WKTReader wkt = new WKTReader(geometryFactory);
             try {
@@ -147,10 +179,14 @@ class AbstractMetadataService extends AbstractObjectService {
             }
         }
 
-        return instance;
+        if(params.dataTable && instance.metaClass.hasProperty(instance, 'dataTable') ) {
+            instance.dataTable = params.dataTable;
+        }
+
+       return instance;
     }
 
-    def save(instance, params, sendMail, feedAuthor, feedType, searchService) {
+    def save(instance, params, boolean sendMail, SUser feedAuthor, String feedType, searchService, String feedDesc=null) {
         log.debug( "saving instance with params assigned >>>>>>>>>>>>>>>>: "+ instance)
 
         instance.clearErrors();
@@ -158,7 +194,7 @@ class AbstractMetadataService extends AbstractObjectService {
         if (!instance.hasErrors() && instance.save(flush: true)) {
             //mailSubject = messageSource.getMessage("info.share.observation", null, LCH.getLocale())
             //String msg = messageSource.getMessage("instance.label", [instance.id], LCH.getLocale())
-            activityFeedService.addActivityFeed(instance, null, instance.author, feedType);
+            activityFeedService.addActivityFeed(instance, null, instance.getAuthor(), feedType, feedDesc);
             setAssociations(instance, params, sendMail);
             if(sendMail)
                 utilsService.sendNotificationMail(feedType, instance, null, params.webaddress);
@@ -175,41 +211,56 @@ class AbstractMetadataService extends AbstractObjectService {
                 def formattedMessage = messageSource.getMessage(it, null);
                 errors << [field: it.field, message: formattedMessage]
             }
-
+            println errors;
             def model = utilsService.getErrorModel("Failed to save ${instance}", instance, OK.value(), errors);
             return model;
         }
     }
 
     def setAssociations(instance, params, sendMail) {
-
+        log.debug "setAssociations tags"
         def tags = (params.tags != null) ? ((params.tags instanceof List) ? params.tags : Arrays.asList(params.tags)) : new ArrayList();
-        instance.setTags(tags)
-
-        if(params.groupsWithSharingNotAllowed) {
-            setUserGroups(instance, [params.groupsWithSharingNotAllowed], sendMail);
-        } else {
-            List validUserGroups = getValidUserGroups(instance, params.userGroupsList);
-            if(validUserGroups)
-                setUserGroups(instance, validUserGroups, sendMail);
+        if(tags) {
+            instance.setTags(tags)
         }
+        if(instance.metaClass.hasProperty(instance, "userGroups")) {
+            log.debug "setAssociations userGroups"
+            if(params.groupsWithSharingNotAllowed) {
+                setUserGroups(instance, [params.groupsWithSharingNotAllowed], sendMail);
+            } else {
+                List validUserGroups = getValidUserGroups(instance, params.userGroupsList);
+                if(validUserGroups)
+                    setUserGroups(instance, validUserGroups, sendMail);
+            }
+        }
+
+        /*if(instance.metaClass.hasProperty(instance, "dateAccuracy")) {
+            switch(instance.dateAccuracy) {
+                case DateAccuracy.UNKNOWN:
+                case DateAccuracy.APPROXIMATE :
+                    flagIt(instance, FlagType.DATE_INAPPROPRIATE, "Date is "+dateAccuracy.value());
+                    break;
+           }
+        } else {
+        }*/
+
     }
 
-    def setUserGroups(instance, List userGroupIds, boolean sendMail = true) {
+    def setUserGroups(instance, List userGroupIds, boolean sendMail = true, doFlush = true) {
 		if(!instance) return;
         userGroupIds = userGroupIds?.collect {(it instanceof Long) ? it : Long.parseLong(it)}
 		def instanceInUserGroups = instance.userGroups.collect { it.id }
 		def toRemainInUserGroups =  instanceInUserGroups.intersect(userGroupIds);
 		if(userGroupIds.size() == 0) {
 			log.debug 'removing instance from usergroups'
-			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
+			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail, doFlush);
 		} else {
 			userGroupIds.removeAll(toRemainInUserGroups)
             println "Adding resources to ${userGroupIds}"
-			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail);
+			userGroupService.addResourceOnGroups(instance, userGroupIds, sendMail, doFlush);
 			instanceInUserGroups.removeAll(toRemainInUserGroups)
             println "Removing from ${instanceInUserGroups}"
-			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail);
+			userGroupService.removeResourceOnGroups(instance, instanceInUserGroups, sendMail, doFlush);
 		}
 	}
 
@@ -223,6 +274,15 @@ class AbstractMetadataService extends AbstractObjectService {
         }
         List<UserGroup> userGroupsWithFilterRule = UserGroup.findAllByFilterRuleIsNotNull();
         userGroupIds.addAll(userGroupsWithFilterRule.collect {it.id})
+
+        //if instance is part of dataTable then all datatable usergroups
+        if(instance.metaClass.hasProperty(instance, 'dataTable') && instance.dataTable) {
+            userGroupIds.addAll(instance.dataTable.userGroups.collect {it.id});
+            if(instance.dataTable.dataset) {
+                userGroupIds.addAll(instance.dataTable.dataset.userGroups.collect {it.id});
+            }
+        }
+
         return new ArrayList(userGroupIds);
 
         /*boolean hasValidUserGroup = instance.metaClass.respondsTo(instance, "isUserGroupValidForPosting");
@@ -232,7 +292,7 @@ class AbstractMetadataService extends AbstractObjectService {
             userGroupsWithFilterRule.each { uGroup ->
                 if(instance.isUserGroupValidForPosting(uGroup))
                     validUserGroups << uGroup.id;
-                else 
+                else
                     userGroupIds.remove(uGroup.id);
             }
             if(userGroupIds) {
@@ -241,7 +301,7 @@ class AbstractMetadataService extends AbstractObjectService {
         }
         return validUserGroups;
         */
-        
+
     }
 
     Date parseDate(date){
@@ -249,7 +309,7 @@ class AbstractMetadataService extends AbstractObjectService {
     }
 
     boolean validateDwCA(String zipFile) {
-        
+
         def http = new HTTPBuilder()
         http.request( GBIF_DWCA_VALIDATOR, GET, JSON ) { req ->
             uri.query = [ archiveUrl:zipFile]
@@ -267,5 +327,28 @@ class AbstractMetadataService extends AbstractObjectService {
         }
     }
 
-
+    void flagIt(instance, FlagType flagType, String notes=null) {
+        log.info "Flagging instance ${instance}"
+        def flagInstance = Flag.findWhere(author: instance.author, objectId: instance.id, objectType:instance.class.getCanonicalName());
+        if (!flagInstance) {
+            try {
+                flagInstance = new Flag(objectId: instance.id, objectType: instance.class.getCanonicalName(), author: instance.author, flag:flagType, notes:notes)
+                if(!flagInstance.save(flush:true)){
+                    flagInstance.errors.allErrors.each { println it }
+                    return null
+                }
+                log.info "Saving flagCount"
+                instance.flagCount++
+                instance.save(flush:true)
+                log.info "Adding flagged activity"
+                def activityNotes = flagInstance.flag.value() + ( flagInstance.notes ? " \n" + flagInstance.notes : "")
+                def act = activityFeedService.addActivityFeed(instance, flagInstance, flagInstance.author, activityFeedService.OBSERVATION_FLAGGED, activityNotes);
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                e.printStackTrace();
+            }
+        } else {
+            log.error "object ${instance} is already flagged by author"
+        }
+    }
 }

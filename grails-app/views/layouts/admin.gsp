@@ -1,4 +1,4 @@
-<%@ page import="org.codehaus.groovy.grails.plugins.PluginManagerHolder"%>
+<%@ page import="grails.util.Holders"%>
 <%@ page
 	import="grails.plugin.springsecurity.SpringSecurityUtils"%>
 <%@ page import="grails.plugin.springsecurity.SecurityConfigType"%>
@@ -171,7 +171,7 @@
 								</li>
 							</ul></li>
 						<g:if
-							test="${PluginManagerHolder.pluginManager.hasGrailsPlugin('springSecurityAcl')}">
+							test="${Holders.pluginManager.hasGrailsPlugin('springSecurityAcl')}">
 							<li><a class="accessible"><g:message
 										code="spring.security.ui.menu.acl" /> </a>
 								<ul>

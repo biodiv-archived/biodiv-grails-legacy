@@ -15,7 +15,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         <asset:javascript src="jquery.js"/>
         <asset:javascript src="fileuploader.js"/>
         <asset:stylesheet href="application.css"/>
-        <asset:stylesheet src="/all/${org.codehaus.groovy.grails.commons.ConfigurationHolder.config.speciesPortal.app.siteCode}.css"/>
+        <asset:stylesheet src="/all/${grails.util.Holders.config.speciesPortal.app.siteCode}.css"/>
         <g:layoutHead />
         <ckeditor:resources />
 
@@ -46,7 +46,7 @@ import="grails.plugin.springsecurity.SpringSecurityUtils"%>
         </div>
         <div id="species_main_wrapper" style="clear: both;">
             <domain:showSiteHeader model="['userGroupInstance':userGroupInstance]" />
-            <g:if test ="${params.controller == 'namelist'||params.controller == 'trait'}">
+            <g:if test ="${params.controller == 'namelist'||params.controller == 'trait'||params.controller == 'dataset'||params.controller == 'dataTable'||(params.controller =='observation' && params.action == 'traits')||(params.controller =='species' && params.action == 'traits')}">
             <div class="container-fluid outer-wrapper">
             </g:if>
             <g:else>

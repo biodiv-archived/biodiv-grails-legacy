@@ -2,7 +2,6 @@ package species.participation
 
 import java.util.Date;
 import grails.converters.JSON;
-import grails.util.Holders;
 
 import species.auth.SUser;
 import speciespage.ObvUtilService;
@@ -10,7 +9,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap;
 import org.apache.commons.logging.LogFactory
 import org.apache.commons.logging.Log;
 import org.apache.log4j.Level;
-
+import grails.util.Holders;
 class UploadLog {
     private static Log log = LogFactory.getLog(this);
 
@@ -119,19 +118,46 @@ paramsMapAsText type:'text';
     }
 
     def writeLog = { String content, Level level=Level.DEBUG -> 
-        if(!logFilePath){
-            String contentRootDir = Holders.config.speciesPortal.content.rootDir;
-            String tmpFileName = (new File(filePath)).getName()+".log";
-            logFile = utilsService.createFile(tmpFileName, uploadType, contentRootDir)
+        File errorFile;
+        println "-------------------------________"
+        if(!logFilePath && filePath) {
+            println "===================="
+            println filePath
+
+            def config = Holders.config
+            String contentRootDir = config.speciesPortal.content.rootDir;
+            File ipFile = new File(filePath);
+            String tmpFileName = ipFile.getName()+".log";
+            logFile = ipFile.exists() ? new File(ipFile.getParent(), tmpFileName) : utilsService.createFile(tmpFileName, uploadType, contentRootDir)
             logFilePath = logFile.getAbsolutePath();
+            println 'Creating error file log-------------------';
+            errorFile = new File(ipFile.getParent(), ipFile.getName()+'.dev.log');
+            errorFilePath = errorFile.getAbsolutePath();
+ 
             if(!this.save(flush:true)){ 
                 this.errors.allErrors.each { log.error it }
             }
             println "----------------------- logFile path " + logFilePath
-        }
+            println "----------------------- logFile path " + errorFilePath
+       }
 
-        def ln = System.getProperty('line.separator');
-        logFile << "$ln${level.toString()} : $content";
-        utilsService.writeLog(content,level);
+       if(logFilePath) {
+           logFile = new File(logFilePath);
+       }
+
+       if(errorFilePath) {
+           errorFile = new File(errorFilePath);
+       }
+
+       def ln = System.getProperty('line.separator');
+       if(errorFile) {
+           errorFile << "$ln${level.toString()} : $content";
+       }
+       if(logFile) {
+           if(level.toInt() > Level.DEBUG.toInt()) {
+               logFile << "$ln${level.toString()} : $content";
+           }
+       }
+       utilsService.writeLog(content, level);
     }
 }

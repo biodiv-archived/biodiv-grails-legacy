@@ -23,7 +23,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import grails.plugin.springsecurity.SpringSecurityUtils;
 import grails.converters.JSON
-import static org.codehaus.groovy.grails.commons.ConfigurationHolder.config as Config
+import static grails.util.Holders.config as Config
 import org.springframework.http.HttpStatus
 import uk.co.desirableobjects.ajaxuploader.exception.FileUploadException
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -43,8 +43,8 @@ import content.eml.UFile;
 import org.springframework.web.servlet.support.RequestContextUtils as RCU;
 import species.License
 import species.License.LicenseType
-
-
+import grails.util.Holders;
+	
 class UFileController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -53,7 +53,7 @@ class UFileController {
     def springSecurityService;
     def grailsApplication
     def speciesUploadService;
-    def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+    def config = Holders.config
     def messageSource
     def speciesService;
 	String contentRootDir = config.speciesPortal.content.rootDir
@@ -113,18 +113,18 @@ class UFileController {
 			def url = g.createLinkTo(base:config.speciesPortal.content.serverURL, file: relPath)
             String fileExt = fileExtension(originalFilename);
             def res;
-            def xlsxFileUrl = null;
+            def xlsxFileUrl = url;
             def isSimpleSheet;
             //Conversion of excel to csv 
             //FIND out a proper method to detect excel
             def headerMetadata;
             if(params.fileConvert == "true" && (fileExt == "xls" || fileExt == "xlsx") ) {
-                xlsxFileUrl = url;
+                //xlsxFileUrl = url;
                 if(params.fromChecklist == "false") {
                     headerMetadata = getHeaderMetaDataInFormat(uploaded);
                     //println "======HEADER METADATA READ FROM FILE ===== " + headerMetadata;
                 }
-                res = convertExcelToCSV(uploaded, params)
+                res = convertExcelToCSV(uploaded, params, ",");
                 if(res != null) {
                     isSimpleSheet = res.get("isSimpleSheet")
                     relPath = res.get("relPath")
@@ -138,12 +138,15 @@ class UFileController {
             }
             log.debug "uploaded " + uploaded.absolutePath + " rel path " + relPath + " URL " + url
             //log.debug "url for uploaded file >>>>>>>>>>>>>>>>>>>>>>>>"+ url
-			return render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
+			render(text: [success:true, filePath:relPath, fileURL: url, fileSize:UFileService.getFileSize(uploaded), xlsxFileUrl: xlsxFileUrl, headerMetadata: headerMetadata, isSimpleSheet: isSimpleSheet ] as JSON, contentType:'text/html')
 		} catch (FileUploadException e) {
-
+            e.printStackTrace();
 			log.error("Failed to upload file.", e)
-			return render(text: [success:false] as JSON, contentType:'text/html')
-		}
+			render(text: [success:false] as JSON, contentType:'text/html')
+		} catch(Exception e) {
+            e.printStackTrace();
+			render(text: [success:false, 'msg':"Failed to upload file. Error:"+e.getMessage()] as JSON, contentType:'text/html')
+        }
 	}
 
 	/**
@@ -236,8 +239,8 @@ class UFileController {
 
 
 
-
-    def download = {
+	@Secured(['ROLE_USER'])
+    def download() {
 
         UFile ufile = UFile.get(params.id)
         if (!ufile) {
@@ -248,21 +251,20 @@ class UFileController {
             return
         }
 
-        def file = new File(ufile.path)
+        //def config = Hodlers.config
+        def file = new File(config.speciesPortal.content.rootDir+ufile.path)
         if (file.exists()) {
             log.debug "Serving file id=[${ufile.id}] for the ${ufile.downloads} to ${request.remoteAddr}"
-            ufile.downloads++
-            ufile.save()
+            //ufile.downloads++
+            //ufile.save()
             response.setContentType("application/octet-stream")
             response.setHeader("Content-disposition", "${params.contentDisposition}; filename=${file.name}")
             response.outputStream << file.readBytes()
             return
         } else {
-            def msg = messageSource.getMessage("fileupload.download.filenotfound", [ufile.name] as Object[], RCU.getLocale(request))
+            def msg = messageSource.getMessage("fileupload.download.nofile", [ufile.path] as Object[], RCU.getLocale(request))
             log.error msg
-            flash.message = msg
-            redirect controller: params.errorController, action: params.errorAction
-            return
+            render (['msg':msg] as JSON);
         }
     }
 
@@ -568,7 +570,7 @@ class UFileController {
         return res
     }
 
-    private Map convertExcelToCSV(File uploaded, params ) {
+    private Map convertExcelToCSV(File uploaded, params , String separator = ',') {
         def compContent
         def spread
         File outCSVFile = utilsService.createFile(outputCSVFile, params.uploadDir,contentRootDir)
@@ -581,16 +583,16 @@ class UFileController {
             def headerNameList = spread.get(0).collect {
                 StringEscapeUtils.escapeCsv(it.getKey());
             }
-            def  joinedHeader = headerNameList.join(",")
-            bw.write(joinedHeader + "\r\r\n\n")
+            def  joinedHeader = headerNameList.join(separator)
+            bw.write(joinedHeader +"\r\n")
 
             spread.each { rowMap->  
                 List rowValues = []
                 rowMap.each{
                     rowValues << StringEscapeUtils.escapeCsv(it.getValue());
                 }
-                def joinedContent = rowValues.join(",")
-                bw.write(joinedContent + "\r\r\n\n")
+                def joinedContent = rowValues.join(separator)
+                bw.write(joinedContent +"\r\n")
             }
         }else{
             compContent = SpreadsheetReader.readSpreadSheet(uploaded.absolutePath, 0)
@@ -616,8 +618,8 @@ class UFileController {
                 }
                 index = index + 1
             }
-            def  joinedHeader = headerRow.join(",")
-            bw.write(joinedHeader + "\r\r\n\n")
+            def  joinedHeader = headerRow.join(separator)
+            bw.write(joinedHeader +"\r\n")
             def counter = 0
             compContent.each{ stringRow ->
                 if(counter >= 4){
@@ -629,8 +631,8 @@ class UFileController {
                         }
                         k++;
                     }
-                    def joinedContent = rowValues.join(",")
-                    bw.write(joinedContent + "\r\r\n\n")
+                    def joinedContent = rowValues.join(separator)
+                    bw.write(joinedContent +"\r\n")
                 }
                 counter = counter + 1
             }

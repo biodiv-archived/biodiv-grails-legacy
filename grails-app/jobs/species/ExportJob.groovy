@@ -18,7 +18,8 @@ class ExportJob {
 	def checklistService
 	def speciesService
     def namelistService;
-	
+    def observationService;
+
     static triggers = {
         println "==========================Setting trigger for ExportJob";
       simple name:'ExportJob', startDelay: 600l, repeatInterval: 5000l // starts after 5 minutes and execute job once in 5 seconds 
@@ -38,8 +39,9 @@ class ExportJob {
 				
 				switch (dl.sourceType) {
 					case [OBSERVATION_LIST, UNIQUE_SPECIES]:
-						f = obvUtilService.export(dl.fetchMapFromText(), dl)
-						break
+					//Observation download is happeing from biodiv-api and elastic code
+						//f = obvUtilService.export(dl.fetchMapFromText(), dl)
+						return
 					case CHECKLIST:
 						f = checklistService.export(dl.fetchMapFromText(), dl)
 						break
@@ -50,6 +52,15 @@ class ExportJob {
                     case TAXONOMY_DEFINITION:
                         log.info "Initiating taxon definition names list export."
                         f = namelistService.export(dl.fetchMapFromText(), dl);
+                        break;
+                    case "Matching species":
+                        log.info "Initiating matching species list export."
+                        f = speciesService.exportMatchingSpeciesList(dl.fetchMapFromText(), dl);
+                        break;
+                    case "Matching observations":
+                        log.info "Initiating matching observations list export."
+                        f = observationService.exportMatchingObservationsList(dl.fetchMapFromText(), dl);
+                        break;
 					default:
 						log.debug "Invalid source Type $dl.sourceType"
 				}
@@ -95,8 +106,14 @@ class ExportJob {
 			return null
 		}
 		scheduledTaskList.each { DownloadLog dl ->
-			setStatus(dl, ObvUtilService.EXECUTING)
+			switch (dl.sourceType) {
+				case [OBSERVATION_LIST, UNIQUE_SPECIES]: 
+					return;
+				default :
+					setStatus(dl, ObvUtilService.EXECUTING);
+			}
 		}
+		
 		
 		return scheduledTaskList
 	}

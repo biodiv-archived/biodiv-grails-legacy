@@ -21,14 +21,22 @@ import static groovyx.net.http.ContentEncoding.Type.GZIP;
 import java.util.concurrent.TimeUnit
 import org.codehaus.groovy.grails.web.json.JSONException
 import com.the6hours.grails.springsecurity.facebook.FacebookAccessToken
-
+import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
+import org.pac4j.core.profile.CommonProfile;
+import org.springframework.security.authentication.CredentialsExpiredException
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+import species.auth.JwtAuthToken;
+import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 
 class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.FacebookAuthUtils {
 
-	private static def log = Logger.getLogger(this)
+	private static def log = Logger.getLogger(this);
 
 	def grailsApplication;
-    
+    def userDetailsService;
+
     /*private static final String AUTH_URL = "https://www.facebook.com/dialog/oauth"
     private static final String API_URL = "https://graph.facebook.com"
 
@@ -78,7 +86,6 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
                 }
             }
 
-            println "AccessToken response: $data"
             /*println responseStr
             Map data = [:]
             response.split('&').each {
@@ -105,6 +112,7 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
             } else {
               log.error("No expires in response: $data")
             }
+            println "Returning facebookAuthToken ${token}"
             //log.debug("Got AccessToken: $token")
             return token
         } catch (IOException e) {
@@ -124,5 +132,43 @@ class FacebookAuthUtils extends com.the6hours.grails.springsecurity.facebook.Fac
 		}
 	}
 
+    Cookie getJwtTokenCookie(HttpServletRequest request) {
+        String cookieName = "BAToken";
+        request.cookies?.find { Cookie it ->
+            FacebookAuthUtils.log.debug("Cookie $it.name, expected $cookieName")
+            it.name == cookieName
+        }
+    }
+    
+    JwtAuthToken buildJwtToken(String jwtToken) {
+        return new JwtAuthToken(jwtToken);
+    }
+
+    def authenticate(String jwtToken) {
+        def authenticator =  new JwtAuthenticator(new org.pac4j.jwt.config.signature.SecretSignatureConfiguration(JWT_SALT));
+        CommonProfile profile = authenticator.validateToken(jwtToken);
+        def token = new JwtAuthToken();
+        if(profile) {
+            def user = SUser.findByEmail(profile.email);
+            token.details = null
+            token.principal = userDetailsService.createUserDetails(user);
+            token.authenticated = true
+            token.authorities = (Collection<GrantedAuthority>)((UserDetails)principal).authorities;
+        } else {
+            token.authenticated = false
+        }
+        return token;
+    }
+
+    void logoutJwtAuth(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+		Cookie cookie2 = this.getJwtTokenCookie(httpServletRequest)
+		if (cookie2 != null) {
+            cookie2.value = false
+			cookie2.maxAge = 0
+			cookie2.path = grailsApplication.config.speciesPortal.api.cookie.path;
+			cookie2.domain = grailsApplication.config.speciesPortal.api.cookie.domain;
+			httpServletResponse.addCookie(cookie2)
+		}
+	}
 }
 

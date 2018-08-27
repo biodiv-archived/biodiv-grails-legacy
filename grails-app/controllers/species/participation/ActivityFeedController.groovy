@@ -68,7 +68,11 @@ class ActivityFeedController {
 	}
 	
 	def list() {
-		['feedType':params.feedType, 'feedCategory':params.feedCategory]
+        String feedType = params.feedType;
+        if(params.webaddress) {
+            feedType = ActivityFeedService.GROUP_SPECIFIC;
+        }
+		['feedType':feedType, 'feedCategory':params.feedCategory]
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

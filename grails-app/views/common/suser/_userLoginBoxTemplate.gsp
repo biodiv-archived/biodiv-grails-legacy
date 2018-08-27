@@ -59,8 +59,8 @@
 					title="Groups"><i
 						class="icon-user"></i><g:message code="link.my.groups" /> <sup><g:message code="msg.beta" /></sup> </a> <uGroup:getCurrentUserUserGroupsSidebar />
 				</li>
-				<li><a id="logout" class="${(false)?'isSubGroup':'isParentGroup'}"
-					href="${uGroup.createLink(controller:'logout', 'userGroup':userGroup, 'userGroupWebaddress':userGroupWebaddress) }"><i
+				<li><a id="logout" class="${(false)?'isSubGroup':'isParentGroup'}">
+                    <i
 						class="icon-off"></i><g:message code="button.logout" /></a></li>
 
 			</ul></li>
