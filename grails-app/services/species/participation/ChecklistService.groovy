@@ -26,7 +26,7 @@ import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
 import species.sourcehandler.XMLConverter;
 import species.formatReader.SpreadsheetReader;
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
+import grails.util.Holders.ConfigurationHolder;
 
 //pdf related
 import au.com.bytecode.opencsv.CSVWriter
