@@ -14,7 +14,7 @@ class TraitTranslation {
 		name(nullable:true);
 		source(nullable:true);
 		language nullable:false;
-		trait nullable:false;		
+		traitInstance nullable:false;		
 	}
 
 	static mapping = {
