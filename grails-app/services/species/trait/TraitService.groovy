@@ -125,13 +125,13 @@ class TraitService extends AbstractObjectService {
                 rowNo++;
                 continue;
             }*/
-            dl.writeLog("============================================\n", Level.INFO);            
-            dl.writeLog("Processing row (${rowNo}) : " + row, Level.INFO);            
+            dl.writeLog("============================================\n", Level.INFO);
+            dl.writeLog("Processing row (${rowNo}) : " + row, Level.INFO);
 
             List taxons_scope = [];
-            row[taxonIdHeaderIndex].tokenize(",").each { taxonId -> 
+            row[taxonIdHeaderIndex].tokenize(",").each { taxonId ->
                 taxonId = taxonId.replaceAll('"','');
-                try { 
+                try {
                     TaxonomyDefinition t = TaxonomyDefinition.read(Long.parseLong(taxonId?.trim()));
                     if(t) taxons_scope << t;
                     else {
@@ -155,13 +155,13 @@ class TraitService extends AbstractObjectService {
                     if(traitInstance && languageInstance){
                         traitTranslation = TraitTranslation.findByTraitAndLanguage(traitInstance, languageInstance);
                         if(!traitTranslation){
-                            traitTranslation = new TraitTranslation();  
-                            isTranslate = true;          
+                            traitTranslation = new TraitTranslation();
+                            isTranslate = true;
                         }
                     }else{
                         if(taxon_scope.size() == 1) {
                             traitInstance = Trait.executeQuery("select t from Trait t join t.taxon taxon where t.name=? and taxon = ?", [row[traitNameHeaderIndex],  taxons_scope[0]]);
-                            dl.writeLog("Updating trait ${traitInstance} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");    
+                            dl.writeLog("Updating trait ${traitInstance} with name ${row[traitNameHeaderIndex]} and taxon ${taxon_scope}");
                         } else {
                             dl.writeLog("Trait id is required to update trait ${row[traitNameHeaderIndex]}", Level.ERROR);
                         }
@@ -185,18 +185,18 @@ class TraitService extends AbstractObjectService {
                         case 'trait' :
                         //traitInstance = Trait.findByName(value.toLowerCase().trim())
                         //if(!traitInstance){trait.name = value.toLowerCase().trim();}
-                        //else{i 
+                        //else{i
                         if(!isTranslate && !traitInstance.name) trait.name = value.trim();
                         traitTranslation.name=value.trim();
                         //}
                         break;
 
-                        /*case 'values' : 
+                        /*case 'values' :
                        if(!traitInstance){traitInstance.values = value.trim()}
                         else{traitInstance.values = value.trim()}
                         break;
                          */
-                        case 'datatype': 
+                        case 'datatype':
                         if(!isTranslate) traitInstance.dataTypes = Trait.fetchDataTypes(value.trim());
                         break;
 
@@ -204,15 +204,15 @@ class TraitService extends AbstractObjectService {
                         if(!isTranslate) traitInstance.traitTypes = Trait.fetchTraitTypes(value.trim());
                         break;
 
-                        case 'units' : 
+                        case 'units' :
                         if(!isTranslate) traitInstance.units = Trait.fetchUnits(value.trim());
                         break;
 
-                        case 'trait source' : 
+                        case 'trait source' :
                         if(!isTranslate) traitInstance.source = value.trim();
                         break;
 
-                        case 'trait icon' : 
+                        case 'trait icon' :
                         if(!isTranslate) traitInstance.icon = migrateIcons(value.trim(), traitResourceDir, resourceFromDir);
                         break;
 
@@ -246,10 +246,10 @@ class TraitService extends AbstractObjectService {
                         break;
 
 
-                    } 
+                    }
                 }
                 if(dataTable) {
-                    traitInstance.dataTable = dataTable;//DataTable.read(Long.parseLong(''+m['dataTable'])); 
+                    traitInstance.dataTable = dataTable;//DataTable.read(Long.parseLong(''+m['dataTable']));
                 }
 
                 if(!traitInstance.hasErrors() && traitInstance.save(flush:true)) {
@@ -259,7 +259,7 @@ class TraitService extends AbstractObjectService {
                     traitTranslation.trait = traitInstance;
                     if(!traitTranslation.hasErrors() && traitTranslation.save(flush:true)) {
                         println "Successfully inserted/updated traitTranslation"
-                        dl.writeLog("Successfully inserted/updated traitTranslation");                        
+                        dl.writeLog("Successfully inserted/updated traitTranslation");
                     }else{
                         dl.writeLog("Failed to save TraitTranslation", Level.ERROR);
                         println "Failed to save TraitTranslation"
@@ -267,8 +267,8 @@ class TraitService extends AbstractObjectService {
                     }
                 } else {
                     dl.writeLog("Failed to save trait", Level.ERROR);
-                    traitInstance.errors.allErrors.each { 
-                        dl.writeLog(it.toString(), Level.ERROR); 
+                    traitInstance.errors.allErrors.each {
+                        dl.writeLog(it.toString(), Level.ERROR);
                     }
 
                 }
@@ -285,6 +285,7 @@ class TraitService extends AbstractObjectService {
         dl.writeLog("====================================\nLoaded ${noOfTraitsLoaded} traits\n====================================\n", Level.INFO);
         return ['success':true, 'msg':"Loaded ${noOfTraitsLoaded} traits."];
      }
+   }
 
     private Field getField(String string, Language languageInstance) {
         if(!string) return null;
@@ -301,7 +302,7 @@ println f
             field = Field.findByLanguageAndConceptAndCategory(languageInstance, f[0].trim(), f[1].trim());
         } else  if (f.size() == 3) {
             field = Field.findByLanguageAndConceptAndCategoryAndSubCategory(languageInstance, f[0].trim(), f[1].trim(), f[2].trim());
-        } 
+        }
         return field;
     }
 
@@ -316,7 +317,7 @@ println f
         dl.writeLog("Loading trait values from ${file}", Level.INFO);
         List reqdHeaders = ['trait', 'value'];
         return validateSpreadsheetHeaders(file, dl, reqdHeaders);
-    }   
+    }
 
     Map uploadTraitValues(String file, UploadLog dl, Language languageInstance, DataTable dataTable=null) {
         int noOfValuesLoaded=0;
@@ -375,14 +376,14 @@ println f
         SpreadsheetReader.readSpreadSheet(new File(file).getAbsolutePath()).get(0).eachWithIndex { row, rowNo ->
 
             /*if(row[traitNameHeaderIndex] == null || row[traitNameHeaderIndex] == '' || row[valueHeaderIndex] == null || row[valueHeaderIndex] == '') {
-                dl.writeLog("============================================\n", Level.INFO);            
+                dl.writeLog("============================================\n", Level.INFO);
                 dl.writeLog("Ignoring row (${rowNo})" + row, Level.WARN);
                 row = reader.readNext();
                 rowNo++;
                 return;
             }*/
-            dl.writeLog("============================================\n", Level.INFO);            
-            dl.writeLog("Processing row (${rowNo})" + row, Level.INFO);            
+            dl.writeLog("============================================\n", Level.INFO);
+            dl.writeLog("Processing row (${rowNo})" + row, Level.INFO);
 
 
 
@@ -430,7 +431,7 @@ println f
             }
             traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), traitInstance);
 
-            if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {                
+            if(row[updateHeaderIndex]?.equalsIgnoreCase('update')) {
                 traitValue = TraitValue.get(Long.parseLong(row[valueIdHeaderIndex].trim()))
                 if(traitValue){
                     traitValueTranslation = TraitValueTranslation.findByTraitValueAndLanguage(traitValue,languageInstance);
@@ -464,21 +465,21 @@ println f
                     if(!isTranslate) traitValue.value=value.trim();
                     traitValueTranslation.value=value.trim();
                     break;
-                    case 'value source' : 
+                    case 'value source' :
                     traitValue.source=value.trim()
                     traitValueTranslation.source=value.trim();
                     break;
-                    case 'value icon' : 
+                    case 'value icon' :
                     if(!isTranslate) traitValue.icon=migrateIcons(value.trim(),traitResourceDir, resourceFromDir);
                     break;
-                    case 'value definition' : 
+                    case 'value definition' :
                     traitValue.description=value.trim()
                     traitValueTranslation.description=value.trim();
                     break;
-                    //case 'taxon id' : 
+                    //case 'taxon id' :
                     //traitValue.taxon = taxon
                     break;
-                } 
+                }
             }
 
             if(dataTable) {
@@ -491,7 +492,7 @@ println f
                 traitValueTranslation.traitValue = traitValue;
                 if(!traitValueTranslation.hasErrors() && traitValueTranslation.save(flush:true)) {
                     println "------------------------Successfully inserted/updated traitValueTranslation"
-                    dl.writeLog("Successfully inserted/updated traitValueTranslation");                        
+                    dl.writeLog("Successfully inserted/updated traitValueTranslation");
                 }else{
                     dl.writeLog("Failed to save traitValueTranslation", Level.ERROR);
                     println "Failed to save traitValueTranslation"
@@ -499,8 +500,8 @@ println f
                 }
             }else {
                 dl.writeLog("Failed to save trait value", Level.ERROR);
-                traitValue.errors.allErrors.each { 
-                    dl.writeLog(it.toString(), Level.ERROR); 
+                traitValue.errors.allErrors.each {
+                    dl.writeLog(it.toString(), Level.ERROR);
                 }
             }
 
@@ -513,7 +514,7 @@ println f
 
     Map getFilteredList(def params, int max, int offset) {
 
-        def queryParts = getFilterQuery(params) 
+        def queryParts = getFilterQuery(params)
         String query = queryParts.query;
         long allInstanceCount = 0;
 
@@ -546,7 +547,7 @@ println f
         allInstanceCountQuery.setProperties(queryParts.queryParams)
         allInstanceCount = allInstanceCountQuery.list()[0]
 
-        if(!queryParts.queryParams.trait) 
+        if(!queryParts.queryParams.trait)
         queryParts.queryParams.trait = params.trait;
 
         Sql sql = Sql.newInstance(dataSource);
@@ -582,7 +583,7 @@ println f
             queryParams['fetchField'] = params.fetchField
         }else if(params.filterProperty == 'nearByRelated' && !params.bounds) {
             query += " g2 "
-        } 
+        }
         else {
             query += " obv "
         }
@@ -630,7 +631,7 @@ println f
                 List<TaxonomyDefinition> taxons = [];
                 List s = [];
                 params.sGroup.split(',').each {
-                    Long x = Long.parseLong(it); 
+                    Long x = Long.parseLong(it);
                     def y = SpeciesGroup.read(x)?.getTaxon();
                     if(y)
                         taxons.addAll(y);
@@ -643,14 +644,14 @@ println f
 
                 if(!classification)
                     classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
-                
+
                 List parentTaxon = [];
                 taxons.each {taxon ->
                     if(taxon) {
                         parentTaxon.addAll(taxon.parentTaxonRegistry(classification).get(classification).collect {it.id});
                     }
                 }
-                queryParams['classification'] = classification.id; 
+                queryParams['classification'] = classification.id;
                 queryParams['sGroup'] = s;
                 queryParams['parentTaxon'] = parentTaxon ;
                 //queryParams['taxons'] = taxons;
@@ -659,10 +660,10 @@ println f
 
                 if(params.showInObservation && params.showInObservation.toBoolean()){
                     filterQuery += ' and obv.showInObservation = :showInObservation '
-                    queryParams['showInObservation'] = true ; 
+                    queryParams['showInObservation'] = true ;
                 }
 
- 
+
                 taxonQuery = " left join obv.taxon taxon left join taxon.hierarchies as reg, SpeciesGroupMapping sgm ";
                 query += taxonQuery;
                 String inQuery = '';
@@ -671,7 +672,7 @@ println f
                 } else if(params.sGroup == allSGroupId) {
                     filterQuery += " ";// and reg.classification.id = :classification and ( ${inQuery} ) and taxon is null  ";
                 } else if(parentTaxon) {
-                    inQuery = " taxon.id in (:parentTaxon) or " 
+                    inQuery = " taxon.id in (:parentTaxon) or "
                     filterQuery += " and (taxon is null or (reg.classification.id = :classification and ( ${inQuery} (cast(sgm.taxonConcept.id as string) = reg.path or reg.path like '%!_'||sgm.taxonConcept.id||'!_%' escape '!' or reg.path like sgm.taxonConcept.id||'!_%'  escape '!' or reg.path like '%!_' || sgm.taxonConcept.id escape '!'))) and sgm.speciesGroup.id in (:sGroup)) ";
                 }
 
@@ -695,7 +696,7 @@ println f
                 if(!classification)
                     classification = Classification.findByName(grailsApplication.config.speciesPortal.fields.IBP_TAXONOMIC_HIERARCHY);
 
-                queryParams['classification'] = classification.id; 
+                queryParams['classification'] = classification.id;
                 activeFilters['classification'] = classification.id;
                 List parentTaxon = taxon.parentTaxonRegistry(classification).get(classification).collect {it.id};
                 if(parentTaxon) {
@@ -755,15 +756,15 @@ println f
 
     def getAllFilter(filters){
         def traitInstance,traitValue,traitFilter=[:];
-        filters.each{ f -> 
+        filters.each{ f ->
             traitInstance = Trait.findByName(f);
-            if(traitInstance){ 
+            if(traitInstance){
                 traitValue = TraitValue.findAllByTraitInstance(traitInstance);
-                traitFilter[""+traitInstance.name]=traitValue          
+                traitFilter[""+traitInstance.name]=traitValue
             }
         }
         return traitFilter
-    }    
+    }
 
     List createTraitValues(Trait traitInstance, params){
 
@@ -777,7 +778,7 @@ println f
             traitValueInstance.trait = traitInstance
             traitValueInstance.icon = getTraitIcon(params["icon_"+i])
 
-            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {               
+            if (!traitValueInstance.hasErrors() && traitValueInstance.save(flush: true)) {
                 def msg = "Trait Value Added Successfully"
                 updateTraitValueTranslation(traitValueInstance,params.languageInstance);
             }
@@ -787,12 +788,13 @@ println f
                     def formattedMessage = messageSource.getMessage(it, null);
                     log.error formattedMessage
                 }
-     
-            traitValues << traitValueInstance; 
+
+            traitValues << traitValueInstance;
         }
         return traitValues;
     }
-    
+  }
+
     Map saveTraitValues(List<TraitValue> traitValues) {
         log.debug "saving trait values";
         def valueCount = traitValues.size();
@@ -810,10 +812,10 @@ println f
             }
         }
         return result;
-       
+
     }
 
-    private String getTraitIcon(String icon) {    
+    private String getTraitIcon(String icon) {
         if(!icon) return;
         def resource = null;
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
@@ -866,7 +868,7 @@ println f
                         log.error e.getMessage();
                         errors << [message:e.getMessage()];
                     }
-                } 
+                }
                 else {
                     messageCode = 'default.not.found.message'
                     url = utilsService.generateLink(params.controller, 'list', [])
@@ -888,7 +890,7 @@ println f
         if(!icon) return;
         def rootDir = grailsApplication.config.speciesPortal.traits.rootDir
         File file = utilsService.getUniqueFile(usersDir, Utils.generateSafeFileName(icon));
-        if(!fromDir) fromDir = grailsApplication.config.speciesPortal.content.rootDir; 
+        if(!fromDir) fromDir = grailsApplication.config.speciesPortal.content.rootDir;
         File fi = new File(fromDir+"/icons/"+icon);
         if(fi.exists()) {
             (new AntBuilder()).copy(file: fi, tofile: file)
