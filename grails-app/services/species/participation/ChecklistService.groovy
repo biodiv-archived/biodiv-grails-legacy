@@ -26,7 +26,7 @@ import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
 import species.sourcehandler.XMLConverter;
 import species.formatReader.SpreadsheetReader;
-
+import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
 //pdf related
 import au.com.bytecode.opencsv.CSVWriter
@@ -742,7 +742,7 @@ class ChecklistService {
 	}
 	
 	def migrateChecklistToDataTable(){
-        dataSource.setUnreturnedConnectionTimeout(10000000);
+        //dataSource.setUnreturnedConnectionTimeout(10000000);
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 		List clIdList = Checklists.listOrderById(order: "asc").collect{it.id}
@@ -796,7 +796,7 @@ if(!contributor)
                 dataTable.viaCode = cl.viaCode;
                 dataTable.checklistId = cl.id; 
                 //uFile
-                def config = org.codehaus.groovy.grails.commons.ConfigurationHolder.config
+                def config = ConfigurationHolder.config
                 if(cl.rawChecklist) {
                     String contentRootDir = config.speciesPortal.content.rootDir;
                     try{
