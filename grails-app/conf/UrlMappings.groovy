@@ -1,5 +1,4 @@
 import org.gualdi.grails.plugins.ckeditor.CkeditorConfig
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.springframework.context.i18n.LocaleContextHolder as LCH;
 
@@ -50,7 +49,7 @@ class UrlMappings {
                 action = [GET:"show", PUT:"update", DELETE:"delete"]
                 constraints { id matches: /\d+/ }
             }
-            "/user/$id/$action"( controller : 'SUser') 
+            "/user/$id/$action"( controller : 'SUser')
             "/user/$action" {
                 controller = 'SUser'
                 constraints {
@@ -76,7 +75,7 @@ class UrlMappings {
             }
 
             "/related/$controller/$filterProperty?/$filterPropertyValue?" (action:'related', method:'GET')
-            
+
 
             "/$controller"( action:'index', method:'GET')
             "/$controller"( action:'save', method:'POST')
@@ -117,47 +116,47 @@ class UrlMappings {
 		"/logout/$action?"(controller: "logout")
 
         //DONOT REMOVE
-		"/$controller/$action?/$id?(.${format})?"{ 
+		"/$controller/$action?/$id?(.${format})?"{
             constraints { id matches: /\d+/ }
         }
 		"/static/$path"(controller:"species", action:"staticContent")
-		
-	
+
+
 		name pages:"/pages" {
 			controller = 'userGroup'
 			action = 'pages'
 		}
-		
+
 		name page:"/page/$newsletterId" {
 			controller = 'userGroup'
 			action = 'pages'
 		}
-	
-       
+
+
 		//just for replacement sake in taglib..not to be used for mapping
 		name onlyUserGroup:"/group/$webaddress" {
 			controller='userGroup'
 			action='index'
 		}
-		
+
 		//to match /group/list
 		name userGroupGeneric: "/group/$action" {
 			controller = 'userGroup'
 		}
 
         name userGroupModule:"/group/$webaddress/$controller/$action?/$id?" {
-	        method='*'	
+	        method='*'
 		}
-		
+
 		name userGroupPageShow: "/group/$webaddress/page/$newsletterId" {
 			controller = 'userGroup'
 			action = 'pages'
 		}
-		
+
 		name userGroup: "/group/$webaddress/$action" {
 			controller = 'userGroup'
 		}
-	
+
         group("/group") {
             "/$webaddress/user/list" {
                 controller='userGroup'
@@ -205,7 +204,7 @@ class UrlMappings {
 			controller = 'emailConfirmation'
 			action = "index"
 		}
-   
+
     "/rating/rate/$id" {
         controller = "rating"
         action = "rate"
@@ -239,15 +238,15 @@ class UrlMappings {
     delegate.(prefix + "/biodivofm/filemanager") (controller: "biodivOpenFileManagerConnector", action: "fileManager")
 
     // Images outside the web-app dir
-    if (uploadPrefix) { 
+    if (uploadPrefix) {
         delegate.(uploadPrefix + "/$filepath**") (controller: "biodivOpenFileManagerConnector", action: "show")
     }
-    
+
 
     "/admin/manage/$action?"(controller: "adminManage")
     "/adminManage/$action?"(controller: "errors", action: "urlMapping")
 
-   
+
     "/wikwio/partners" (view:'/portal/en/partners')
     "/wikwio/donors" (view:'/portal/en/donors')
     "/wikwio/team" (view:'/portal/en/team')
@@ -257,7 +256,6 @@ class UrlMappings {
     "/wikwio/citation" (view:'/portal/en/citation')
     "/wikwio/feedback" (view:'/portal/en/feedback')
     "/wikwio/contact" (view:'/portal/en/contact')
- 
 
 
 
@@ -265,7 +263,8 @@ class UrlMappings {
 
 
 
-     
+
+
     }
 
 }

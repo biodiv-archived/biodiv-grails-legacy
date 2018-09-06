@@ -255,7 +255,7 @@ class ObservationsSearchService extends AbstractSearchService {
                                                    left join recommendation r on obv.max_voted_reco_id=r.id
                                                    left join taxonomy_definition t on r.taxon_concept_id=t.id
                                                    left join taxonomy_registry tres on tres.taxon_definition_id=t.id
-                                                    where (tres.classification_id=265799 or tres.classification_id=null)
+                                                    where (tres.classification_id=6 or tres.classification_id=null)
                                                     and obv.id in ( """+sids+""" )""";
 
 

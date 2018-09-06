@@ -444,7 +444,7 @@ println f
             }
 
 
-            TraitValue traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), traitInstance);
+           traitValue = TraitValue.findByValueAndTrait(row[valueHeaderIndex].trim(), traitInstance);
 
             if(!traitValue && !traitValueTranslation) {
                 dl.writeLog("Creating new trait value ${row[valueHeaderIndex]} for trait ${trait.name}", Level.INFO);
