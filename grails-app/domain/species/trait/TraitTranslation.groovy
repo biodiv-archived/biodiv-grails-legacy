@@ -6,7 +6,7 @@ class TraitTranslation {
 	String name;
 	String source;
 	Language language;
-	Trait trait;
+	Trait traitInstance;
 
 
 	static constraints = {
