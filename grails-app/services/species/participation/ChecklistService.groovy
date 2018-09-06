@@ -26,7 +26,7 @@ import species.participation.RecommendationVote.ConfidenceType;
 import species.utils.Utils;
 import species.sourcehandler.XMLConverter;
 import species.formatReader.SpreadsheetReader;
-import grails.util.Holders.ConfigurationHolder;
+import grails.util.Holders;
 
 //pdf related
 import au.com.bytecode.opencsv.CSVWriter
@@ -796,7 +796,7 @@ if(!contributor)
                 dataTable.viaCode = cl.viaCode;
                 dataTable.checklistId = cl.id; 
                 //uFile
-                def config = ConfigurationHolder.config
+                def config = Holders.config
                 if(cl.rawChecklist) {
                     String contentRootDir = config.speciesPortal.content.rootDir;
                     try{
