@@ -821,7 +821,7 @@ environments {
     }
     kk {
         servername = 'biodiversity.bt'
-        grails.serverURL = "http://${servername}/${appName}"
+        grails.serverURL = "http://${servername}"
 
         speciesPortal {
             app.rootDir = "/apps/biodiv"
