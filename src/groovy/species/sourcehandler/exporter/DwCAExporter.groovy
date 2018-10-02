@@ -793,7 +793,7 @@ class DwCAExporter {
      *
      */
     private void cleanUpGorm() {
-        def ctx = grails.util.Holders.getApplication().getMainContext();
+        def ctx = grails.util.Holders.getGrailsApplication().getMainContext();
         SessionFactory sessionFactory = ctx.getBean("sessionFactory")
         def hibSession = sessionFactory?.getCurrentSession()
         if(hibSession) {
