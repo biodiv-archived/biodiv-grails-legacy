@@ -54,3 +54,7 @@ ehthumbs.db
 Thumbs.db
 .swp
 .gsp~
+
+.slcache
+.idea
+.directory

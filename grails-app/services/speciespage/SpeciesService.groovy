@@ -655,7 +655,9 @@ class SpeciesService extends AbstractObjectService  {
         }
     }
 
-
+    /*
+     * Add or Update Species Reference - first it will find reference by string in DB if not found then add it as new
+     */
     private def updateSpeciesReference(referenceId, long speciesId, long fieldId, def value) {
         String msg = '';
         def content;
@@ -669,8 +671,11 @@ class SpeciesService extends AbstractObjectService  {
                 return [success:false, msg:messageSource.getMessage("info.reference.id.not.found", messagesourcearg, LCH.getLocale())]
             }
 
-            Field field = Field.read(fieldId);       
+            Field field = Field.read(fieldId);
             speciesField = SpeciesField.findByFieldAndSpeciesAndDescription(field,speciesInstance,value);
+            if(!speciesField){
+                speciesField = SpeciesField.findByFieldAndSpecies(field,speciesInstance);
+            }
             if(!speciesField){
                 speciesField = createNewSpeciesField(speciesInstance, field, "dummy");
             }
