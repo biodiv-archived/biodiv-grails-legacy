@@ -672,6 +672,9 @@ class SpeciesService extends AbstractObjectService  {
             Field field = Field.read(fieldId);       
             speciesField = SpeciesField.findByFieldAndSpeciesAndDescription(field,speciesInstance,value);
             if(!speciesField){
+                speciesField = SpeciesField.findByFieldAndSpecies(field,speciesInstance);
+            }
+            if(!speciesField){
                 speciesField = createNewSpeciesField(speciesInstance, field, "dummy");
             }
             def references = [];        
