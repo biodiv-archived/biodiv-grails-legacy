@@ -68,7 +68,7 @@ abstract class AbstractSearchService {
         def URL=searchConfig.search.nakshaURL;
         def http = new HTTPBuilder(URL)
         http.request(POST,ContentType.JSON) {
-            uri.path = "/naksha/services/bulk-upload/${index}/${index}";
+            uri.path = "/esmodule/v1/services/bulk-upload/${index}/${index}";
             body = doc
             response.success = { resp, reader ->
                 log.debug "Successfully posted observation  to elastic"
