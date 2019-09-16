@@ -101,6 +101,7 @@
                             <a href="http://strandls.com/"><img class="img-polaroid" src="/sites/default/files/strand.png"></a>
                             <a href="http://www.wwfindia.org/"><img class="img-polaroid" src="/sites/default/files/wwf_standard.png"></a>
                             <a href="http://zooreach.org/"><img class="img-polaroid" src="/sites/default/files/zoo_standard.png"></a>
+                            <a href="http://strandlifefoundation.org"><img class="img-polaroid" src="/sites/default/files/metastring_standard.jpg"></a>
 
             </div>
             </div>
