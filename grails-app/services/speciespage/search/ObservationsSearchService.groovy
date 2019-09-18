@@ -680,7 +680,7 @@ def rgbToHSV(red, green, blue) {
 
         def http = new HTTPBuilder(URL)
         http.request(Method.POST, groovyx.net.http.ContentType.JSON) {
-            uri.path = "/esmodule/v1/services/bulk-upload/observation/observation";
+            uri.path = "/esmodule-api/api/v1/services/bulk-upload/observation/observation";
             body = doc
             response.success = { resp, reader ->
                 log.debug "Successfully posted observation  to elastic"
